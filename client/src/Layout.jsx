@@ -1,7 +1,7 @@
 import Header from "./Header";
 import { Outlet } from "react-router-dom";
 import Footer from "./Footer";
-import LoginPage from "./pages/LoginPage";
+import LoginPage from "./pages/authPages/LoginPage";
 
 const Layout = () => {
   return (
