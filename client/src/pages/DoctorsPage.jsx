@@ -13,7 +13,7 @@ const DoctorsPage = () => {
   };
 
   return (
-    <div className="flex justify-center pt-20">
+    <div className="flex justify-center pt-10">
       {" "}
       {/* Increased padding-top to pt-20 */}
       {/* Main container for centering the card with border and animation */}
@@ -29,7 +29,7 @@ const DoctorsPage = () => {
         {/* Content section of the card */}
         <div className="p-5">
           {/* Doctor's name */}
-          <h5 className="text-2xl font-bold tracking-tight text-gray-900">
+          <h5 className="text-2xl font-bold text-teal-500 tracking-tight text-gray-900">
             {doctor.name}
           </h5>
           {/* Doctor's specialization */}
@@ -38,9 +38,9 @@ const DoctorsPage = () => {
           </p>
           {/* Contact information */}
           <div className="flex flex-col space-y-2">
-            <p className="text-gray-600">Phone: {doctor.phone}</p>
-            <p className="text-gray-600">Email: {doctor.email}</p>
-            <p className="text-gray-600">Address: {doctor.address}</p>
+            <p className="text-gray-800">Phone: {doctor.phone}</p>
+            <p className="text-gray-900">Email: {doctor.email}</p>
+            <p className="text-gray-700">Address: {doctor.address}</p>
           </div>
         </div>
       </div>

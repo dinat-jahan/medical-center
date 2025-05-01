@@ -11,3 +11,6 @@ input[type="password"] {
 button {
   @apply w-full border border-primary bg-primary text-white font-poetsen rounded-2xl py-2;
 }
+.addMember{
+  @apply text-teal-500;
+}
