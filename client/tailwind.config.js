@@ -11,6 +11,7 @@ export default {
       },
       colors: {
         primary: "#A31D1D",
+      
       },
     },
   },

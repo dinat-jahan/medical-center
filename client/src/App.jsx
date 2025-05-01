@@ -6,9 +6,12 @@ import ServicePage from "./pages/ServicePage";
 import DoctorsPage from "./pages/DoctorsPage";
 import MedicalStaffsPage from "./pages/MedicalStaffsPage";
 import ContactPage from "./pages/ContactPage";
+import AddMember from "./pages/universityAdminPages/AddMember";
+import RegisterPage from "./pages/RegisterPage"
 
 function App() {
   return (
+  
     <Routes>
       <Route path="/login" element={<LoginPage />} />{" "}
       {/* Login page as a separate route */}
@@ -18,6 +21,8 @@ function App() {
         <Route path="/doctors" element={<DoctorsPage />} />
         <Route path="/medical-staffs" element={<MedicalStaffsPage />} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="/add-member" element={<AddMember/>} />
+        <Route path="/register" element={<RegisterPage/>}/>
       </Route>
     </Routes>
   );

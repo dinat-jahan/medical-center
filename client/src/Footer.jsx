@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FaArrowUp } from "react-icons/fa"; // Importing Font Awesome icons
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   const [isVisible, setIsVisible] = useState(false); // State to manage visibility of the "Go to Top" button
@@ -30,34 +31,37 @@ const Footer = () => {
   }, []); // Empty dependency array ensures this effect runs only once after the initial render and cleans up on unmount
 
   return (
-    <footer className="bg-gray-800 text-gray-300 py-8 relative">
-      <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+    <footer className="bg-gray-800 text-gray-300 py-8 relative ">
+      <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 pl-10">
         <div>
           <h6 className="text-lg font-semibold mb-4">Important Links</h6>
           <ul className="list-none">
             <li className="mb-2">
-              <a href="#" className="hover:text-blue-400">
+              <Link to="about-us" className="hover:text-blue-400">
                 About us
-              </a>
+              </Link>
             </li>
             <li className="mb-2">
-              <a href="#" className="hover:text-blue-400">
+              <Link to="doctors" className="hover:text-blue-400">
                 Doctors
-              </a>
+              </Link>
             </li>
             <li className="mb-2">
-              <a href="#" className="hover:text-blue-400">
+              <Link to="medical-staffs" className="hover:text-blue-400">
                 Medical Staffs
-              </a>
+              </Link>
             </li>
             <li className="mb-2">
-              <a href="#" className="hover:text-blue-400">
+              <Link to="services" className="hover:text-blue-400">
                 Services
-              </a>
+              </Link>
+            </li>
+            <li>
+              <Link to="add-member"  className="hover:text-blue-400">Add member</Link>
             </li>
           </ul>
         </div>
-        <div>
+        <div className="pr-10">
           <h6 className="text-lg font-semibold mb-4">Contact Us</h6>
           <p className="mb-2">
             Feel free to contact us for any inquiries or suggestions. We are
