@@ -5,9 +5,13 @@ const router = express.Router();
 
 const authenticationRoutes = require("./authenticationRoutes");
 
-router.use((req, res, next) => {
-  res.locals.user = req.session.user || req.user || null;
-  next();
+router.get("/api/whoami", async (req, res) => {
+  if (req.session && req.session.user) {
+    const user = req.session.user;
+    return res.json(user);
+  } else {
+    return res.json(null);
+  }
 });
 
 // router.use("/admin/medical", require("./medicalAdminRoutes"));

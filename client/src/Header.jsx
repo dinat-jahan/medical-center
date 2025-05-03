@@ -21,55 +21,79 @@ const Header = () => {
 
   const handleMobileMenuClick = (path) => {
     setIsMobileMenuOpen(false);
-    navigate(path);
+    setIsPeopleDropdownOpen(false);
+    if (window.location.pathname === path) {
+      window.location.reload();
+    } else {
+      navigate(path);
+    }
   };
 
   return (
-    <div className="relative shadow-md">
+    <div className="relative shadow-md bg-white z-50">
       <header className="flex justify-between items-center px-4 py-3">
-        {/* Logo */}
-        <Link to="/" className="flex items-center">
-          <img src="mbstu_logo.png" alt="MBSTU Logo" className="w-14 mr-2" />
-          <span className="text-2xl font-poetsen text-primary mt-1 hidden md:inline">
+        {/* Logo & Name */}
+        <Link
+          to="/"
+          className="flex items-center space-x-2"
+          onClick={() => handleMobileMenuClick("/")}
+        >
+          <img
+            src="mbstu_logo.png"
+            alt="MBSTU Logo"
+            className="w-14 h-14 object-contain"
+          />
+          <span className="text-2xl font-poetsen text-primary hidden md:inline-block">
             MBSTU Medical Center
           </span>
         </Link>
 
-        {/* Menu Icon for Mobile */}
-        <div className="flex lg:hidden absolute right-4 top-4">
-
-
-          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="bg-primary text-white p-2 rounded-full focus:outline-none">
-            <Menu className="w-8 h-8" />
+        {/* Mobile Menu Icon */}
+        <div className="lg:hidden">
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="bg-primary text-white p-2 rounded-full"
+          >
+            <Menu className="w-6 h-6" />
           </button>
         </div>
 
-        {/* Large Screen Menu */}
-        <ul className="hidden lg:flex space-x-5 text-red-500 font-semibold items-center relative">
+        {/* Desktop Menu */}
+        <ul className="hidden lg:flex space-x-5 text-red-500 font-semibold items-center">
           <li>
-            <Link className="hover:text-blue-900 transition-colors" to="/">Home</Link>
+            <Link className="hover:text-blue-900" to="/">
+              Home
+            </Link>
           </li>
           <li>
-            <Link className="hover:text-blue-900 transition-colors" to="/about">About</Link>
+            <Link className="hover:text-blue-900" to="/about">
+              About
+            </Link>
           </li>
           <li
             className="relative"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           >
-            <Link to="/people" className="hover:text-blue-900 transition-colors">
+            <Link className="hover:text-blue-900" to="/people">
               People
             </Link>
             {isPeopleDropdownOpen && (
               <div className="absolute left-0 mt-2 bg-base-200 rounded-md shadow-lg w-32 z-20">
                 <ul className="flex flex-col p-2">
                   <li>
-                    <Link to="/doctors" className="block px-4 py-2 hover:bg-blue-100 hover:text-blue-900 transition-colors">
+                    <Link
+                      to="/doctors"
+                      className="block px-4 py-2 hover:bg-blue-100 hover:text-blue-900"
+                    >
                       Doctors
                     </Link>
                   </li>
                   <li>
-                    <Link to="/medical-staffs" className="block px-4 py-2 hover:bg-blue-100 hover:text-blue-900 transition-colors">
+                    <Link
+                      to="/medical-staffs"
+                      className="block px-4 py-2 hover:bg-blue-100 hover:text-blue-900"
+                    >
                       Staffs
                     </Link>
                   </li>
@@ -78,69 +102,116 @@ const Header = () => {
             )}
           </li>
           <li>
-            <Link className="hover:text-blue-900 transition-colors" to="/services">Services</Link>
+            <Link className="hover:text-blue-900" to="/services">
+              Services
+            </Link>
           </li>
           <li>
-            <Link className="hover:text-blue-900 transition-colors" to="/contact">Contact</Link>
+            <Link className="hover:text-blue-900" to="/contact">
+              Contact
+            </Link>
           </li>
           <li>
             <button
-              className="hover:text-blue-900 transition-colors focus:outline-none"
+              className="bg-red-700 text-white px-3 py-1 rounded-full hover:bg-red-800 transition"
               onClick={() => document.getElementById("login_modal").showModal()}
             >
               Login
             </button>
           </li>
           <li>
-            <Link className="hover:text-blue-900 transition-colors" to="/register">Register</Link>
+            <Link
+              className="bg-violet-700 text-white px-4 py-1 rounded-md hover:bg-violet-800 transition"
+              to="/register"
+            >
+              Register
+            </Link>
           </li>
         </ul>
       </header>
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 bg-base-200 py-4 shadow-md w-full z-10">
-          <ul className="flex flex-col items-start px-6 space-y-2 text-red-500 font-semibold">
+        <div className="lg:hidden absolute top-full left-0 w-full bg-base-100 shadow-md z-40">
+          <ul className="flex flex-col space-y-2 p-4 text-red-500 font-semibold">
             <li>
-              <Link to="/" onClick={() => handleMobileMenuClick("/")} className="hover:text-blue-900 transition-colors block">Home</Link>
+              <button
+                onClick={() => handleMobileMenuClick("/")}
+                className="text-left w-full"
+              >
+                Home
+              </button>
             </li>
             <li>
-              <Link to="/about" onClick={() => handleMobileMenuClick("/about")} className="hover:text-blue-900 transition-colors block">About</Link>
+              <button
+                onClick={() => handleMobileMenuClick("/about")}
+                className="text-left w-full"
+              >
+                About
+              </button>
             </li>
-            <li className="relative">
-              <Link to="/people" onClick={(e) => { e.preventDefault(); setIsPeopleDropdownOpen(!isPeopleDropdownOpen); }} className="hover:text-blue-900 transition-colors block">
+            <li>
+              <button
+                onClick={() => setIsPeopleDropdownOpen(!isPeopleDropdownOpen)}
+                className="text-left w-full"
+              >
                 People
-              </Link>
+              </button>
               {isPeopleDropdownOpen && (
-                <ul className="ml-4 mt-2 space-y-2">
+                <ul className="ml-4 mt-1 space-y-1">
                   <li>
-                    <Link to="/doctors" onClick={() => handleMobileMenuClick("/doctors")} className="hover:text-blue-900 transition-colors block">Doctors</Link>
+                    <button
+                      onClick={() => handleMobileMenuClick("/doctors")}
+                      className="text-left w-full"
+                    >
+                      Doctors
+                    </button>
                   </li>
                   <li>
-                    <Link to="/medical-staffs" onClick={() => handleMobileMenuClick("/medical-staffs")} className="hover:text-blue-900 transition-colors block">Staffs</Link>
+                    <button
+                      onClick={() => handleMobileMenuClick("/medical-staffs")}
+                      className="text-left w-full"
+                    >
+                      Staffs
+                    </button>
                   </li>
                 </ul>
               )}
             </li>
             <li>
-              <Link to="/services" onClick={() => handleMobileMenuClick("/services")} className="hover:text-blue-900 transition-colors block">Services</Link>
-            </li>
-            <li>
-              <Link to="/contact" onClick={() => handleMobileMenuClick("/contact")} className="hover:text-blue-900 transition-colors block">Contact</Link>
+              <button
+                onClick={() => handleMobileMenuClick("/services")}
+                className="text-left w-full"
+              >
+                Services
+              </button>
             </li>
             <li>
               <button
-                className="hover:text-blue-900 transition-colors focus:outline-none bg-primary text-white px-3 py-1 rounded-md text-sm block text-left"
+                onClick={() => handleMobileMenuClick("/contact")}
+                className="text-left w-full"
+              >
+                Contact
+              </button>
+            </li>
+            <li>
+              <button
                 onClick={() => {
                   document.getElementById("login_modal").showModal();
                   setIsMobileMenuOpen(false);
                 }}
+                className="bg-red-700 text-white px-3 py-1 rounded-md w-full text-left"
               >
                 Login
               </button>
             </li>
             <li>
-              <Link to="/register" onClick={() => handleMobileMenuClick("/register")} className="hover:text-blue-900 transition-colors block">Register</Link>
+              <button
+                onClick={() => handleMobileMenuClick("/register")}
+                className="bg-violet-700 text-white px-4 py-1 rounded-md w-full text-left"
+              >
+                Register
+              </button>
             </li>
           </ul>
         </div>
