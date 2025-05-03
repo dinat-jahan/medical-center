@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+// Role determination logic
 function determineRole(userType, designation, office) {
   const lowerDesignation = (designation || "").toLowerCase();
   const lowerOffice = (office || "").toLowerCase();
@@ -19,6 +20,7 @@ function determineRole(userType, designation, office) {
   return "patient";
 }
 
+// Schema definition
 const medicalUserSchema = new mongoose.Schema({
   uniqueId: {
     type: String,
@@ -51,8 +53,10 @@ const medicalUserSchema = new mongoose.Schema({
   googleId: { type: String, unique: true, sparse: true },
 });
 
+// Static method
 medicalUserSchema.statics.determineRole = determineRole;
 
+// Model
 const MedicalUser = mongoose.model("MedicalUser", medicalUserSchema);
 
 module.exports = MedicalUser;
