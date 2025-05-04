@@ -12,13 +12,8 @@ const Layout = () => {
   return (
     <div className="p-4">
       <Header />
-      {user ? (
-        <>
-          <RoleMenu />
-        </>
-      ) : (
-        <LoginPage />
-      )}
+      <LoginPage />
+
       <Outlet />
       <Footer />
     </div>

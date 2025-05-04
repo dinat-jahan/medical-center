@@ -7,6 +7,8 @@ import MedicalStaffsPage from "./pages/MedicalStaffsPage";
 import ContactPage from "./pages/ContactPage";
 import AddMember from "./pages/universityAdminPages/AddMember";
 import RegisterPage from "./pages/authPages/RegisterPage";
+import ProfilePage from "./pages/ProfilePage";
+import SetPasswordPage from "./pages/authPages/SetPasswordPage";
 import { UserContextProvider } from "./UserContext";
 import axios from "axios";
 
@@ -26,6 +28,8 @@ function App() {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/add-member" element={<AddMember />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/set-password" element={<SetPasswordPage />} />
         </Route>
       </Routes>
     </UserContextProvider>

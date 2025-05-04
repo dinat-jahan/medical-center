@@ -1,10 +1,16 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu } from "lucide-react";
+import { Menu, UserIcon } from "lucide-react";
+import { UserContext } from "./UserContext";
+import { roleMenus } from "./constants";
+import RoleMenu from "./components/RoleMenu";
+import axios from "axios";
 
 const Header = () => {
+  const { user, setUser } = useContext(UserContext);
   const [isPeopleDropdownOpen, setIsPeopleDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const timeoutRef = useRef(null);
   const navigate = useNavigate();
 
@@ -29,9 +35,33 @@ const Header = () => {
     }
   };
 
+  const handleProfileMenuClick = () => {
+    setIsProfileMenuOpen(!isProfileMenuOpen); //toggle the profile menu
+  };
+
+  const handleLogout = async () => {
+    try {
+      await axios.get("/auth/logout");
+      setUser(null); //log the user out
+      setIsProfileMenuOpen(false); //close the profile menu
+      navigate("/"); //redirect to login
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <div className="relative shadow-md bg-white z-50">
       <header className="flex justify-between items-center px-4 py-3">
+        {/* Mobile Menu Icon on small screen */}
+        <div className="lg:hidden flex items-center space-x-2">
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="bg-primary text-white p-2 rounded-full"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+        </div>
         {/* Logo & Name */}
         <Link
           to="/"
@@ -47,16 +77,6 @@ const Header = () => {
             MBSTU Medical Center
           </span>
         </Link>
-
-        {/* Mobile Menu Icon */}
-        <div className="lg:hidden">
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="bg-primary text-white p-2 rounded-full"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
-        </div>
 
         {/* Desktop Menu */}
         <ul className="hidden lg:flex space-x-5 text-red-500 font-semibold items-center">
@@ -110,26 +130,51 @@ const Header = () => {
             <Link className="hover:text-blue-900" to="/contact">
               Contact
             </Link>
-          </li>
-          <li>
-            <button
-              className="bg-red-700 text-white px-3 py-1 rounded-full hover:bg-red-800 transition"
-              onClick={() => document.getElementById("login_modal").showModal()}
-            >
-              Login
-            </button>
-          </li>
-          <li>
-            <Link
-              className="bg-violet-700 text-white px-4 py-1 rounded-md hover:bg-violet-800 transition"
-              to="/register"
-            >
-              Register
-            </Link>
-          </li>
+          </li>{" "}
+          {user ? (
+            <li>
+              <button
+                className="bg-red-700 text-white px-3 py-1 rounded-full hover:bg-red-800 transition"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </li>
+          ) : (
+            <>
+              <li>
+                <button
+                  className="bg-red-700 text-white px-3 py-1 rounded-full hover:bg-red-800 transition"
+                  onClick={() =>
+                    document.getElementById("login_modal").showModal()
+                  }
+                >
+                  Login
+                </button>
+              </li>
+              <li>
+                <Link
+                  className="bg-violet-700 text-white px-4 py-1 rounded-md hover:bg-violet-800 transition"
+                  to="/register"
+                >
+                  Register
+                </Link>
+              </li>
+            </>
+          )}
         </ul>
+        {/* Profile icon for smaller screen */}
+        <div className="block lg:hidden items-center space-x-4">
+          <button
+            onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+            className="text-white focus:outline-none rounded-full"
+          >
+            <UserIcon className="w-6 h-6" />
+          </button>
+        </div>
       </header>
-
+      {/* Show Role Menu in second row if logged in */}
+      {user && <RoleMenu />}
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="lg:hidden absolute top-full left-0 w-full bg-base-100 shadow-md z-40">
@@ -213,6 +258,61 @@ const Header = () => {
                 Register
               </button>
             </li>
+          </ul>
+        </div>
+      )}
+
+      {/* Profile menu links */}
+      {isProfileMenuOpen && (
+        <div className="absolute right-0 mt-2 bg-base-200 rounded-md shadow-lg w-48 z-20">
+          <ul className="flex flex-col p-2">
+            {!user ? (
+              <>
+                <li>
+                  <button
+                    onClick={() => {
+                      document.getElementById("login_modal").showModal();
+                      setIsProfileMenuOpen(false);
+                    }}
+                    className="bg-red-700 text-white px-3 py-1 rounded-md w-full text-left"
+                  >
+                    Login
+                  </button>
+                </li>
+                <li>
+                  <Link
+                    className="bg-violet-700 text-white px-4 py-1 rounded-md hover:bg-violet-800 transition"
+                    to="/register"
+                    onClick={() => setIsProfileMenuOpen(false)}
+                  >
+                    Register
+                  </Link>
+                </li>
+              </>
+            ) : (
+              roleMenus[user.role]?.map((menuItem) => (
+                <li key={menuItem.name}>
+                  <Link
+                    key={menuItem.path}
+                    to={menuItem.path}
+                    className="block px-4 py-2 hover:bg-blue-100 hover:text-blue-900"
+                  >
+                    {menuItem.name}
+                  </Link>
+                </li>
+              ))
+            )}
+
+            {user && (
+              <li>
+                <button
+                  onClick={handleLogout}
+                  className="block px-4 py-2 hover:bg-blue-100 hover:text-blue-900"
+                >
+                  Logout
+                </button>
+              </li>
+            )}
           </ul>
         </div>
       )}

@@ -124,7 +124,14 @@ module.exports.auth_google_callback = (req, res, next) => {
 };
 
 module.exports.logout_get = (req, res) => {
-  req.logout(() => {
-    res.redirect("/");
+  req.logout((err) => {
+    if (err) {
+      return res.status(500).send("Logout failed");
+    }
+
+    //clear the session cookie
+    res.clearCookie("connect.sid");
+
+    res.status(200).send("Logged out successfully");
   });
 };
