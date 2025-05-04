@@ -1,0 +1,39 @@
+const mongoose = require("mongoose");
+
+const MedicineSchema = new mongoose.Schema({
+  name: { type: String, required: true }, // Brand name
+  genericName: { type: String, required: true }, // Formula name
+  type: {
+    type: String,
+    enum: [
+      "Tablet",
+      "Capsule",
+      "Syrup",
+      "Injection",
+      "Ointment",
+      "Eye Drops",
+      "Powder",
+      "Gel",
+      "Lotion",
+    ],
+    required: true,
+  },
+  quantity: {
+    type: Number,
+    required: true,
+    min: [0, "Quantity cannot be less than 0"],
+  },
+  dosage: { type: String },
+  manufacturer: { type: String },
+  expiryDate: { type: Date },
+  batchNumber: { type: String },
+  price: { type: Number },
+
+  storageCondition: { type: String },
+  sideEffects: [{ type: String }],
+  usageInstructions: { type: String },
+});
+
+const Medicine = mongoose.model("Medicine", MedicineSchema);
+
+module.exports = Medicine;

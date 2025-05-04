@@ -10,6 +10,10 @@ const { UniversityDBAdmin, MedicalDBAdmin } = require("../models/admin");
 exports.fetchMember = async (req, res) => {
   try {
     const { uniqueId } = req.params;
+    const user = await MedicalUser.findOne({ uniqueId });
+    if (user) {
+      return res.json({ success: false, message: "User already exists" });
+    }
     const member = await UniversityMember.findOne({ uniqueId: uniqueId });
 
     if (!member) {
@@ -33,6 +37,7 @@ exports.fetchMember = async (req, res) => {
 //send otp to gmail
 exports.sendOtp = async (req, res) => {
   const { uniqueId, emailForOtp } = req.body;
+  console.log("emailforotp", emailForOtp);
   try {
     const member = await UniversityMember.findOne({ uniqueId });
     if (!member) {
@@ -75,6 +80,7 @@ exports.sendOtp = async (req, res) => {
 //verify otp
 exports.verifyOtp = async (req, res) => {
   const { uniqueId, otp } = req.body;
+  console.log("otp", otp);
 
   try {
     const foundOtp = await OtpModel.findOne({ uniqueId });
@@ -100,6 +106,8 @@ exports.verifyOtp = async (req, res) => {
 //save password in db
 exports.saveUserPassword = async (req, res) => {
   const { uniqueId, password } = req.body;
+  console.log(uniqueId);
+  console.log(password);
   try {
     const user = await UniversityMember.findOne({ uniqueId });
 
@@ -150,6 +158,7 @@ exports.saveUserPassword = async (req, res) => {
 //log in operation
 exports.login = async (req, res) => {
   const { uniqueId, password } = req.body;
+  // const lowerUniqueId = uniqueId.toLowerCase();
 
   try {
     const user =
@@ -201,7 +210,6 @@ exports.setPassword = async (req, res) => {
     const hashedPassword = await bycrypt.hash(password, 10);
     user.password = hashedPassword;
     await user.save();
-    res.redirect("/login");
   } catch (e) {
     console.log(e);
   }

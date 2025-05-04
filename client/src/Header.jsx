@@ -264,7 +264,7 @@ const Header = () => {
 
       {/* Profile menu links */}
       {isProfileMenuOpen && (
-        <div className="absolute right-0 mt-2 bg-base-200 rounded-md shadow-lg w-48 z-20">
+        <div className="absolute  right-0 mt-2 bg-base-200 rounded-md shadow-lg w-48 z-20">
           <ul className="flex flex-col p-2">
             {!user ? (
               <>
