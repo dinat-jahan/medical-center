@@ -12,6 +12,7 @@ import SetPasswordPage from "./pages/authPages/SetPasswordPage";
 import { UserContextProvider } from "./UserContext";
 import axios from "axios";
 import AvailableMedicine from "./pages/AvailableMedicine";
+import AboutPage from "./pages/AboutPage";
 
 axios.defaults.baseURL = "http://localhost:2000";
 axios.defaults.withCredentials = true;
@@ -32,6 +33,7 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/set-password" element={<SetPasswordPage />} />
           <Route path="/available-medicine" element={<AvailableMedicine />} />
+          <Route path="/about" element={<AboutPage />} />
         </Route>
       </Routes>
     </UserContextProvider>
