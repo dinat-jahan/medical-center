@@ -1,8 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
-  FaUserCircle, FaPhoneAlt, FaBirthdayCake, FaEnvelope, FaUniversity,
-  FaBuilding, FaUserTag, FaTint, FaEdit, FaCamera
-} from 'react-icons/fa';
+  FaUserCircle,
+  FaPhoneAlt,
+  FaBirthdayCake,
+  FaEnvelope,
+  FaUniversity,
+  FaBuilding,
+  FaUserTag,
+  FaTint,
+  FaEdit,
+  FaCamera,
+} from "react-icons/fa";
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
@@ -30,7 +38,7 @@ const ProfilePage = () => {
   }, []);
 
   const handleChange = (field, value) => {
-    setEditedUser(prev => ({ ...prev, [field]: value }));
+    setEditedUser((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleImageChange = (e) => {
@@ -50,12 +58,14 @@ const ProfilePage = () => {
     setEditMode(false);
   };
 
-  if (!user) return <div className="text-center mt-20 text-gray-500">Loading profile...</div>;
+  if (!user)
+    return (
+      <div className="text-center mt-20 text-gray-500">Loading profile...</div>
+    );
 
   return (
     <div className="flex justify-center items-start min-h-screen bg-[#f0fdfa] py-10 px-4">
       <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-2xl relative">
-
         {/* Edit Button */}
         {!editMode && (
           <button
@@ -91,35 +101,125 @@ const ProfilePage = () => {
         </div>
 
         {/* Name & Role */}
-        <h2 className="text-3xl font-bold text-center mb-1 text-gray-800">{user.name}</h2>
-        <p className="text-center text-sm text-gray-500 capitalize mb-6">{user.role}</p>
+        <h2 className="text-3xl font-bold text-center mb-1 text-gray-800">
+          {user.name}
+        </h2>
+        {/* <p className="text-center text-sm text-gray-500 capitalize mb-1">
+          Unique ID:{" "}
+          <span className="font-semibold text-gray-700">{user.uniqueId}</span>
+        </p> */}
+        <p className="text-center text-sm text-gray-500 capitalize mb-6">
+          {user.role}
+        </p>
 
         {/* Info Fields */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700">
-          <EditableField icon={<FaPhoneAlt />} label="Phone" field="phone" value={editedUser.phone} onChange={handleChange} editMode={editMode} />
-          <EditableField icon={<FaBirthdayCake />} label="Date of Birth" field="dob" value={editedUser.dob} onChange={handleChange} editMode={editMode} />
-          <EditableField icon={<FaEnvelope />} label="Email" field="emails" value={editedUser.emails.join(', ')} onChange={(f, val) => handleChange(f, val.split(',').map(e => e.trim()))} editMode={editMode} />
-          <EditableField icon={<FaTint />} label="Blood Group" field="bloodGroup" value={editedUser.bloodGroup} onChange={handleChange} editMode={editMode} />
+          <EditableField
+            icon={<FaPhoneAlt />}
+            label="Phone"
+            field="phone"
+            value={editedUser.phone}
+            onChange={handleChange}
+            editMode={editMode}
+          />
+          <EditableField
+            icon={<FaBirthdayCake />}
+            label="Date of Birth"
+            field="dob"
+            value={editedUser.dob}
+            onChange={handleChange}
+            editMode={editMode}
+          />
+          <EditableField
+            icon={<FaEnvelope />}
+            label="Email"
+            field="emails"
+            value={editedUser.emails.join(", ")}
+            onChange={(f, val) =>
+              handleChange(
+                f,
+                val.split(",").map((e) => e.trim())
+              )
+            }
+            editMode={editMode}
+          />
+          <EditableField
+            icon={<FaTint />}
+            label="Blood Group"
+            field="bloodGroup"
+            value={editedUser.bloodGroup}
+            onChange={handleChange}
+            editMode={editMode}
+          />
 
-          {user.userType === 'student' && (
+          {user.userType === "student" && (
             <>
-              <EditableField icon={<FaUniversity />} label="Department" field="department" value={editedUser.department} onChange={handleChange} editMode={editMode} />
-              <EditableField icon={<FaBuilding />} label="Hall" field="hall" value={editedUser.hall} onChange={handleChange} editMode={editMode} />
-              <EditableField icon={<FaUserTag />} label="Session" field="session" value={editedUser.session} onChange={handleChange} editMode={editMode} />
+              <EditableField
+                icon={<FaUniversity />}
+                label="Department"
+                field="department"
+                value={editedUser.department}
+                onChange={handleChange}
+                editMode={editMode}
+              />
+              <EditableField
+                icon={<FaBuilding />}
+                label="Hall"
+                field="hall"
+                value={editedUser.hall}
+                onChange={handleChange}
+                editMode={editMode}
+              />
+              <EditableField
+                icon={<FaUserTag />}
+                label="Session"
+                field="session"
+                value={editedUser.session}
+                onChange={handleChange}
+                editMode={editMode}
+              />
             </>
           )}
 
-          {user.userType === 'teacher' && (
+          {user.userType === "teacher" && (
             <>
-              <EditableField icon={<FaUniversity />} label="Department" field="department" value={editedUser.department} onChange={handleChange} editMode={editMode} />
-              <EditableField icon={<FaUserTag />} label="Designation" field="designation" value={editedUser.designation} onChange={handleChange} editMode={editMode} />
+              <EditableField
+                icon={<FaUniversity />}
+                label="Department"
+                field="department"
+                value={editedUser.department}
+                onChange={handleChange}
+                editMode={editMode}
+              />
+              <EditableField
+                icon={<FaUserTag />}
+                label="Designation"
+                field="designation"
+                value={editedUser.designation}
+                onChange={handleChange}
+                editMode={editMode}
+              />
             </>
           )}
 
-          {user.userType === 'staff' && (
+          {user.userType === "staff" && (
             <>
-              <EditableField icon={<FaBuilding />} label="Office" field="office" value={editedUser.office || 'N/A'} onChange={handleChange} editMode={editMode} />
-              <EditableField icon={<FaUserTag />} label="Designation" field="designation" value={editedUser.designation} onChange={handleChange} editMode={editMode} />
+              <EditableField
+                icon={<FaBuilding />}
+                label="Office"
+                field="office"
+                value={editedUser.office || "N/A"}
+                onChange={handleChange}
+                editMode={editMode}
+              />
+              <EditableField
+                icon={<FaUserTag />}
+                label="Designation"
+                field="designation"
+                value={editedUser.designation}
+                onChange={handleChange}
+                editMode={editMode}
+              />
             </>
           )}
         </div>
@@ -127,10 +227,16 @@ const ProfilePage = () => {
         {/* Save / Cancel Buttons */}
         {editMode && (
           <div className="mt-6 flex justify-center gap-4">
-            <button onClick={handleSave} className="bg-teal-500 text-white px-6 py-2 rounded-2xl hover:bg-teal-600 border-none">
+            <button
+              onClick={handleSave}
+              className="bg-teal-500 text-white px-6 py-2 rounded-2xl hover:bg-teal-600 border-none"
+            >
               Save
             </button>
-            <button onClick={handleCancel} className="bg-blue-500 text-white px-6 py-2 rounded-2xl hover:bg-blue-600 border-none">
+            <button
+              onClick={handleCancel}
+              className="bg-blue-500 text-white px-6 py-2 rounded-2xl hover:bg-blue-600 border-none"
+            >
               Cancel
             </button>
           </div>
