@@ -23,6 +23,10 @@ const universityMemberSchema = new mongoose.Schema({
   department: {
     type: String,
   },
+  program: {
+    type: String,
+    enum: ["graduate", "undergraduate"],
+  },
   office: {
     type: String,
   },

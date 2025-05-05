@@ -15,7 +15,7 @@ router.get("/api/whoami", async (req, res) => {
 });
 
 // router.use("/admin/medical", require("./medicalAdminRoutes"));
-// router.use("/admin/university", require("./universityAdminRoutes"));
+router.use("/admin/university", require("./universityAdminRoutes"));
 // router.use("/doctor", require("./doctorRoutes"));
 // router.use("/patient", require("./patientRoutes"));
 // router.use("/medical-staff", require("./medicalStaffRoutes"));
