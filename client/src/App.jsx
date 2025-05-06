@@ -12,6 +12,8 @@ import SetPasswordPage from "./pages/authPages/SetPasswordPage";
 import { UserContextProvider } from "./UserContext";
 import axios from "axios";
 import AvailableMedicine from "./pages/AvailableMedicine";
+import PrivateRoute from "./PrivateRoute";
+import AccessDenied from "./AccessDeniedPage";
 import AboutPage from "./pages/AboutPage";
 
 axios.defaults.baseURL = "http://localhost:2000";
@@ -28,11 +30,27 @@ function App() {
           <Route path="/doctors" element={<DoctorsPage />} />
           <Route path="/medical-staffs" element={<MedicalStaffsPage />} />
           <Route path="/contact" element={<ContactPage />} />
-          <Route path="/add-member" element={<AddMember />} />
+
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute
+                element={ProfilePage}
+                roles={["patient", "doctor", "medical-staff"]}
+              />
+            }
+          />
+
           <Route path="/set-password" element={<SetPasswordPage />} />
           <Route path="/available-medicine" element={<AvailableMedicine />} />
+          <Route
+            path="/university-admin/add-member"
+            element={
+              <PrivateRoute element={AddMember} roles={["university-admin"]} />
+            }
+          />
+          <Route path="/access-denied" element={<AccessDenied />} />
           <Route path="/about" element={<AboutPage />} />
         </Route>
       </Routes>

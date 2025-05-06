@@ -34,6 +34,10 @@ const medicalUserSchema = new mongoose.Schema({
     required: true,
   },
   department: { type: String },
+  program: {
+    type: String,
+    enum: ["graduate", "undergraduate"],
+  },
   office: { type: String },
   designation: { type: String },
   designation_2: { type: String },

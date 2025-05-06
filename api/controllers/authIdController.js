@@ -10,11 +10,15 @@ const { UniversityDBAdmin, MedicalDBAdmin } = require("../models/admin");
 exports.fetchMember = async (req, res) => {
   try {
     const { uniqueId } = req.params;
-    const user = await MedicalUser.findOne({ uniqueId });
+    const user = await MedicalUser.findOne({
+      uniqueId: uniqueId.toLowerCase(),
+    });
     if (user) {
       return res.json({ success: false, message: "User already exists" });
     }
-    const member = await UniversityMember.findOne({ uniqueId: uniqueId });
+    const member = await UniversityMember.findOne({
+      uniqueId: uniqueId.toLowerCase(),
+    });
 
     if (!member) {
       return res.json({ success: false, message: "No member found" });
@@ -39,7 +43,9 @@ exports.sendOtp = async (req, res) => {
   const { uniqueId, emailForOtp } = req.body;
   console.log("emailforotp", emailForOtp);
   try {
-    const member = await UniversityMember.findOne({ uniqueId });
+    const member = await UniversityMember.findOne({
+      uniqueId: uniqueId.toLowerCase(),
+    });
     if (!member) {
       return res.json({ success: false, message: "Member not found" });
     }
@@ -128,6 +134,7 @@ exports.saveUserPassword = async (req, res) => {
       office: user.office,
       designation: user.designation,
       designation_2: user.designation_2,
+      program: user.program,
       hall: user.hall,
       session: user.session,
       bloodGroup: user.bloodGroup,
@@ -158,13 +165,13 @@ exports.saveUserPassword = async (req, res) => {
 //log in operation
 exports.login = async (req, res) => {
   const { uniqueId, password } = req.body;
-  // const lowerUniqueId = uniqueId.toLowerCase();
+  const lowerUniqueId = uniqueId.toLowerCase();
 
   try {
     const user =
-      (await MedicalUser.findOne({ uniqueId })) ||
-      (await UniversityDBAdmin.findOne({ uniqueId })) ||
-      (await MedicalDBAdmin.findOne({ uniqueId }));
+      (await MedicalUser.findOne({ uniqueId: lowerUniqueId })) ||
+      (await UniversityDBAdmin.findOne({ uniqueId: lowerUniqueId })) ||
+      (await MedicalDBAdmin.findOne({ uniqueId: lowerUniqueId }));
 
     if (!user) {
       return res.status(401).send("User not found");

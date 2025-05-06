@@ -1,44 +1,62 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from "react";
 import {
-  FaUserCircle, FaPhoneAlt, FaBirthdayCake, FaEnvelope, FaUniversity,
-  FaBuilding, FaUserTag, FaTint, FaIdBadge
-} from 'react-icons/fa';
+  FaUserCircle,
+  FaPhoneAlt,
+  FaBirthdayCake,
+  FaEnvelope,
+  FaUniversity,
+  FaBuilding,
+  FaUserTag,
+  FaTint,
+  FaIdBadge,
+} from "react-icons/fa";
+import { UserContext } from "../UserContext";
+import axios from "axios";
 
 const ProfilePage = () => {
-  const [user, setUser] = useState(null);
+  const { user: currentUser } = useContext(UserContext);
+  const [userInfo, setUserInfo] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
 
   useEffect(() => {
-    const dummyUser = {
-      uniqueId: "IT20006",
-      name: "Taslima Khatun",
-      userType: "student", // Try changing to 'Staff' or 'Student' to test
-      department: "ICT",
-      program: "undergraduate",
-      office: "Academic Section",
-      designation: "Lecturer", // Change this to test 'Lecturer' hiding for staff
-      designation_2: "Advisor",
-      hall: "Bangamata Sheikh Fojilatunnesa Mujib Hall",
-      session: "2019-20",
-      bloodGroup: "AB+",
-      dob: "2000-11-12",
-      emails: ["it20006@mbstu.ac.bd"],
-      phone: "0123456789",
-      photo: "",
-      role: "patient",
+    const fetchProfile = async () => {
+      try {
+        console.log("inside frontend");
+        const { data } = await axios.get(`/api/profile/${currentUser.id}`);
+        console.log(data);
+        if (data.success) {
+          setUserInfo(data.user);
+          if (data.user.photoUrl) setProfileImage(data.user.photoUrl);
+        }
+      } catch (err) {
+        console.log(err);
+      }
     };
-    setUser(dummyUser);
-    if (dummyUser.photo) {
-      setProfileImage(dummyUser.photo);
+
+    if (currentUser && currentUser.id) {
+      fetchProfile();
     }
-  }, []);
+  }, [currentUser]);
 
-  if (!user) return <div className="text-center mt-20 text-gray-500">Loading profile...</div>;
+  const capitalizeFirst = (str) =>
+    str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
+  if (!userInfo)
+    return (
+      <div className="text-center mt-20 text-gray-500">Loading profile...</div>
+    );
+  const dateOfBirth = new Date(userInfo.dob);
+  const formattedDate =
+    dateOfBirth instanceof Date && !isNaN(dateOfBirth)
+      ? dateOfBirth.toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        })
+      : "Invalid Date";
   return (
     <div className="flex justify-center items-start min-h-screen bg-[#f0fdfa] py-10 px-4">
       <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-2xl relative">
-
         {/* Profile Image */}
         <div className="relative flex justify-center mb-6">
           {profileImage ? (
@@ -53,52 +71,120 @@ const ProfilePage = () => {
         </div>
 
         {/* Name & Role */}
-        <h2 className="text-3xl font-bold text-center mb-1 text-gray-800">{user.name}</h2>
-        <p className="text-center text-sm text-gray-500 capitalize mb-6">{user.role}</p>
+        <h2 className="text-3xl font-bold text-center mb-1 text-gray-800">
+          {userInfo.name}
+        </h2>
+        <p className="text-center text-sm text-gray-500 capitalize mb-6">
+          {userInfo.role}
+        </p>
 
         {/* Info Fields */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700">
-          <InfoField icon={<FaIdBadge />} label="Unique ID" value={user.uniqueId} />
-          <InfoField icon={<FaIdBadge />} label="Category" value={user.userType} />
-          <InfoField icon={<FaBirthdayCake />} label="Date of Birth" value={user.dob} />
-          <InfoField icon={<FaTint />} label="Blood Group" value={user.bloodGroup} />
+          <InfoField
+            icon={<FaIdBadge />}
+            label="Unique ID"
+            value={userInfo.uniqueId.toUpperCase()}
+          />
+          <InfoField
+            icon={<FaIdBadge />}
+            label="Category"
+            value={capitalizeFirst(userInfo.userType)}
+          />
+          <InfoField
+            icon={<FaBirthdayCake />}
+            label="Date of Birth"
+            value={formattedDate}
+          />
+          <InfoField
+            icon={<FaTint />}
+            label="Blood Group"
+            value={userInfo.bloodGroup}
+          />
 
-          {user.userType === 'student' && (
+          {userInfo.userType === "student" && (
             <>
-              <InfoField icon={<FaUniversity />} label="Department" value={user.department} />
-              <InfoField icon={<FaBuilding />} label="Hall" value={user.hall} />
-              <InfoField icon={<FaUserTag />} label="Session" value={user.session} />
-              <InfoField icon={<FaUniversity />} label="Program" value={user.program} />
+              <InfoField
+                icon={<FaUniversity />}
+                label="Department"
+                value={userInfo.department}
+              />
+              <InfoField
+                icon={<FaBuilding />}
+                label="Hall"
+                value={userInfo.hall}
+              />
+              <InfoField
+                icon={<FaUserTag />}
+                label="Session"
+                value={userInfo.session}
+              />
+              <InfoField
+                icon={<FaUniversity />}
+                label="Program"
+                value={capitalizeFirst(userInfo.program)}
+              />
             </>
           )}
 
-          {user.userType === 'teacher' && (
+          {userInfo.userType === "teacher" && (
             <>
-              <InfoField icon={<FaUniversity />} label="Department" value={user.department || 'Not Provided'} />
-              {user.designation && (
-                <InfoField icon={<FaUserTag />} label="Designation" value={user.designation} />
-              )}
-              <InfoField icon={<FaUserTag />} label="Secondary Title" value={user.designation_2 || 'Not Provided'} />
-            </>
-          )}
-
-          {user.userType === 'staff' && (
-            <>
-              <InfoField icon={<FaBuilding />} label="Office" value={user.office || 'N/A'} />
+              <InfoField
+                icon={<FaUniversity />}
+                label="Department"
+                value={userInfo.department || "Not Provided"}
+              />
               {user.designation && (
                 <InfoField
                   icon={<FaUserTag />}
                   label="Designation"
-                  value={user.designation !== 'Lecturer' ? user.designation : 'N/A'}
+                  value={userInfo.designation}
                 />
               )}
-              <InfoField icon={<FaUserTag />} label="Secondary Title" value={user.designation_2 || 'N/A'} />
+              <InfoField
+                icon={<FaUserTag />}
+                label="Secondary Title"
+                value={userInfo.designation_2 || "Not Provided"}
+              />
+            </>
+          )}
+
+          {userInfo.userType === "staff" && (
+            <>
+              <InfoField
+                icon={<FaBuilding />}
+                label="Office"
+                value={userInfo.office || "N/A"}
+              />
+              {userInfo.designation && (
+                <InfoField
+                  icon={<FaUserTag />}
+                  label="Designation"
+                  value={userInfo.designation || "N/A"}
+                />
+              )}
+              <InfoField
+                icon={<FaUserTag />}
+                label="Secondary Title"
+                value={userInfo.designation_2 || "N/A"}
+              />
             </>
           )}
 
           {/* Contact Info */}
-          <InfoField icon={<FaPhoneAlt />} label="Phone" value={user.phone} />
-          <InfoField icon={<FaEnvelope />} label="Email" value={user.emails.join(', ')} />
+          <InfoField
+            icon={<FaPhoneAlt />}
+            label="Phone"
+            value={userInfo.phone}
+          />
+          <InfoField
+            icon={<FaEnvelope />}
+            label="Email"
+            value={
+              Array.isArray(userInfo.emails)
+                ? userInfo.emails.join(", ")
+                : userInfo.emails
+            }
+          />
         </div>
       </div>
     </div>
