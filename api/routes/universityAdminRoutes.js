@@ -45,9 +45,9 @@ router.post(
       await s3Client.send(new PutObjectCommand(uploadParams));
 
       const newMember = new UniversityMember(data);
+      await newMember.save();
       console.log(newMember);
       res.status(200).send({ message: "Member added successfully!" });
-      await newMember.save();
     } catch (err) {
       console.log(err);
       res

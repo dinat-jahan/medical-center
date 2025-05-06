@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import axios from "axios";
 
 const AddMember = () => {
+  const fileInputRef = useRef();
   const [userType, setUserType] = useState("student"); // Default to student
   const [formData, setFormData] = useState({
     uniqueId: "",
@@ -48,7 +49,7 @@ const AddMember = () => {
     }
 
     try {
-      const response = axios.post("/admin/university/add-member", form, {
+      const response = await axios.post("/admin/university/add-member", form, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -76,6 +77,7 @@ const AddMember = () => {
         phone: "",
         photo: null,
       });
+      fileInputRef.current.value = null;
     } catch (err) {
       console.log(err);
       setErrorMessage(
@@ -469,6 +471,7 @@ const AddMember = () => {
                 Photo
               </label>
               <input
+                ref={fileInputRef}
                 type="file"
                 name="photo"
                 id="photo"

@@ -24,14 +24,14 @@ passport.use(
         const email = profile.emails[0].value.toLowerCase();
         // Check if the user exists in MedicalUser
         let user = await MedicalUser.findOne({
-          emails: { $in: [email] },
+          emails: { $elemMatch: { $regex: new RegExp(`^${email}$`, "i") } },
         });
         console.log("User from Google:", user);
 
         if (!user) {
           // If user not found, check if the user exists in UniversityMember
           const universityUser = await UniversityMember.findOne({
-            emails: { $in: [email] },
+            emails: { $elemMatch: { $regex: new RegExp(`^${email}$`, "i") } },
           });
           console.log("user from university user:", universityUser);
           if (universityUser) {
@@ -51,6 +51,7 @@ passport.use(
               office: universityUser.office,
               designation: universityUser.designation,
               designation_2: universityUser.designation_2,
+              program: universityUser.program,
               hall: universityUser.hall,
               session: universityUser.session,
               bloodGroup: universityUser.bloodGroup,

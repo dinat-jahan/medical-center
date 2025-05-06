@@ -1,4 +1,4 @@
-import { useState, useRef, useContext } from "react";
+import { useEffect, useState, useRef, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, UserIcon } from "lucide-react";
 import { UserContext } from "./UserContext";
@@ -13,6 +13,23 @@ const Header = () => {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const timeoutRef = useRef(null);
   const navigate = useNavigate();
+
+  // Event listener to handle window resizing and close profile menu on large screens
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        // Close menu if on desktop
+        setIsProfileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   const handleMouseEnter = () => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
