@@ -14,6 +14,7 @@ import axios from "axios";
 import AvailableMedicine from "./pages/AvailableMedicine";
 import PrivateRoute from "./PrivateRoute";
 import AccessDenied from "./AccessDeniedPage";
+import AboutPage from "./pages/AboutPage";
 
 axios.defaults.baseURL = "http://localhost:2000";
 axios.defaults.withCredentials = true;
@@ -31,7 +32,16 @@ function App() {
           <Route path="/contact" element={<ContactPage />} />
 
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute
+                element={ProfilePage}
+                roles={["patient", "doctor", "medical-staff"]}
+              />
+            }
+          />
+
           <Route path="/set-password" element={<SetPasswordPage />} />
           <Route path="/available-medicine" element={<AvailableMedicine />} />
           <Route
@@ -40,8 +50,9 @@ function App() {
               <PrivateRoute element={AddMember} roles={["university-admin"]} />
             }
           />
-        </Route>{" "}
-        <Route path="/access-denied" element={<AccessDenied />} />
+          <Route path="/access-denied" element={<AccessDenied />} />
+          <Route path="/about" element={<AboutPage />} />
+        </Route>
       </Routes>
     </UserContextProvider>
   );
