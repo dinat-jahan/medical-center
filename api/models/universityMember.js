@@ -25,7 +25,7 @@ const universityMemberSchema = new mongoose.Schema({
   },
   program: {
     type: String,
-    enum: ["graduate", "undergraduate"],
+    enum: ["graduate", "undergraduate", ""],
   },
   office: {
     type: String,
