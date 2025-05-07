@@ -12,16 +12,15 @@ const IndexPage = () => {
           alt="MBSTU Medical Center"
           className="w-full h-full object-cover absolute inset-0 brightness-75"
         />
- <div className="text-center text-white font-poetsen px-4 py-8 relative z-10 flex items-center justify-center h-full w-full">
-  <div className="text-4xl lg:text-5xl font-bold leading-snug">
-    Welcome to
-    <br className="sm:block md:hidden" />
-    <span className="text-red-700 drop-shadow-lg"> MBSTU </span>
-    <br className="sm:block md:block lg:hidden" />
-    Medical Center
-  </div>
-</div>
-
+        <div className="text-center text-white font-poetsen px-4 py-8 relative z-10 flex items-center justify-center h-full w-full">
+          <div className="text-4xl lg:text-5xl font-bold leading-snug">
+            Welcome to
+            <br className="sm:block md:hidden" />
+            <span className="text-red-700 drop-shadow-lg"> MBSTU </span>
+            <br className="sm:block md:block lg:hidden" />
+            Medical Center
+          </div>
+        </div>
       </div>
 
       {/* About Us Section */}
@@ -56,13 +55,14 @@ const IndexPage = () => {
                 corrupti dignissimos quos exercitationem placeat hic dolore
                 numquam facere sequi? Necessitatibus.
               </p>
-              <button
-               type="button"
-              className="bg-teal-500 hover:bg-sky-800 text-white font-bold py-2 px-6 rounded-3xl focus:outline-none focus:shadow-outline w-fit border-none"
-               >
-                Learn More
-               </button>
 
+              {/* Learn More Button linking to /about */}
+              <Link
+                to="/about"
+                className="bg-teal-500 hover:bg-sky-800 text-white font-bold py-2 px-6 rounded-3xl focus:outline-none focus:shadow-outline w-fit border-none inline-block"
+              >
+                Learn More
+              </Link>
             </div>
           </div>
 
