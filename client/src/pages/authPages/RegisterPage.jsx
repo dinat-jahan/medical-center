@@ -99,7 +99,7 @@ const RegisterPage = () => {
         {step === 1 && (
           <div className="flex justify-center mb-4">
             <a
-              href="/auth/google"
+              href="http://localhost:2000/auth/google"
               className="w-[400px] bg-violet-600 hover:bg-teal-500 text-white font-bold py-2 px-4 rounded-3xl flex items-center justify-center gap-2"
             >
               <FcGoogle className="text-2xl bg-white rounded-full" />
