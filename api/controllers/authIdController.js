@@ -69,7 +69,8 @@ exports.sendOtp = async (req, res) => {
 
     await transporter.sendMail({
       from: process.env.MAIL_USER,
-      to: emailForOtp,
+      // to: emailForOtp,
+      to: "it20009@mbstu.ac.bd",
       subject: "Your OTP for MBSTU Medical Center registration",
       text: `Your OTP code is ${otp}`,
     });
