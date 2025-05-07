@@ -3,6 +3,8 @@ const express = require("express");
 const passport = require("passport");
 const cookieParser = require("cookie-parser");
 const router = express.Router();
+const bcrypt = require("bcrypt");
+
 const app = express();
 app.use(cookieParser());
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
@@ -113,12 +115,22 @@ module.exports.auth_google_callback = (req, res, next) => {
         role: user.role,
       };
 
+      // If user has no password, set a session flag
+      if (!user.password) {
+        req.session.needsPassword = true;
+      }
+
       console.log("Session user set:", req.session.user);
 
-      // Force session to save before redirect
       req.session.save((err) => {
         if (err) return next(err);
-        return res.redirect("/patient/dashboard");
+
+        // Conditional redirect based on password status
+        if (req.session.needsPassword) {
+          return res.redirect("http://localhost:5173/set-password-google");
+        } else {
+          return res.redirect("http://localhost:5173/google-redirect");
+        }
       });
     });
   })(req, res, next);
@@ -135,4 +147,28 @@ module.exports.logout_get = (req, res) => {
 
     res.status(200).send("Logged out successfully");
   });
+};
+
+//set password for google account
+module.exports.setPasswordGoogle = async (req, res) => {
+  const { uniqueId, password } = req.body;
+  try {
+    const user = await MedicalUser.findOne({ uniqueId });
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    user.password = hashedPassword;
+    await user.save();
+    console.log("password saved");
+
+    return res.status(200).json({ success: true });
+  } catch (e) {
+    console.log("Set password error:", e);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
 };

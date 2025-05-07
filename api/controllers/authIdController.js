@@ -204,24 +204,6 @@ exports.login = async (req, res) => {
   }
 };
 
-//set password
-exports.setPassword = async (req, res) => {
-  const { uniqueId, password } = req.body;
-  try {
-    const user = await MedicalUser.findOne({ uniqueId });
-
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
-
-    const hashedPassword = await bycrypt.hash(password, 10);
-    user.password = hashedPassword;
-    await user.save();
-  } catch (e) {
-    console.log(e);
-  }
-};
-
 //get set-password page
 // router.get("/set-password", (req, res) => {
 //   const { uniqueId } = req.query;
