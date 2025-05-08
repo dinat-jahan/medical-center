@@ -17,6 +17,7 @@ import AccessDenied from "./AccessDeniedPage";
 import AboutPage from "./pages/AboutPage";
 import GoogleRedirect from "./pages/authPages/GoogleRedirectPage";
 import SetPasswordGoogle from "./pages/authPages/SetPasswordGoogle";
+import PatientProfilePage from "./pages/doctorPages/PatientProfilePage";
 axios.defaults.baseURL = "http://localhost:2000";
 axios.defaults.withCredentials = true;
 
@@ -55,6 +56,10 @@ function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/google-redirect" element={<GoogleRedirect />} />
           <Route path="/set-password-google" element={<SetPasswordGoogle />} />
+          <Route
+            path="/patient-profile/:uniqueId"
+            element={<PatientProfilePage />}
+          />
         </Route>
       </Routes>
     </UserContextProvider>

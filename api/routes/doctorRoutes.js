@@ -18,25 +18,22 @@ const isDoctor = (req, res, next) => {
   return res.status(403).send("Access denied");
 };
 
-//     const medicines = query
-//       ? await Medicine.find({
-//           $or: [
-//             { name: { $regex: query.toString(), $options: "i" } },
-//             { genericName: { $regex: query.toString(), $options: "i" } },
-//             { manufacturer: { $regex: query.toString(), $options: "i" } },
-//           ],
-//         })
-//       : [];
-//search patient by using gmail
 router.get("/search-patient", isDoctor, async (req, res) => {
   const query = req.query.patient;
 
   try {
     const patients = query
       ? await MedicalUser.find({
-          $or: [
-            { uniqueId: { $regex: query.toString(), $options: "i" } },
-            { name: { $regex: query.toString(), $options: "i" } },
+          $and: [
+            // Search either by uniqueId or name
+            {
+              $or: [
+                { uniqueId: { $regex: query.toString(), $options: "i" } },
+                { name: { $regex: query.toString(), $options: "i" } },
+              ],
+            },
+            // Filter out doctors
+            { role: { $ne: "doctor" } },
           ],
         })
       : [];
@@ -66,6 +63,41 @@ router.get("/search-patient", isDoctor, async (req, res) => {
     console.log(err);
     return res.status(500).json({
       message: "An error occurred while searching for the patient",
+      error: err.message,
+    });
+  }
+});
+
+router.get("/patient-profile/:uniqueId", isDoctor, async (req, res) => {
+  const { uniqueId } = req.params;
+
+  try {
+    const patient = await MedicalUser.findOne({
+      uniqueId: uniqueId,
+      role: { $ne: "doctor" },
+    });
+
+    if (!patient) {
+      return res.status(404).json({ message: "Patient not found" });
+    }
+
+    patient.photoUrl = await getSignedUrl(
+      s3Client,
+      new GetObjectCommand({
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: patient.photo,
+      })
+    );
+
+    return res.json({
+      success: true,
+      user: patient,
+      message: "Patient profile fetched successfully",
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({
+      message: "An error occurred while fetching the patient profile",
       error: err.message,
     });
   }

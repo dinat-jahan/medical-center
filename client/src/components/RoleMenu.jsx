@@ -1,7 +1,7 @@
 import { roleMenus } from "../constants/index";
 import { UserContext } from "../UserContext";
 import { useContext, useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import SearchInput from "./SearchInput";
 import SearchSuggestions from "./SearchSuggestions";
 import axios from "axios";
@@ -12,30 +12,26 @@ const RoleMenu = () => {
   const [medicineSearch, setMedicineSearch] = useState("");
   const [patientSuggestions, setPatientSuggestions] = useState([]);
   const [medicineSuggestions, setMedicineSuggestions] = useState([]);
-
+  const navigate = useNavigate();
   if (!user || !user.role) return null;
 
   const menuItems = roleMenus[user.role];
   if (!menuItems) return null;
 
-  useEffect(() => {
-    const fetchPatientSuggestions = async () => {
-      if (patientSearch.trim() === "") {
-        setPatientSuggestions([]);
-        return;
-      }
-      try {
-        const { data } = await axios.get("/doctor/search-patient", {
-          params: { patient: patientSearch },
-        });
-        setPatientSuggestions(data.patients || []);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-
-    fetchPatientSuggestions();
-  }, [patientSearch]);
+  const fetchPatientSuggestions = async () => {
+    if (patientSearch.trim() === "") {
+      setPatientSuggestions([]);
+      return;
+    }
+    try {
+      const { data } = await axios.get("/doctor/search-patient", {
+        params: { patient: patientSearch },
+      });
+      setPatientSuggestions(data.patients || []);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   useEffect(() => {
     const fetchMedicineSuggestions = async () => {
@@ -56,7 +52,22 @@ const RoleMenu = () => {
 
   const handlePatientSelect = (patient) => {
     console.log("Selected patient", patient);
+    navigate(`/patient-profile/${patient.uniqueId}`);
   };
+
+  const handleSearchClick = () => {
+    fetchPatientSuggestions();
+  };
+
+  const handleEnterPress = (e) => {
+    if (e.key === "Enter") {
+      fetchPatientSuggestions();
+    }
+  };
+
+  useEffect(() => {
+    fetchPatientSuggestions();
+  }, [patientSearch]);
 
   const handleMedicineSelect = (medicine) => {
     // Handle medicine selection (e.g., navigate to the medicine details)
@@ -89,7 +100,9 @@ const RoleMenu = () => {
                 placeholder="Search Patient by id, name..."
                 value={patientSearch}
                 onChange={setPatientSearch}
+                onKeyPress={handleEnterPress}
               />
+              <button onClick={handleSearchClick}>Search</button>
               {/* Show suggestions only if there are any */}
               {patientSuggestions.length > 0 && (
                 <SearchSuggestions

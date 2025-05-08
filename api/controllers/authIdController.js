@@ -25,13 +25,7 @@ exports.fetchMember = async (req, res) => {
     }
     res.json({
       success: true,
-      member: {
-        name: member.name,
-        department: member.department,
-        designation: member.designation,
-        emails: member.emails,
-        phone: member.phone,
-      },
+      member,
     });
   } catch (err) {
     console.log(err);
