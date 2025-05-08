@@ -10,41 +10,41 @@ import {
   FaTint,
   FaIdBadge,
 } from "react-icons/fa";
-import { UserContext } from "../UserContext";
+import { useParams } from "react-router-dom";
 import axios from "axios";
-import { InfoField } from "../components/InfoField";
+import { InfoField } from "../../components/InfoField";
 
-const ProfilePage = () => {
-  const { user: currentUser } = useContext(UserContext);
+const PatientProfilePage = () => {
+  const { uniqueId } = useParams();
   const [userInfo, setUserInfo] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        console.log("inside frontend");
-        const { data } = await axios.get(`/api/profile/${currentUser.id}`);
+        const { data } = await axios.get(`/doctor/patient-profile/${uniqueId}`);
         console.log(data);
         if (data.success) {
           setUserInfo(data.user);
           if (data.user.photoUrl) setProfileImage(data.user.photoUrl);
+          setLoading(false);
         }
       } catch (err) {
         console.log(err);
       }
     };
-
-    if (currentUser && currentUser.id) {
+    if (uniqueId) {
       fetchProfile();
     }
-  }, [currentUser]);
-
+  }, [uniqueId]);
+  if (loading) return <div>Loading...</div>;
   const capitalizeFirst = (str) =>
     str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
   if (!userInfo)
     return (
-      <div className="text-center mt-20 text-gray-500">Loading profile...</div>
+      <div className="text-center mt-20 text-gray-500">No patient found.</div>
     );
   const dateOfBirth = new Date(userInfo.dob);
   const formattedDate =
@@ -187,9 +187,18 @@ const ProfilePage = () => {
             }
           />
         </div>
+        {/* Write Prescription Button */}
+        <div className="mt-6 text-center">
+          <button
+            className="px-6 py-2 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700"
+            onClick={() => console.log("Writing prescription...")}
+          >
+            Write Prescription
+          </button>
+        </div>
       </div>
     </div>
   );
 };
 
-export default ProfilePage;
+export default PatientProfilePage;

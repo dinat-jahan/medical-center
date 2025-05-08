@@ -25,13 +25,7 @@ exports.fetchMember = async (req, res) => {
     }
     res.json({
       success: true,
-      member: {
-        name: member.name,
-        department: member.department,
-        designation: member.designation,
-        emails: member.emails,
-        phone: member.phone,
-      },
+      member,
     });
   } catch (err) {
     console.log(err);
@@ -69,7 +63,8 @@ exports.sendOtp = async (req, res) => {
 
     await transporter.sendMail({
       from: process.env.MAIL_USER,
-      to: emailForOtp,
+      // to: emailForOtp,
+      to: "it20009@mbstu.ac.bd",
       subject: "Your OTP for MBSTU Medical Center registration",
       text: `Your OTP code is ${otp}`,
     });
