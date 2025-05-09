@@ -1,48 +1,63 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 const DoctorsPage = () => {
-  // Doctor's data object
-  const doctor = {
-    name: "Dr. Smith",
-    specialization: "Cardiologist",
-    image:
-      "https://www.bing.com/th/id/OIP.YqLbD9qVh6MiK3RyLeCAxwHaEl?w=290&h=211&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2", // Using the provided image URL
-    phone: "+88 017XXXXXXX",
-    email: "smith@example.com",
-    address: "123, Medical Street, Dhaka",
-  };
+  const [doctors, setDoctors] = useState([]);
+  const [profileImage, setProfileImage] = useState(null);
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const res = await axios.get("/api/doctors");
+
+        setDoctors(res.data.doctors);
+        console.log(res.data);
+        // setProfileImage(res.data.photoUrl);
+      } catch (error) {
+        console.error("Error fetching doctors:", error);
+      }
+    };
+    fetchDoctors();
+  }, []);
 
   return (
-    <div className="flex justify-center pt-10">
-      {" "}
-      {/* Increased padding-top to pt-20 */}
-      {/* Main container for centering the card with border and animation */}
-      <div className="max-w-sm bg-white rounded-lg shadow-md border-2 border-gray-300 cursor-pointer transition-transform duration-300 hover:scale-105">
-        {" "}
-        {/* Increased border width to border-2 and color to border-gray-300 */}
-        {/* Image section of the card */}
-        <img
-          className="rounded-t-lg h-64 w-full object-cover"
-          src={doctor.image}
-          alt={doctor.name}
-        />
-        {/* Content section of the card */}
-        <div className="p-5">
-          {/* Doctor's name */}
-          <h5 className="text-2xl font-bold text-teal-500 tracking-tight text-gray-900">
-            {doctor.name}
-          </h5>
-          {/* Doctor's specialization */}
-          <p className="mb-3 font-normal text-gray-700">
-            {doctor.specialization}
-          </p>
-          {/* Contact information */}
-          <div className="flex flex-col space-y-2">
-            <p className="text-gray-800">Phone: {doctor.phone}</p>
-            <p className="text-gray-900">Email: {doctor.email}</p>
-            <p className="text-gray-700">Address: {doctor.address}</p>
+    <div className="min-h-screen bg-[#f8f9fa] px-4 py-10">
+      <h2 className="text-3xl font-bold text-center text-[#2B2D42] mb-10">
+        Our Doctors
+      </h2>
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
+        {doctors.map((doctor) => (
+          <div
+            key={doctor._id}
+            className="bg-white shadow rounded-2xl overflow-hidden transition hover:shadow-lg border"
+          >
+            <img
+              className="w-full h-60 object-cover"
+              src={doctor.photoUrl}
+              alt={doctor.name}
+            />
+            <div className="p-6">
+              <h3 className="text-xl font-semibold text-[#0e7660] mb-1">
+                {doctor.name}
+              </h3>
+              <p className="text-sm text-gray-700">MBBS</p>
+              <p className="text-sm text-gray-700">{doctor.designation_2}</p>
+              <p className="text-sm text-gray-700">{doctor.office}</p>
+              <p className="text-sm text-gray-700">
+                Mawlana Bhashani Science and Technology University
+              </p>
+              <div className="mt-4 text-sm text-gray-600 space-y-1">
+                <p>
+                  <span className="font-medium">Phone:</span> {doctor.phone}
+                </p>
+                <p>
+                  <span className="font-medium">Email:</span>{" "}
+                  {doctor.emails?.[0]}
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
+        ))}
       </div>
     </div>
   );

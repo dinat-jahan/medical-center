@@ -15,10 +15,16 @@ const MedicineSchema = new mongoose.Schema({
       "Powder",
       "Gel",
       "Lotion",
+      "Other",
     ],
     required: true,
   },
-  quantity: {
+  mainStockQuantity: {
+    type: Number,
+    required: true,
+    min: [0, "Quantity cannot be less than 0"],
+  },
+  monthlyStockQuantity: {
     type: Number,
     required: true,
     min: [0, "Quantity cannot be less than 0"],

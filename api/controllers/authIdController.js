@@ -68,7 +68,7 @@ exports.sendOtp = async (req, res) => {
       subject: "Your OTP for MBSTU Medical Center registration",
       text: `Your OTP code is ${otp}`,
     });
-
+    console.log("otp", otp);
     res.json({ success: true, message: `OTP sent to ${emailForOtp}` });
   } catch (err) {
     console.log(err);
