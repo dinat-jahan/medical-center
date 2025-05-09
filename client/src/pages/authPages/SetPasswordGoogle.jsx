@@ -40,7 +40,7 @@ const SetPasswordGoogle = () => {
   return (
     <div className="min-h-screen bg-teal-50 px-4 py-6">
       {/* Top Welcome Message */}
-      <p className="text-2xl text-teal-600 text-center py-6">
+      <p className="text-xl text-teal-600 text-center py-6">
         🎉 Welcome! You're a verified university member. Please set a password
         for your Medical Center account so you can log in directly next time.
       </p>

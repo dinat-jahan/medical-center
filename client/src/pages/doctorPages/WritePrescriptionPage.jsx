@@ -49,7 +49,7 @@ const WritePrescription = () => {
 
   return (
     <div className="max-w-4xl mx-auto mt-6 p-6 bg-white rounded-2xl shadow">
-      <h2 className="text-3xl font-poetsen text-center text-teal-500 mb-4">
+      <h2 className="text-3xl font-poetsen text-center text-teal-5cd00 mb-4">
         Write Prescription
       </h2>
 

@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const MedicalUser = require("../models/medicalUser");
 // const DutyRosterDoctor = require("../models/dutyRoster");
@@ -72,26 +73,37 @@ router.get("/patient-profile/:uniqueId", isDoctor, async (req, res) => {
   const { uniqueId } = req.params;
 
   try {
+    // Fetch the patient (non-doctor role)
     const patient = await MedicalUser.findOne({
       uniqueId: uniqueId,
       role: { $ne: "doctor" },
-    });
+    }).lean();
 
     if (!patient) {
       return res.status(404).json({ message: "Patient not found" });
     }
 
-    patient.photoUrl = await getSignedUrl(
-      s3Client,
-      new GetObjectCommand({
-        Bucket: process.env.AWS_BUCKET_NAME,
-        Key: patient.photo,
-      })
-    );
+    // If the patient has a photo, generate a signed URL and add it to the object
+    if (patient.photo) {
+      patient.photoUrl = await getSignedUrl(
+        s3Client,
+        new GetObjectCommand({
+          Bucket: process.env.AWS_BUCKET_NAME,
+          Key: patient.photo,
+        })
+      );
+      console.log(patient.photoUrl);
+    } else {
+      // If no photo exists, set photoUrl to null
+      patient.photoUrl = null;
+    }
 
+    console.log(patient); // Check if photoUrl is added here
+
+    // Return the patient object with the photoUrl included
     return res.json({
       success: true,
-      user: patient,
+      user: patient, // Send the modified patient object
       message: "Patient profile fetched successfully",
     });
   } catch (err) {
