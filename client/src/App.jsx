@@ -24,7 +24,7 @@ import SearchMedicinesPage from "./pages/doctorPages/SearchMedicinesPage";
 import ManageMedicinePage from "./pages/medicalStaffPages/ManageMedicinePage";
 import MedicineOutOfStockPage from "./pages/medicalStaffPages/MedicineOutOfStockPage";
 import DutyRosterOfDoctorsPage from "./pages/DutyRosterofDoctorsPage";
-
+import TelemedicinePage from "./pages/TelemedicinePage";
 axios.defaults.baseURL = "http://localhost:2000";
 axios.defaults.withCredentials = true;
 
@@ -80,6 +80,7 @@ function App() {
             element={<DutyRosterOfDoctorsPage />}
           />
           <Route path="/search-medicine" element={<SearchMedicinesPage />} />
+          <Route path="/telemedicine" element={<TelemedicinePage />} />
         </Route>
       </Routes>
     </UserContextProvider>
