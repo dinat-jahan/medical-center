@@ -4,6 +4,7 @@ const router = express.Router();
 
 const authenticationRoutes = require("./authenticationRoutes");
 const MedicalUser = require("../models/medicalUser");
+const DutyRosterDoctor = require("../models/dutyRosterDoctor");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const { GetObjectAclCommand, GetObjectCommand } = require("@aws-sdk/client-s3");
 const s3Client = require("../config/awsConfig");
@@ -42,7 +43,7 @@ router.get("/api/profile/:id", async (req, res) => {
   }
 });
 
-// router.use("/admin/medical", require("./medicalAdminRoutes"));
+router.use("/admin/medical", require("./medicalAdminRoutes"));
 router.use("/admin/university", require("./universityAdminRoutes"));
 router.use("/doctor", require("./doctorRoutes"));
 // router.use("/patient", require("./patientRoutes"));
@@ -99,4 +100,54 @@ router.get("/api/doctors", async (req, res) => {
   }
 });
 
+router.get("/api/duty-roster", async (req, res) => {
+  try {
+    const dutyRoster = await DutyRosterDoctor.aggregate([
+      {
+        $lookup: {
+          from: "medicalusers", // The collection that stores doctors
+          localField: "doctor", // The field in the DutyRosterDoctor collection
+          foreignField: "_id", // The field in the MedicalUser collection
+          as: "doctorDetails", // The alias for the populated data
+        },
+      },
+      {
+        $unwind: "$doctorDetails", // Unwind the populated doctor details array
+      },
+      {
+        $group: {
+          _id: "$day", // Group by day of the week
+          morning: {
+            $push: {
+              doctor: "$doctorDetails.name", // Include doctor name
+              startTime: "$startTime",
+              endTime: "$endTime",
+            },
+          },
+          evening: {
+            $push: {
+              doctor: "$doctorDetails.name", // Include doctor name
+              startTime: "$startTime",
+              endTime: "$endTime",
+            },
+          },
+        },
+      },
+      { $sort: { _id: 1 } }, // Sort days of the week
+    ]);
+
+    console.log(dutyRoster);
+    res.json(dutyRoster); // Return the data as a JSON response
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+router.get("/doctor-list", async (req, res) => {
+  try {
+    const dutyRosterDoctor = await DutyRosterDoctor.find().populate("doctor");
+    res.json(dutyRosterDoctor);
+  } catch (err) {
+    console.log(err);
+  }
+});
 module.exports = router;

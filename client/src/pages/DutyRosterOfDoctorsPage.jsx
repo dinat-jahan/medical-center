@@ -67,23 +67,38 @@ const daysOfWeek = [
 const Modal = ({ day, roster, onClose }) => (
   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div className="bg-white p-6 rounded-lg shadow-lg w-11/12 max-w-md relative">
-      <button onClick={onClose} className="absolute top-2 right-2 text-white-500 bg-teal-700 border-none w-6">✕</button>
-      <h3 className="text-2xl font-bold mb-4 text-teal-500">{day} - Full Roster</h3>
+      <button
+        onClick={onClose}
+        className="absolute top-2 right-2 text-white-500 bg-teal-700 border-none w-6"
+      >
+        ✕
+      </button>
+      <h3 className="text-2xl font-bold mb-4 text-teal-500">
+        {day} - Full Roster
+      </h3>
       <div className="mb-3">
         <h4 className="font-bold text-xl text-teal-700">Morning Shift:</h4>
         {roster.morning.length ? (
           <ul className="list-disc list-inside text-gray-700">
-            {roster.morning.map((doc, idx) => <li key={idx}>{doc}</li>)}
+            {roster.morning.map((doc, idx) => (
+              <li key={idx}>{doc}</li>
+            ))}
           </ul>
-        ) : <p className="text-gray-700 italic">No doctors available</p>}
+        ) : (
+          <p className="text-gray-700 italic">No doctors available</p>
+        )}
       </div>
       <div>
         <h4 className="font-bold text-xl text-teal-700">Evening Shift:</h4>
         {roster.evening.length ? (
           <ul className="list-disc list-inside text-gray-700">
-            {roster.evening.map((doc, idx) => <li key={idx}>{doc}</li>)}
+            {roster.evening.map((doc, idx) => (
+              <li key={idx}>{doc}</li>
+            ))}
           </ul>
-        ) : <p className="text-gray-500 italic">No doctors available</p>}
+        ) : (
+          <p className="text-gray-500 italic">No doctors available</p>
+        )}
       </div>
     </div>
   </div>
@@ -107,7 +122,8 @@ const DutyRosterOfDoctorsPage = () => {
           >
             <h3 className="text-xl font-semibold text-[#0e7660] mb-3">{day}</h3>
             <p className="text-gray-700 text-sm">
-              Morning: Doctors<br />
+              Morning: Doctors
+              <br />
               Evening: Doctors
             </p>
           </div>

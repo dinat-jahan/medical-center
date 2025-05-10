@@ -17,7 +17,6 @@ const RoleMenu = () => {
 
   const menuItems = roleMenus[user.role];
   if (!menuItems) return null;
-
   const fetchPatientSuggestions = async () => {
     if (patientSearch.trim() === "") {
       setPatientSuggestions([]);
@@ -33,45 +32,48 @@ const RoleMenu = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchMedicineSuggestions = async () => {
-      if (medicineSearch.trim() === "") {
-        setMedicineSuggestions([]);
-        return;
-      }
-      try {
-        const { data } = await axios.get("/doctor/search-medicine");
-        setMedicineSuggestions(data);
-      } catch (err) {
-        console.log(err);
-      }
-    };
+  // Move this function outside useEffect for both useEffect and button click access
+  const fetchMedicineSuggestions = async () => {
+    if (medicineSearch.trim() === "") {
+      setMedicineSuggestions([]);
+      return;
+    }
+    try {
+      const { data } = await axios.get("/doctor/search-medicine", {
+        params: { medicine: medicineSearch }, // Send medicine search query to backend
+      });
+      setMedicineSuggestions(data.medicines || []);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-    fetchMedicineSuggestions();
-  }, [patientSearch]);
+  useEffect(() => {
+    fetchMedicineSuggestions(); // fetch medicine suggestions whenever the search input changes
+  }, [medicineSearch]);
 
   const handlePatientSelect = (patient) => {
     console.log("Selected patient", patient);
     navigate(`/patient-profile/${patient.uniqueId}`);
   };
 
-  const handleSearchClick = () => {
-    fetchPatientSuggestions();
+  const handleMedicineSearchClick = () => {
+    navigate(`search-medicine/${medicineSearch}`);
   };
 
   const handleEnterPress = (e) => {
     if (e.key === "Enter") {
-      fetchPatientSuggestions();
+      fetchPatientSuggestions(); // Trigger patient search when Enter key is pressed
     }
   };
 
   useEffect(() => {
-    fetchPatientSuggestions();
+    fetchPatientSuggestions(); // Fetch patient suggestions when the patient search input changes
   }, [patientSearch]);
 
   const handleMedicineSelect = (medicine) => {
-    // Handle medicine selection (e.g., navigate to the medicine details)
     console.log("Selected Medicine:", medicine);
+    navigate(`/search-medicine/${medicine._id}`);
   };
 
   return (
@@ -102,12 +104,13 @@ const RoleMenu = () => {
                 onChange={setPatientSearch}
                 onKeyPress={handleEnterPress}
               />
-              <button onClick={handleSearchClick}>Search</button>
+              <button>Search</button>
               {/* Show suggestions only if there are any */}
               {patientSuggestions.length > 0 && (
                 <SearchSuggestions
                   suggestions={patientSuggestions}
                   onSelect={handlePatientSelect} // Pass the selection handler
+                  fields={["name", "uniqueId"]}
                 />
               )}
               {/* Search Medicine */}
@@ -115,11 +118,21 @@ const RoleMenu = () => {
                 placeholder="Search Medicine"
                 value={medicineSearch}
                 onChange={setMedicineSearch}
-              />
-              <SearchSuggestions
-                suggestions={medicineSuggestions}
-                onSelect={handleMedicineSelect}
-              />
+              />{" "}
+              <button
+                onClick={handleMedicineSearchClick}
+                className="bg-red-500 text-white p-2 rounded"
+              >
+                Search
+              </button>
+              {/* Show suggestions for medicines */}
+              {medicineSuggestions.length > 0 && (
+                <SearchSuggestions
+                  suggestions={medicineSuggestions}
+                  onSelect={handleMedicineSelect}
+                  fields={["name", "genericName", "manufacturer"]}
+                />
+              )}
             </div>
           )}
         </div>
