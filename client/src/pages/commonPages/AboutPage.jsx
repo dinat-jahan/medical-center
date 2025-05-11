@@ -1,4 +1,4 @@
-import doctor_standing from "../assets/doctor_standing.jpg";
+import doctor_standing from "../../assets/doctor_standing.jpg";
 import { useState } from "react";
 
 const AboutPage = ({ shortMode = false }) => {
@@ -8,16 +8,16 @@ const AboutPage = ({ shortMode = false }) => {
     "Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorum dolorem nesciunt eos fugio minus eveniet ut accusamus distinctio provident autem nemo cumque corporis odio ea ipsum eum quae modi officiis.",
     "Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi corrupti dignissimos quos exercitationem placeat hic dolore numquam facere sequi? Necessitatibus.",
     "Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorum dolorem nesciunt eos fugio minus eveniet ut accusamus distinctio provident autem nemo cumque corporis odio ea ipsum eum quae modi officiis.",
-    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi corrupti dignissimos quos exercitationem placeat hic dolore numquam facere sequi? Necessitatibus."
+    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi corrupti dignissimos quos exercitationem placeat hic dolore numquam facere sequi? Necessitatibus.",
   ];
 
-  const visibleParagraphs = shortMode && !showFull ? paragraphs.slice(0, 2) : paragraphs;
+  const visibleParagraphs =
+    shortMode && !showFull ? paragraphs.slice(0, 2) : paragraphs;
 
   return (
     <div className="bg-teal-50 pt-20 pb-10 px-4 md:px-12 mx-auto min-h-screen">
       <div className="container mx-auto px-8 md:px-16">
         <div className="flex flex-col md:flex-row justify-center md:items-stretch gap-8">
-
           {/* Doctor Image */}
           <div className="hidden md:block md:w-[40%] md:mr-8">
             <img

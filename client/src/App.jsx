@@ -1,10 +1,10 @@
 import { Link, Routes, Route } from "react-router-dom";
 import IndexPage from "./pages/IndexPage";
 import Layout from "./Layout";
-import ServicePage from "./pages/ServicePage";
-import DoctorsPage from "./pages/DoctorsPage";
-import MedicalStaffsPage from "./pages/MedicalStaffsPage";
-import ContactPage from "./pages/ContactPage";
+import ServicePage from "./pages/commonPages/ServicePage";
+import DoctorsPage from "./pages/commonPages/DoctorsPage";
+import MedicalStaffsPage from "./pages/commonPages/MedicalStaffsPage";
+import ContactPage from "./pages/commonPages/ContactPage";
 import AddMember from "./pages/universityAdminPages/AddMember";
 import RegisterPage from "./pages/authPages/RegisterPage";
 import ProfilePage from "./pages/ProfilePage";
@@ -14,7 +14,7 @@ import axios from "axios";
 import AvailableMedicine from "./pages/AvailableMedicine";
 import PrivateRoute from "./PrivateRoute";
 import AccessDenied from "./AccessDeniedPage";
-import AboutPage from "./pages/AboutPage";
+import AboutPage from "./pages/commonPages/AboutPage";
 import GoogleRedirect from "./pages/authPages/GoogleRedirectPage";
 import SetPasswordGoogle from "./pages/authPages/SetPasswordGoogle";
 import PatientProfilePage from "./pages/doctorPages/PatientProfilePage";
@@ -24,9 +24,10 @@ import SearchMedicinesPage from "./pages/doctorPages/SearchMedicinesPage";
 import ManageMedicinePage from "./pages/medicalStaffPages/ManageMedicinePage";
 import MedicineOutOfStockPage from "./pages/medicalStaffPages/MedicineOutOfStockPage";
 import DutyRosterOfDoctorsPage from "./pages/DutyRosterofDoctorsPage";
+import TelemedicinePage from "./pages/commonPages/TelemedicinePage";
+import BookingPage from "./pages/bookingPages/BookingPage";
 import SearchMedicines2Page from "./pages/doctorPages/SearchMedicines2Page";
 import ManageDutyRosterDoctor from "./pages/medicalAdminPages/ManageDutyRosterDoctor";
-
 axios.defaults.baseURL = "http://localhost:2000";
 axios.defaults.withCredentials = true;
 
@@ -92,6 +93,9 @@ function App() {
             path="/medical-admin/manage-duty-roster-doctor"
             element={<ManageDutyRosterDoctor />}
           />
+          <Route path="/search-medicine" element={<SearchMedicinesPage />} />
+          <Route path="/telemedicine" element={<TelemedicinePage />} />
+          <Route path="/book-appointment" element={<BookingPage />} />
         </Route>
       </Routes>
     </UserContextProvider>
