@@ -26,7 +26,10 @@ export const roleMenus = {
   "medical-admin": [
     { name: "All Users", path: "/medical-admin/users" },
     { name: "Manage Medicines", path: "/medical-admin/medicines" },
-    { name: "Edit Doctor List", path: "/medical-admin/duty-roster-doctor" },
+    {
+      name: "Edit Doctor List",
+      path: "/medical-admin/manage-duty-roster-doctor",
+    },
     {
       name: "Manage Medical Staff",
       path: "/admin/manage-medical-staff",

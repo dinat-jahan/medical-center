@@ -201,26 +201,50 @@ router.get("/patient-profile/:uniqueId", isDoctor, async (req, res) => {
 //   }
 // });
 
-// //search medicine
-// router.get("/search-medicine", isDoctor, async (req, res) => {
-//   try {
-//     const query = req.query.medicine || ""; // Ensure it's always a string
+//search medicine
+router.get("/search-medicine", isDoctor, async (req, res) => {
+  try {
+    const query = req.query.medicine || ""; // Ensure it's always a string
 
-//     const medicines = query
-//       ? await Medicine.find({
-//           $or: [
-//             { name: { $regex: query.toString(), $options: "i" } },
-//             { genericName: { $regex: query.toString(), $options: "i" } },
-//             { manufacturer: { $regex: query.toString(), $options: "i" } },
-//           ],
-//         })
-//       : []; // If query is empty, return an empty array
+    const medicines = query
+      ? await Medicine.find({
+          $or: [
+            { name: { $regex: query.toString(), $options: "i" } },
+            { genericName: { $regex: query.toString(), $options: "i" } },
+            { manufacturer: { $regex: query.toString(), $options: "i" } },
+          ],
+        })
+      : []; // If query is empty, return an empty array
 
-//     res.render("doctor-views/searchMedicine", { medicines });
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).send("Internal Server Error"); // Handle errors properly
-//   }
-// });
+    if (medicines.length === 0) {
+      return res.status(404).json({
+        message: "medicines not found",
+        medicines: null,
+      });
+    }
+    return res.json({
+      medicines: medicines,
+      message: "medicines found successfully",
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Internal Server Error"); // Handle errors properly
+  }
+});
+
+router.get("/medicine/:medicineId", async (req, res) => {
+  const { medicineId } = req.params;
+  console.log("inside");
+  try {
+    const medicine = await Medicine.findById(medicineId); // Assuming you're using MongoDB
+    if (!medicine) {
+      return res.status(404).json({ message: "Medicine not found" });
+    }
+    console.log(medicine);
+    res.json(medicine);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching medicine data" });
+  }
+});
 
 module.exports = router;

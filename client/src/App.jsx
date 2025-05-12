@@ -25,13 +25,14 @@ import ManageMedicinePage from "./pages/medicalStaffPages/ManageMedicinePage";
 import MedicineOutOfStockPage from "./pages/medicalStaffPages/MedicineOutOfStockPage";
 import DutyRosterOfDoctorsPage from "./pages/DutyRosterofDoctorsPage";
 import TelemedicinePage from "./pages/TelemedicinePage";
+import SearchMedicines2Page from "./pages/doctorPages/SearchMedicines2Page";
+import ManageDutyRosterDoctor from "./pages/medicalAdminPages/ManageDutyRosterDoctor";
 axios.defaults.baseURL = "http://localhost:2000";
 axios.defaults.withCredentials = true;
 
 function App() {
   return (
     <UserContextProvider>
-      {" "}
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<IndexPage />} />
@@ -81,6 +82,18 @@ function App() {
           />
           <Route path="/search-medicine" element={<SearchMedicinesPage />} />
           <Route path="/telemedicine" element={<TelemedicinePage />} />
+          <Route
+            path="/search-medicine/:medicineId"
+            element={<SearchMedicinesPage />}
+          />
+          <Route
+            path="/search-medicine/:medicineSearch"
+            element={<SearchMedicines2Page />}
+          />
+          <Route
+            path="/medical-admin/manage-duty-roster-doctor"
+            element={<ManageDutyRosterDoctor />}
+          />
         </Route>
       </Routes>
     </UserContextProvider>
