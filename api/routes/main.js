@@ -5,6 +5,7 @@ const router = express.Router();
 const authenticationRoutes = require("./authenticationRoutes");
 const MedicalUser = require("../models/medicalUser");
 const DutyRosterDoctor = require("../models/dutyRosterDoctor");
+const TimeSlot = require("../models/timeslot");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const { GetObjectAclCommand, GetObjectCommand } = require("@aws-sdk/client-s3");
 const s3Client = require("../config/awsConfig");
@@ -49,6 +50,7 @@ router.use("/doctor", require("./doctorRoutes"));
 // router.use("/patient", require("./patientRoutes"));
 // router.use("/medical-staff", require("./medicalStaffRoutes"));
 router.use("/auth", authenticationRoutes);
+router.use("/booking", require("./bookingRoutes"));
 
 // //view doctor list
 // router.get("/doctor-list", async (req, res) => {
@@ -150,4 +152,16 @@ router.get("/doctor-list", async (req, res) => {
     console.log(err);
   }
 });
+
+router.delete("/delete-all-time-slots", async (req, res) => {
+  try {
+    await TimeSlot.deleteMany({});
+    res.json({ message: "All time slots deleted successfully" });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Error deleting time slots", error: err.message });
+  }
+});
+
 module.exports = router;
