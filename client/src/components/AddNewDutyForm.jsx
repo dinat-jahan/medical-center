@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 import axios from "axios";
 
-const AddNewDutyForm = ({ doctors }) => {
+const AddNewDutyForm = ({ doctors, onAddDuty }) => {
   // console.log("doctors", doctors);
   const [formData, setFormData] = useState({
     doctor: "",
@@ -22,14 +22,15 @@ const AddNewDutyForm = ({ doctors }) => {
     console.log(formData);
     axios
       .post("/admin/medical/duty-roster-doctor/add", formData)
-      .then(() => {
+      .then((res) => {
+        const createdDuty = res.data;
+        onAddDuty(createdDuty);
         setSuccessMessage("Duty Added Successfully");
         setErrorMessage("");
-        window.location.reload();
       })
       .catch((err) => {
         console.log(err);
-        setErrorMessage("Error adding duty");
+        setErrorMessage(err.response.data.error);
         setSuccessMessage("");
       });
   };

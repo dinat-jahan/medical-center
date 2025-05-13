@@ -31,9 +31,21 @@ const ManageDutyRosterDoctor = () => {
       .catch((err) => console.log(err));
   };
 
+  const handleAddDuty = (newDuty) => {
+    setDutyRosterDoctors((prev) => [...prev, newDuty]);
+  };
+
   return (
     <div className="bg-teal-50 min-h-screen py-20">
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-20">
+        <h3 className="text-2xl font-poetsen mb-4 text-teal-500 text-center">
+          Add New Duty
+        </h3>
+        <div className="w-full flex justify-center">
+          <div className="w-full max-w-xl bg-teal-50 p-6 shadow-lg rounded-3xl">
+            <AddNewDutyForm doctors={doctors} onAddDuty={handleAddDuty} />
+          </div>
+        </div>
         <h2 className="text-3xl font-poetsen mb-6 text-center text-teal-700 pb-4">
           Duty Roster of Doctors
         </h2>
@@ -44,9 +56,9 @@ const ManageDutyRosterDoctor = () => {
               <tr className="px-4 py-3 text-left text-bold font-bold text-gray-800">
                 <th>Doctor </th>
                 <th> Day</th>
-                <th >Shift</th>
-                <th > Time </th>
-                <th >Action</th>
+                <th>Shift</th>
+                <th> Time </th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -71,23 +83,16 @@ const ManageDutyRosterDoctor = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" className="text-center text-blue-700 py-6 font-semibold">
+                  <td
+                    colSpan="5"
+                    className="text-center text-blue-700 py-6 font-semibold"
+                  >
                     No duty roster found
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
-        </div>
-
-        <h3 className="text-2xl font-poetsen mb-4 text-teal-500 text-center">
-          Add New Duty
-        </h3>
-
-        <div className="w-full flex justify-center">
-          <div className="w-full max-w-xl bg-teal-50 p-6 shadow-lg rounded-3xl">
-            <AddNewDutyForm doctors={doctors} />
-          </div>
         </div>
       </div>
     </div>

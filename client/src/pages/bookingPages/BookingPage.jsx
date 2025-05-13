@@ -12,11 +12,8 @@ const BookingPage = () => {
   const [selectedDate, setSelectedDate] = useState("");
   const [slots, setSlots] = useState([]);
   const patient = user;
+  const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    axios.get("/booking/doctors").then((res) => setDoctors(res.data.doctors));
-  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -36,7 +33,10 @@ const BookingPage = () => {
 
   const handleBooking = (slotId) => {
     axios
-      .post(`/booking/book/${slotId}`, { patientId: patient.id })
+      .post(`/booking/book/${slotId}`, {
+        patientId: patient.id,
+        date: selectedDate,
+      })
       .then((res) => {
         const updatedSlot = res.data.slot;
         setSlots((prevSlots) =>
@@ -71,21 +71,31 @@ const BookingPage = () => {
               : slot
           )
         );
+        setErrorMessage("");
       })
-      .catch((err) => console.log("cancellation err", err));
+      .catch((err) => {
+        console.log("cancellation err", err);
+        if (err.response && err.response.data) {
+          setErrorMessage(err.response.data.message); // Display error in state
+        }
+      });
   };
 
   return (
     <div className="p-4 md:p-8 max-w-5xl mx-auto space-y-6 bg-white-50">
       {/* Patient Info */}
       <div className="bg-teal-50 rounded-2xl shadow p-4 w-[400px] ">
-        <h2 className="text-xl font-bold mb-2 text-teal-700">Patient Information</h2>
+        <h2 className="text-xl font-bold mb-2 text-teal-700">
+          Patient Information
+        </h2>
         <PatientInfoCard patient={patient} />
       </div>
 
       {/* Booking Form */}
       <div className="bg-teal-50 rounded-2xl shadow p-4">
-        <h2 className="text-xl font-bold mb-2 text-teal-700">Book an Appointment</h2>
+        <h2 className="text-xl font-bold mb-2 text-teal-700">
+          Book an Appointment
+        </h2>
         <BookingForm
           doctors={doctors}
           setDoctors={setDoctors}
@@ -98,7 +108,9 @@ const BookingPage = () => {
 
       {/* Slot Table */}
       <div className="bg-white rounded-2xl shadow p-4">
-        <h2 className="text-xl font-bold mb-2 text-teal-700">Available Slots</h2>
+        <h2 className="text-xl font-bold mb-2 text-teal-700">
+          Available Slots
+        </h2>
         {loading ? (
           <div className="flex justify-center items-center py-4">
             <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
@@ -111,6 +123,10 @@ const BookingPage = () => {
             handleCancel={handleCancel}
           />
         )}
+      </div>
+      <div>
+        {errorMessage && <div className="error-message">{errorMessage}</div>}
+        {/* The rest of your BookingPage content */}
       </div>
     </div>
   );
