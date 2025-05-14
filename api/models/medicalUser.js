@@ -33,6 +33,11 @@ const medicalUserSchema = new mongoose.Schema({
     enum: ["student", "teacher", "staff"],
     required: true,
   },
+  sex: {
+    type: String,
+    enum: ["male", "female"],
+    required: true,
+  },
   department: { type: String },
   program: {
     type: String,
@@ -59,6 +64,21 @@ const medicalUserSchema = new mongoose.Schema({
 
 // Static method
 medicalUserSchema.statics.determineRole = determineRole;
+
+medicalUserSchema.set("toObject", { virtuals: true });
+medicalUserSchema.set("toJSON", { virtuals: true });
+
+medicalUserSchema.virtual("writtenPrescriptions", {
+  ref: "Prescription", // Look in the Prescription cabinet
+  localField: "_id", // Use THIS user’s ID...
+  foreignField: "doctor", // ...to match Prescription.doctor
+});
+
+medicalUserSchema.virtual("receivedPrescriptions", {
+  ref: "Prescription", // which model to query
+  localField: "_id", // this user’s _id…
+  foreignField: "patient", // …matches Prescription.patient
+});
 
 // Model
 const MedicalUser = mongoose.model("MedicalUser", medicalUserSchema);
