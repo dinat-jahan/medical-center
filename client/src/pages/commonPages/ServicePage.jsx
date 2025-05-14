@@ -5,40 +5,93 @@ const ServicePage = () => {
 
   const services = [
     {
-      icon: "fas fa-notes-medical",
-      title: "Free Checkup",
-      description: "Get a free checkup with our top-notch facilities and doctors.",
-      moreInfo: "Our free checkup service includes blood pressure, glucose, and general consultation to keep your health in check regularly.",
+      icon: "fa fa-vials",
+      title: "Pathology Department",
+      description: "We offer lab testing and pathology services with scheduled staff shifts.",
+      moreInfo: (
+        <>
+          <p className="mb-4">
+            The Pathology Department at MBSTU Medical Center provides diagnostic services
+            through lab tests and blood sample collection.
+          </p>
+
+
+          <h4 className="font-semibold text-lg text-teal-700 mb-2">🧪 Blood/Sample Collection Time</h4>
+          <ul className="list-disc list-inside mb-4 text-gray-700">
+            <li>Morning: 8:00 AM – 12:00 PM</li>
+            <li>Evening: 2:00 PM – 6:00 PM</li>
+          </ul>
+
+          <h4 className="font-semibold text-lg text-teal-700 mb-2">📋 Weekly Duty Roster</h4>
+          <div className="overflow-x-auto mb-4">
+            <table className="min-w-full text-sm text-left border border-gray-300">
+              <thead className="bg-teal-100 text-gray-800">
+                <tr>
+                  <th className="border px-4 py-2">Day</th>
+                  <th className="border px-4 py-2">Morning (8:00 AM - 2:00 PM)</th>
+                  <th className="border px-4 py-2">Afternoon (2:00 PM - 8:00 PM)</th>
+                </tr>
+              </thead>
+              <tbody className="text-gray-700">
+                {[
+                  ["Saturday", "Md.Mostafizur Rahman", "Shahoriyar Khan"],
+                  ["Sunday", "Shahoriyar Khan", "Md.Mostafizur Rahman"],
+                  ["Monday", "Md.Mostafizur Rahman", "Shahoriyar Khan"],
+                  ["Tuesday", "Shahoriyar Khan", "Md.Mostafizur Rahman"],
+                  ["Wednesday", "Md.Mostafizur Rahman", "Shahoriyar Khan"],
+                ].map(([day, morning, afternoon], idx) => (
+                  <tr key={idx} className="odd:bg-white even:bg-gray-50">
+                    <td className="border px-4 py-2 font-medium">{day}</td>
+                    <td className="border px-4 py-2">{morning}</td>
+                    <td className="border px-4 py-2">{afternoon}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <h4 className="font-semibold text-lg text-teal-700 mb-2">📞 Contact Numbers</h4>
+          <ul className="list-disc list-inside text-gray-700">
+            <li> Shahoriyar Khan  : 01700-614613</li>
+            <li>Md.Mostafizur Rahman: 01751-457683</li>
+          </ul>
+        </>
+      ),
     },
     {
       icon: "fa fa-ambulance",
       title: "24/7 Ambulance",
       description: "We provide 24/7 ambulance services to ensure immediate care.",
-      moreInfo: "Our ambulances are equipped with emergency life-saving tools and are operated by trained medical personnel to ensure safe and timely patient transport.",
+      moreInfo:
+        "Our ambulances are equipped with emergency life-saving tools and are operated by trained medical personnel to ensure safe and timely patient transport.",
     },
     {
-      icon: "fa fa-user-md",
-      title: "Experts Consultancy",
-      description: "Consult with highly experienced medical professionals anytime.",
-      moreInfo: "Get access to specialist doctors for different medical fields including cardiology, neurology, dermatology, and more.",
+      icon: "fa fa-ambulance",
+      title: "Emergency",
+      description: "Emergency medical care is available 24/7 for urgent needs.",
+      moreInfo:
+        "Our emergency unit is equipped with necessary life-saving equipment and staff to handle all types of critical health situations promptly.",
+    },
+    {
+      icon: "fa fa-heartbeat",
+      title: "Telemedicine",
+      description: "Access quality healthcare from your home via online consultation.",
+      moreInfo:
+        "Our telemedicine service allows patients to consult doctors through video calls and get prescriptions without visiting physically.",
     },
     {
       icon: "fa fa-pills",
       title: "Medicines",
       description: "Quality medicines are available at affordable prices.",
-      moreInfo: "We offer both prescription and over-the-counter medicines, ensuring quality and authenticity at our on-campus pharmacy.",
+      moreInfo:
+        "We offer both prescription and over-the-counter medicines, ensuring quality and authenticity at our on-campus pharmacy.",
     },
     {
       icon: "fa fa-bed",
       title: "Bed Facility",
       description: "Comfortable and clean bed facilities for in-patient care.",
-      moreInfo: "Our wards are regularly cleaned, ventilated, and monitored by medical staff to maintain hygiene and patient comfort.",
-    },
-    {
-      icon: "fa fa-heartbeat",
-      title: "Total Care",
-      description: "We provide complete health care support around the clock.",
-      moreInfo: "Our total care package includes diagnosis, treatment, follow-up, and mental health support all under one roof.",
+      moreInfo:
+        "Our wards are regularly cleaned, ventilated, and monitored by medical staff to maintain hygiene and patient comfort.",
     },
   ];
 
@@ -82,7 +135,7 @@ const ServicePage = () => {
 
       {activeIndex !== null && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="relative bg-teal-50 max-w-2xl w-full mx-4 rounded-lg shadow-lg p-6 min-h-[350px]">
+          <div className="relative bg-teal-50 max-w-2xl w-full mx-4 rounded-lg shadow-lg p-6 min-h-[350px] max-h-[80vh] overflow-y-auto">
             <button
               onClick={closePopup}
               className="absolute top-2 right-2 w-8 h-8 bg-teal-500 hover:bg-teal-700 text-white rounded-full flex items-center justify-center text-lg font-bold transition border-none"
@@ -93,7 +146,9 @@ const ServicePage = () => {
               {services[activeIndex].title}
             </h3>
             <p className="text-gray-700 text-base">{services[activeIndex].description}</p>
-            <p className="text-gray-700 text-base mt-4">{services[activeIndex].moreInfo}</p>
+            <div className="text-gray-700 text-base mt-4 space-y-2 overflow-y-auto">
+              {services[activeIndex].moreInfo}
+            </div>
           </div>
         </div>
       )}

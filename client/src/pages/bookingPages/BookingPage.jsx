@@ -78,7 +78,7 @@ const BookingPage = () => {
   return (
     <div className="p-4 md:p-8 max-w-5xl mx-auto space-y-6 bg-white-50">
       {/* Patient Info */}
-      <div className="bg-teal-50 rounded-2xl shadow p-4 w-[400px] ">
+      <div className="bg-teal-50 rounded-2xl shadow p-4">
         <h2 className="text-xl font-bold mb-2 text-teal-700">Patient Information</h2>
         <PatientInfoCard patient={patient} />
       </div>
