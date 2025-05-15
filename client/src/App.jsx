@@ -23,13 +23,14 @@ import ShowPrescriptionPage from "./pages/doctorPages/ShowPrescriptionPage";
 import SearchMedicinesPage from "./pages/doctorPages/SearchMedicinesPage";
 import ManageMedicinePage from "./pages/medicalStaffPages/ManageMedicinePage";
 import MedicineOutOfStockPage from "./pages/medicalStaffPages/MedicineOutOfStockPage";
-import DutyRosterOfDoctorsPage from "./pages/DutyRosterofDoctorsPage";
 import TelemedicinePage from "./pages/commonPages/TelemedicinePage";
 import BookingPage from "./pages/bookingPages/BookingPage";
 import SearchMedicines2Page from "./pages/doctorPages/SearchMedicines2Page";
 import ManageDutyRosterDoctor from "./pages/medicalAdminPages/ManageDutyRosterDoctor";
 import PrescriptionForm from "./pages/doctorPages/prescriptionPage/PrescriptionForm";
 import PrescriptionView from "./pages/doctorPages/prescriptionPage/PrescriptionView";
+import PrescriptionHistory from "./pages/patientPages/prescriptionPages/PrescriptionHistory";
+import DutyRosterOfDoctorsPage from "./pages/DutyRosterOfDoctorsPage";
 axios.defaults.baseURL = "http://localhost:2000";
 axios.defaults.withCredentials = true;
 
@@ -108,6 +109,10 @@ function App() {
           <Route
             path="/show-prescription/:prescriptionId"
             element={<PrescriptionView />}
+          />
+          <Route
+            path="/patient/medical-history"
+            element={<PrescriptionHistory />}
           />
         </Route>
       </Routes>
