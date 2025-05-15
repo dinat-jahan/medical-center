@@ -10,12 +10,12 @@ import {
   FaTint,
   FaIdBadge,
 } from "react-icons/fa";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { InfoField } from "../../components/InfoField";
-
 const PatientProfilePage = () => {
   const { uniqueId } = useParams();
+  const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -55,6 +55,11 @@ const PatientProfilePage = () => {
           year: "numeric",
         })
       : "Invalid Date";
+
+  const handleWritePrescription = () => {
+    // navigate to prescription form, passing patientId via URL
+    navigate(`/write-prescription/${uniqueId}`);
+  };
   return (
     <div className="flex justify-center items-start min-h-screen bg-[#f0fdfa] py-10 px-4">
       <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-2xl relative">
@@ -191,7 +196,7 @@ const PatientProfilePage = () => {
         <div className="mt-6 text-center">
           <button
             className="px-6 py-2 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700"
-            onClick={() => console.log("Writing prescription...")}
+            onClick={handleWritePrescription}
           >
             Write Prescription
           </button>

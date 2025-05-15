@@ -28,6 +28,7 @@ import TelemedicinePage from "./pages/commonPages/TelemedicinePage";
 import BookingPage from "./pages/bookingPages/BookingPage";
 import SearchMedicines2Page from "./pages/doctorPages/SearchMedicines2Page";
 import ManageDutyRosterDoctor from "./pages/medicalAdminPages/ManageDutyRosterDoctor";
+import PrescriptionForm from "./pages/doctorPages/prescriptionPage/PrescriptionForm";
 axios.defaults.baseURL = "http://localhost:2000";
 axios.defaults.withCredentials = true;
 
@@ -73,7 +74,7 @@ function App() {
           <Route path="/write-prescription" element={<WritePrescription />} />
           <Route path="/manage-medicine" element={<ManageMedicinePage />} />
           <Route
-            path='/medicine-out-of stock'
+            path="/medicine-out-of stock"
             element={<MedicineOutOfStockPage />}
           />
           <Route path="/show-prescription" element={<ShowPrescriptionPage />} />
@@ -99,6 +100,10 @@ function App() {
           <Route path="/search-medicine" element={<SearchMedicinesPage />} />
           <Route path="/telemedicine" element={<TelemedicinePage />} />
           <Route path="/book-appointment" element={<BookingPage />} />
+          <Route
+            path="/write-prescription/:uniqueId"
+            element={<PrescriptionForm />}
+          />
         </Route>
       </Routes>
     </UserContextProvider>

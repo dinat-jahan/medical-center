@@ -49,6 +49,7 @@ passport.use(
               uniqueId: universityUser.uniqueId,
               name: universityUser.name,
               userType: universityUser.userType,
+              sex: universityUser.sex,
               department: universityUser.department,
               office: universityUser.office,
               designation: universityUser.designation,

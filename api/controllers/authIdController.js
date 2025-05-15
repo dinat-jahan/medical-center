@@ -125,6 +125,7 @@ exports.saveUserPassword = async (req, res) => {
       uniqueId: user.uniqueId,
       name: user.name,
       userType: user.userType,
+      sex: user.sex,
       department: user.department,
       office: user.office,
       designation: user.designation,

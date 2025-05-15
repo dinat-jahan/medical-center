@@ -9,7 +9,7 @@ const { calculateAge } = require("../helper/utils");
 // const classifiedMedicine = require("../controllers/prescriptionController");
 // const Prescription = require("../models/prescription");
 const Medicine = require("../models/medicine");
-
+const prescriptionController = require("../controllers/prescriptionController");
 const router = express.Router();
 
 const isDoctor = (req, res, next) => {
@@ -114,6 +114,23 @@ router.get("/patient-profile/:uniqueId", isDoctor, async (req, res) => {
     });
   }
 });
+
+//prescription routes
+router.get(
+  "/pres/patient-profile/:uniqueId",
+  prescriptionController.getPatientInfo
+);
+// fetch list of diagnoses with optional ?search=
+router.get("/diagnoses", prescriptionController.listDiagnoses);
+
+// add a new diagnosis
+router.post("/diagnoses", prescriptionController.createDiagnosis);
+
+//search medicine
+router.get("/pres/medicines", prescriptionController.getMedicine);
+
+//post prescription
+router.post("/create-prescription", prescriptionController.postPrescription);
 
 // //post a prescription
 // router.get("/write-prescription/:id", isDoctor, async (req, res) => {
