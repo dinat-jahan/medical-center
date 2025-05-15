@@ -31,7 +31,8 @@ import PrescriptionForm from "./pages/doctorPages/prescriptionPage/PrescriptionF
 import PrescriptionView from "./pages/doctorPages/prescriptionPage/PrescriptionView";
 import PrescriptionHistory from "./pages/patientPages/prescriptionPages/PrescriptionHistory";
 import DutyRosterOfDoctorsPage from "./pages/DutyRosterOfDoctorsPage";
-axios.defaults.baseURL = "http://localhost:2000";
+axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
+
 axios.defaults.withCredentials = true;
 
 function App() {
