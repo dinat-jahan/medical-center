@@ -35,7 +35,7 @@ const LoginForm = () => {
       <div className="p-5">
         <div>
           <a
-            href="http://localhost:2000/auth/google"
+            href={`${import.meta.env.VITE_API_BASE_URL}/auth/google`}
             className="flex mt-3 justify-center items-center gap-5 border border-gray-500 bg-white text-primary p-2 rounded"
           >
             <FcGoogle className="text-2xl bg-white rounded-full" />

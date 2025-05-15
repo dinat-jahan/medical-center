@@ -10,7 +10,7 @@ const GoogleRedirect = () => {
   useEffect(() => {
     // Get the logged-in user from backend session
     axios
-      .get("http://localhost:2000/api/whoami", { withCredentials: true })
+      .get("/api/whoami", { withCredentials: true })
       .then((res) => {
         setUser(res.data);
 
