@@ -1,16 +1,15 @@
 import React, { useContext, useEffect, useState } from "react";
-import PatientInfo from "./components/PatientInfo";
-import DoctorInfo from "./components/DoctorInfo";
 import DiagnosisSelect from "./components/DiagnosisSelect";
 import MedicineEntry from "./components/MedicineEntry";
 import MedicineList from "./components/MedicineList";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { UserContext } from "../../../UserContext";
 import axios from "axios";
 import InternalQtyModal from "./components/InternalQtyModal";
 
 const PrescriptionForm = () => {
   const { uniqueId } = useParams();
+  const navigate = useNavigate();
 
   const [patient, setPatient] = useState(null);
   const { user: doctor } = useContext(UserContext);
@@ -30,14 +29,12 @@ const PrescriptionForm = () => {
   const [followUpDate, setFollowUpDate] = useState("");
   const [advice, setAdvice] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [modalItems, setModalItems] = useState([]);
 
   useEffect(() => {
     const fetchPatientProfile = async () => {
       try {
-        const { data } = await axios.get(
-          `/doctor/pres/patient-profile/${uniqueId}`
-        );
-        console.log(data);
+        const { data } = await axios.get(`/doctor/pres/patient-profile/${uniqueId}`);
         setPatient(data.patient);
       } catch (err) {
         console.log(err);
@@ -49,6 +46,7 @@ const PrescriptionForm = () => {
   }, [uniqueId]);
 
   const savePrescription = async () => {
+    if (!patient) return;
     const payload = {
       patient: patient._id,
       doctor: doctor.id,
@@ -71,31 +69,33 @@ const PrescriptionForm = () => {
       })),
     };
     try {
-      console.log(payload);
-      await axios.post("/doctor/create-prescription", payload);
-      // handle success
+      const { data } = await axios.post("/doctor/create-prescription", payload);
+      console.log(data);
+      // navigate(`/prescriptions/${data.prescription._id}`);
     } catch (err) {
       console.error(err);
     }
   };
 
   const handleSaveClick = () => {
-    if (items.some((m) => m.dispensedFrom === "internal")) {
+    const internals = items.map((m, idx) => ({ ...m, idx })).filter((m) => m.dispensedFrom === "internal");
+    if (internals.length) {
+      setModalItems(internals);
       setShowModal(true);
     } else {
       savePrescription();
     }
   };
 
-  const handleModalConfirm = (localItems) => {
-    const newItems = items.map((m) => {
-      if (m.dispensedFrom === "internal") {
-        const updated = localItems.find(
-          (li) =>
-            li.medicineName === m.medicineName &&
-            li.requestedQuantity === m.requestedQuantity
-        );
-        return updated || m;
+  const handleModalConfirm = (updated) => {
+    const newItems = items.map((m, i) => {
+      const u = updated.find((x) => x.idx === i);
+      if (u) {
+        return {
+          ...m,
+          internalQuantity: u.internalQuantity,
+          externalQuantity: m.requestedQuantity - u.internalQuantity,
+        };
       }
       return m;
     });
@@ -104,30 +104,32 @@ const PrescriptionForm = () => {
     savePrescription();
   };
 
+  const today = new Date().toLocaleDateString("en-US");
+
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
-      <div className="bg-white rounded-2xl shadow-lg p-6 space-y-6 border border-gray-200">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <PatientInfo patient={patient} />
-          <DoctorInfo doctor={doctor} />
-        </div>
+    <div className="max-w-3xl mx-auto px-4 py-6 min-h-screen flex flex-col">
+      <div className="bg-teal-50 rounded-2xl shadow-lg p-6 space-y-6 border border-gray-200 flex-grow">
+        {/* Patient Info (inline in main form) */}
+        {patient ? (
+          <div className="text-gray-700 space-y-1 text-base leading-relaxed font-semibold">
+            <div><span className="font-bold" >Name:</span> {patient.name}</div>
+            <div><span className="font-bold">Unique ID:</span> {patient.uniqueId}</div>
+            <div><span className="font-bold">Age:</span> {patient.age}</div>
+            <div><span className="font-bold" >Sex:</span> {patient.sex}</div>
+          </div>
+        ) : (
+          <div className="text-gray-500">Loading patient info...</div>
+        )}
 
         <DiagnosisSelect diagnoses={diagnoses} setDiagnoses={setDiagnoses} />
 
-        <MedicineEntry
-          entry={entry}
-          setEntry={setEntry}
-          items={items}
-          setItems={setItems}
-        />
+        <MedicineEntry entry={entry} setEntry={setEntry} items={items} setItems={setItems} />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Advice (optional)
-            </label>
+            <label className="block font-semibold text-gray-800 mb-1 text-lg">Advice (optional)</label>
             <textarea
-              className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border  border-gray-300 p-3 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={advice}
               onChange={(e) => setAdvice(e.target.value)}
               placeholder="General advice..."
@@ -135,12 +137,10 @@ const PrescriptionForm = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Follow-Up Date (optional)
-            </label>
+            <label className="block text-lg font-semibold text-gray-800 mb-1">Follow-Up Date (optional)</label>
             <input
               type="date"
-              className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 p-3 rounded-3xl focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={followUpDate}
               onChange={(e) => setFollowUpDate(e.target.value)}
             />
@@ -149,23 +149,31 @@ const PrescriptionForm = () => {
 
         <MedicineList items={items} setItems={setItems} setEntry={setEntry} />
 
-        <div className="text-right pt-4">
-          <button
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition duration-200"
-            onClick={handleSaveClick}
-          >
-            Save Prescription
-          </button>
+        {/* Doctor Info */}
+        <div className="flex justify-end items-center border-t border-gray-300 pt-5 mt-6">
+          <div className="text-right text-gray-600 text-sm font-semibold whitespace-nowrap">
+            <div>Doctor: {doctor.name} (ID: {doctor.uniqueId})</div>
+            <div>Date: {today}</div>
+          </div>
         </div>
-
-        {showModal && (
-          <InternalQtyModal
-            items={items.filter((m) => m.dispensedFrom === "internal")}
-            onConfirm={handleModalConfirm}
-            onCancel={() => setShowModal(false)}
-          />
-        )}
       </div>
+
+      <div className="mt-6 flex justify-center">
+        <button
+          className="bg-blue-500 hover:bg-teal-700 text-white font-medium w-[350px] border-none px-6 py-2 rounded-3xl text-xl transition duration-200"
+          onClick={handleSaveClick}
+        >
+          Save Prescription
+        </button>
+      </div>
+
+      {showModal && (
+        <InternalQtyModal
+          items={modalItems}
+          onConfirm={handleModalConfirm}
+          onCancel={() => setShowModal(false)}
+        />
+      )}
     </div>
   );
 };

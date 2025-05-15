@@ -55,7 +55,8 @@ const MedicineEntry = ({ entry, setEntry, items, setItems }) => {
       entry.medicine && entry.medicine.monthlyStockQuantity > 0
         ? "internal"
         : "external";
-
+    const internalQuantity =
+      dispensedFrom === "external" ? 0 : requestedQuantity;
     setItems((prev) => [
       ...prev,
       {
@@ -217,7 +218,15 @@ const MedicineEntry = ({ entry, setEntry, items, setItems }) => {
             setEntry((prev) => ({ ...prev, comment: e.target.value }))
           }
         />
-        <button onClick={handleAddMedicine}>+ Add Medicine</button>
+       <div className="flex justify-center mt-4">
+  <button
+    onClick={handleAddMedicine}
+    className="bg-teal-500 hover:bg-teal-700 text-white font-medium w-[350px] border-none px-6 py-2 rounded-3xl text-lg transition duration-200"
+  >
+    + Add Medicine
+  </button>
+</div>
+
       </div>
     </div>
   );

@@ -155,9 +155,7 @@ exports.postPrescription = async (req, res) => {
         status: "pending",
       }));
 
-      const overallStatus = dispenseItems.every((item) => item.quantity === 0)
-        ? "pending"
-        : "partial";
+      const overallStatus = "pending";
 
       dispenseRecord = new DispenseRecord({
         prescription: prescription._id,
