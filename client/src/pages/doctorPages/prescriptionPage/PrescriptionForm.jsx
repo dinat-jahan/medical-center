@@ -4,12 +4,13 @@ import DoctorInfo from "./components/DoctorInfo";
 import DiagnosisSelect from "./components/DiagnosisSelect";
 import MedicineEntry from "./components/MedicineEntry";
 import MedicineList from "./components/MedicineList";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { UserContext } from "../../../UserContext";
 import axios from "axios";
 import InternalQtyModal from "./components/InternalQtyModal";
 const PrescriptionForm = () => {
   const { uniqueId } = useParams();
+  const navigate = useNavigate();
 
   const [patient, setPatient] = useState(null);
   const { user: doctor } = useContext(UserContext);
@@ -29,6 +30,7 @@ const PrescriptionForm = () => {
   const [followUpDate, setFollowUpDate] = useState("");
   const [advice, setAdvice] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [modalItems, setModalItems] = useState([]);
 
   useEffect(() => {
     const fetchPatientProfile = async () => {
@@ -70,32 +72,36 @@ const PrescriptionForm = () => {
       })),
     };
     try {
-      console.log(payload);
-      await axios.post("/doctor/create-prescription", payload);
-      // handle success
+      // console.log(payload);
+      const { data } = await axios.post("/doctor/create-prescription", payload);
+      console.log(data);
+      // navigate(`/prescriptions/${data.prescription._id}`);
     } catch (err) {
       console.error(err);
     }
   };
 
   const handleSaveClick = () => {
-    if (items.some((m) => m.dispensedFrom === "internal")) {
+    const internals = items
+      .map((m, idx) => ({ ...m, idx }))
+      .filter((m) => m.dispensedFrom === "internal");
+    if (internals.length) {
+      setModalItems(internals);
       setShowModal(true);
     } else {
       savePrescription();
     }
   };
 
-  const handleModalConfirm = (localItems) => {
-    // merge back full items: keep the external medicine entries unchanged, update internal
-    const newItems = items.map((m) => {
-      if (m.dispensedFrom === "internal") {
-        const updated = localItems.find(
-          (li) =>
-            li.medicineName === m.medicineName &&
-            li.requestedQuantity === m.requestedQuantity
-        );
-        return updated || m;
+  const handleModalConfirm = (updated) => {
+    const newItems = items.map((m, i) => {
+      const u = updated.find((x) => x.idx === i);
+      if (u) {
+        return {
+          ...m,
+          internalQuantity: u.internalQuantity,
+          externalQuantity: m.requestedQuantity - u.internalQuantity,
+        };
       }
       return m;
     });
@@ -150,7 +156,7 @@ const PrescriptionForm = () => {
         <>
           {showModal && (
             <InternalQtyModal
-              items={items.filter((m) => m.dispensedFrom === "internal")}
+              items={modalItems}
               onConfirm={handleModalConfirm}
               onCancel={() => setShowModal(false)}
             />

@@ -55,7 +55,8 @@ const MedicineEntry = ({ entry, setEntry, items, setItems }) => {
       entry.medicine && entry.medicine.monthlyStockQuantity > 0
         ? "internal"
         : "external";
-
+    const internalQuantity =
+      dispensedFrom === "external" ? 0 : requestedQuantity;
     setItems((prev) => [
       ...prev,
       {
