@@ -9,6 +9,28 @@ const DiagnosisSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+const TestSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
+    code: {
+      type: String,
+      trim: true,
+    },
+    description: {
+      type: String,
+      default: "",
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
 const Diagnosis = mongoose.model("Diagnosis", DiagnosisSchema);
-module.exports = Diagnosis;
+const Test = mongoose.model("Test", TestSchema);
+module.exports = { Diagnosis, Test };

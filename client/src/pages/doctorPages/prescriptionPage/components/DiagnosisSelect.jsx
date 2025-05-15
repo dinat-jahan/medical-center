@@ -30,17 +30,12 @@ const DiagnosisSelect = ({ diagnoses, setDiagnoses }) => {
   };
 
   //persist new diagnosis
-  const handleCreate = async (inputValue) => {
-    try {
-      const res = await axios.post("/doctor/diagnoses", {
-        code: "",
-        name: inputValue,
-        displayName: inputValue,
-      });
-      setDiagnoses((prev) => [...prev, res.data]);
-    } catch (err) {
-      console.error("Error creating diagnosis", err);
-    }
+  const handleCreate = (inputValue) => {
+    // push a “free‐text” diagnosis object with no ObjectId
+    setDiagnoses((prev) => [
+      ...prev,
+      { _id: null, name: inputValue, displayName: inputValue },
+    ]);
   };
 
   return (

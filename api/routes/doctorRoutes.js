@@ -132,91 +132,17 @@ router.get("/pres/medicines", prescriptionController.getMedicine);
 //post prescription
 router.post("/create-prescription", prescriptionController.postPrescription);
 
-// //post a prescription
-// router.get("/write-prescription/:id", isDoctor, async (req, res) => {
-//   try {
-//     const patient = await UsersModel2.findById(req.params.id);
-//     patient.age = calculateAge(patient.dob);
+//show prescription
+router.get(
+  "/show-prescription/:prescriptionId",
+  prescriptionController.getPrescription
+);
 
-//     res.render("doctor-views/createPrescription", {
-//       patient: patient,
-//     });
-//   } catch (err) {
-//     console.log(err);
-//   }
-// });
+//get test suggestion
+router.get("/tests", prescriptionController.getTests);
 
-// // Handle prescription form submission
-// router.post("/write-prescription/:id", isDoctor, async (req, res) => {
-//   try {
-//     const patient = await UsersModel2.findById(req.params.id);
-//     patient.age = calculateAge(patient.dob);
-
-//     const { diagnosis, followUpDate, advice } = req.body;
-//     console.log(req.body);
-
-//     // Process medicines data into an array of objects
-//     const medicines = Object.keys(req.body)
-//       .filter((key) => key.startsWith("medicines[")) // Filters out medicine fields
-//       .reduce((acc, key) => {
-//         // Extract the index and the field name (e.g., 'medicines[0].drugName' -> index=0, field='drugName')
-//         const match = key.match(/medicines\[(\d+)\]\.(\w+)/);
-//         if (match) {
-//           const index = match[1]; // Extract the index of the medicine (e.g., '0', '1', etc.)
-//           const field = match[2]; // Extract the field name (e.g., 'drugName', 'dose', etc.)
-
-//           if (!acc[index]) {
-//             acc[index] = {}; // Initialize a new medicine object if it's the first field for this index
-//           }
-
-//           acc[index][field] = req.body[key]; // Assign the field value to the correct medicine object
-//         }
-//         return acc;
-//       }, []);
-
-//     // Now 'medicines' will contain an array of medicine objects
-//     console.log(medicines);
-
-//     // Ensure medicines is an array
-//     let classifiedMedicines = [];
-//     if (Array.isArray(medicines)) {
-//       classifiedMedicines = await classifiedMedicine(medicines); // Classify medicines
-//     }
-
-//     // Create and save the prescription
-//     const prescription = new Prescription({
-//       patient,
-//       doctor: req.session.user.id,
-//       diagnosis,
-//       age: patient.age,
-//       medicines: classifiedMedicines,
-//       followUpDate,
-//       advice,
-//     });
-
-//     await prescription.save();
-
-//     // Render the prescription page
-//     res.render("doctor-views/showPrescription", {
-//       patient: patient,
-//       prescription: prescription,
-//     });
-//   } catch (err) {
-//     console.log(err);
-//   }
-// });
-
-// //see available-medicine
-// router.get("/available-medicine", isDoctor, async (req, res) => {
-//   try {
-//     const medicines = await Medicine.find();
-//     res.render("doctor-views/availableMedicines", {
-//       medicines: medicines,
-//     });
-//   } catch (err) {
-//     console.log(err);
-//   }
-// });
+//post test as a option
+router.post("/tests", prescriptionController.postTests);
 
 //search medicine
 router.get("/search-medicine", isDoctor, async (req, res) => {

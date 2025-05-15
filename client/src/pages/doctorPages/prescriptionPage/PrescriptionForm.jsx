@@ -4,6 +4,7 @@ import DoctorInfo from "./components/DoctorInfo";
 import DiagnosisSelect from "./components/DiagnosisSelect";
 import MedicineEntry from "./components/MedicineEntry";
 import MedicineList from "./components/MedicineList";
+import TestEntry from "./components/TestEntry";
 import { useNavigate, useParams } from "react-router-dom";
 import { UserContext } from "../../../UserContext";
 import axios from "axios";
@@ -16,6 +17,7 @@ const PrescriptionForm = () => {
   const { user: doctor } = useContext(UserContext);
 
   const [diagnoses, setDiagnoses] = useState([]);
+  const [tests, setTestts] = useState([]);
   const [entry, setEntry] = useState({
     medicine: null,
     medicineName: "",
@@ -49,16 +51,23 @@ const PrescriptionForm = () => {
     }
   }, [uniqueId]);
 
-  const savePrescription = async () => {
+  const savePrescription = async (itemsToSend = items) => {
     const payload = {
       patient: patient._id,
       doctor: doctor.id,
       date: new Date(),
-      diagnoses: diagnoses.map((d) => d._id),
+      diagnoses: diagnoses.map((d) => ({
+        diagnosis: d._id, // ObjectId or null
+        displayName: d.displayName || d.name,
+      })),
+      tests: tests.map((t) => ({
+        test: t._id, // null for a custom entry
+        name: t.name,
+      })),
       age: patient.age,
       followUpDate: followUpDate || null,
       advice: advice || "",
-      medicines: items.map((m) => ({
+      medicines: itemsToSend.map((m) => ({
         medicine: m.medicine ? m.medicine._id : null,
         medicineName: m.medicineName,
         dose: m.dose || "",
@@ -75,7 +84,13 @@ const PrescriptionForm = () => {
       // console.log(payload);
       const { data } = await axios.post("/doctor/create-prescription", payload);
       console.log(data);
-      // navigate(`/prescriptions/${data.prescription._id}`);
+      const { prescription, dispenseRecord } = data;
+      console.log(prescription._id);
+      if (prescription && prescription._id) {
+        navigate(`/show-prescription/${prescription._id}`, {
+          state: { dispenseRecord },
+        });
+      }
     } catch (err) {
       console.error(err);
     }
@@ -87,6 +102,7 @@ const PrescriptionForm = () => {
       .filter((m) => m.dispensedFrom === "internal");
     if (internals.length) {
       setModalItems(internals);
+
       setShowModal(true);
     } else {
       savePrescription();
@@ -105,9 +121,11 @@ const PrescriptionForm = () => {
       }
       return m;
     });
+    console.log("newItems", newItems);
     setItems(newItems);
+    console.log("items", items);
     setShowModal(false);
-    savePrescription();
+    savePrescription(newItems);
   };
 
   return (
@@ -122,6 +140,7 @@ const PrescriptionForm = () => {
           items={items}
           setItems={setItems}
         />
+        <TestEntry tests={tests} setTests={setTestts} />
         {/* Advice & Follow-up */}
         <div className="col-span-2">
           <label>Advice (optional)</label>

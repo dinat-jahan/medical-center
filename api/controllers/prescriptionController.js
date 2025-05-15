@@ -3,9 +3,11 @@ require("dotenv").config();
 const MedicalUser = require("../models/medicalUser");
 const Medicine = require("../models/medicine");
 const Prescription = require("../models/prescription");
-const Diagnosis = require("../models/diagnosis");
+const { Diagnosis } = require("../models/diagnosis");
+const { Test } = require("../models/diagnosis");
 const DispenseRecord = require("../models/dispenseRecord");
 const { calculateAge } = require("../helper/prescriptionMethods");
+const mongoose = require("mongoose");
 
 //get patientinfo
 exports.getPatientInfo = async (req, res) => {
@@ -93,6 +95,37 @@ exports.getMedicine = async (req, res) => {
   }
 };
 
+//get test query
+exports.getTests = async (req, res) => {
+  try {
+    const searchTerm = req.query.search || "";
+    const regex = new RegExp(searchTerm, "i");
+    const tests = await Test.find({
+      $or: [{ name: regex }, { code: regex }],
+    }).limit(20);
+    res.json(tests);
+  } catch (err) {
+    console.error("Error fetching tests:", err);
+    res.status(500).json({ message: "Server error fetching tests" });
+  }
+};
+
+exports.postTests = async (req, res) => {
+  try {
+    const { name } = req.body;
+    const newTest = new Test({ name });
+    const saved = await newTest.save();
+    res.status(201).json(saved);
+  } catch (err) {
+    console.error("Error creating test:", err);
+    if (err.code === 11000) {
+      // Duplicate key error
+      return res.status(400).json({ message: "Test already exists" });
+    }
+    res.status(500).json({ message: "Server error creating test" });
+  }
+};
+
 // POST /api/prescriptions
 // Creates a new prescription with medicines array
 exports.postPrescription = async (req, res) => {
@@ -102,6 +135,7 @@ exports.postPrescription = async (req, res) => {
       doctor,
       date = new Date(),
       diagnoses = [],
+      tests = [],
       age,
       followUpDate,
       advice = "",
@@ -136,6 +170,7 @@ exports.postPrescription = async (req, res) => {
       doctor,
       date,
       diagnoses,
+      tests,
       age,
       followUpDate: followUpDate ? new Date(followUpDate) : undefined,
       advice,
@@ -173,6 +208,48 @@ exports.postPrescription = async (req, res) => {
     res.status(201).json({ prescription, dispenseRecord });
   } catch (err) {
     console.error("Error creating prescription and dispense record:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+// GET /api/prescriptions/:id
+// Fetch a prescription along with its dispense record
+exports.getPrescription = async (req, res) => {
+  try {
+    const { prescriptionId } = req.params;
+    console.log(prescriptionId);
+    const prescription = await Prescription.findById(prescriptionId)
+      .populate("patient", "name  sex uniqueId")
+      .populate("doctor", "name uniqueId")
+      .populate("diagnoses", "displayName name")
+      .populate("tests", "name code")
+      .lean();
+
+    if (!prescription) {
+      return res.status(404).json({ error: "Prescription not found" });
+    }
+
+    // Also load its dispense record, if any
+    let dispenseRecord = await DispenseRecord.findOne({
+      prescription: prescriptionId,
+    })
+      .select("medicines overallStatus pharmacyStaff recordedAt")
+      .populate("medicines.medicine", "name")
+      .lean();
+
+    if (dispenseRecord) {
+      // attach a medicineName for each item for convenience
+      dispenseRecord.medicines = dispenseRecord.medicines.map((item) => ({
+        ...item,
+        medicineName: item.medicine ? item.medicine.name : undefined,
+      }));
+    }
+
+    console.log(prescription);
+    console.log(dispenseRecord);
+    res.json({ prescription, dispenseRecord });
+  } catch (err) {
+    console.error("Error fetching prescription:", err);
     res.status(500).json({ error: "Server error" });
   }
 };

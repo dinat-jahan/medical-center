@@ -29,6 +29,7 @@ import BookingPage from "./pages/bookingPages/BookingPage";
 import SearchMedicines2Page from "./pages/doctorPages/SearchMedicines2Page";
 import ManageDutyRosterDoctor from "./pages/medicalAdminPages/ManageDutyRosterDoctor";
 import PrescriptionForm from "./pages/doctorPages/prescriptionPage/PrescriptionForm";
+import PrescriptionView from "./pages/doctorPages/prescriptionPage/PrescriptionView";
 axios.defaults.baseURL = "http://localhost:2000";
 axios.defaults.withCredentials = true;
 
@@ -103,6 +104,10 @@ function App() {
           <Route
             path="/write-prescription/:uniqueId"
             element={<PrescriptionForm />}
+          />
+          <Route
+            path="/show-prescription/:prescriptionId"
+            element={<PrescriptionView />}
           />
         </Route>
       </Routes>
