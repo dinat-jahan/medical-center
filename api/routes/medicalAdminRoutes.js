@@ -41,18 +41,35 @@ router.get("/duty-roster-doctor", isMedicalAdmin, async (req, res) => {
 //add a new doctor duty roster entry
 router.post("/duty-roster-doctor/add", isMedicalAdmin, async (req, res) => {
   try {
-    console.log(req.body);
-    const { doctor, day, shift, startTime, endTime } = req.body;
-    await DutyRosterDoctor.create({
-      doctor,
-      day,
-      shift,
-      startTime,
-      endTime,
+    const { doctor, day, shift } = req.body;
+    const exists = await DutyRosterDoctor.findOne({ doctor, day, shift });
+    if (exists) {
+      return res.status(400).json({
+        error: "That doctor is already scheduled for this day & shift.",
+      });
+    }
+    const newDuty = await DutyRosterDoctor.create({
+      doctor: req.body.doctor,
+      day: req.body.day,
+      shift: req.body.shift,
+      startTime: req.body.startTime,
+      endTime: req.body.endTime,
     });
-    res.status(200).json({ success: true });
+
+    // populate the doctor field so it comes back as { _id, name, … }
+    await newDuty.populate("doctor");
+
+    // return the full document
+    res.status(200).json(newDuty);
   } catch (err) {
-    console.log(err);
+    // Duplicate key?
+    if (err.code === 11000) {
+      return res.status(400).json({
+        error: "That doctor is already scheduled for this day & shift.",
+      });
+    }
+    console.error(err);
+    res.status(500).json({ error: "Server error." });
   }
 });
 

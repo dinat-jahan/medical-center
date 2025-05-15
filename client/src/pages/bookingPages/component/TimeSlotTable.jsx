@@ -39,6 +39,7 @@ const TimeSlotTable = ({ slots, patient, handleBooking, handleCancel }) => {
                     ✔ {/* Green tick */}
                   </button>
                 ) : slot.bookingStatus === "booked" &&
+                  slot.status === "available" &&
                   slot.bookedBy === patient.id ? (
                   // If the slot is booked by the logged-in user, show the red cross to cancel
                   <button

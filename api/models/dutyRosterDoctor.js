@@ -22,7 +22,7 @@ const DutyRosterDoctorSchema = new mongoose.Schema({
   },
   shift: {
     type: String,
-    enum: ["Morning", "Evening", "Full day"],
+    enum: ["Morning", "Evening", "Full Day"],
     required: true,
   },
   startTime: {
@@ -38,6 +38,11 @@ const DutyRosterDoctorSchema = new mongoose.Schema({
   //   default: false, // Optional field for telemedicine availability
   // },
 });
+
+DutyRosterDoctorSchema.index(
+  { doctor: 1, day: 1, shift: 1 },
+  { unique: true, name: "unique_doctor_day_shift" }
+);
 
 const DutyRosterDoctor = mongoose.model(
   "DutyRosterDoctor",

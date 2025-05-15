@@ -1,5 +1,6 @@
 import React from "react";
 import axios from "axios";
+import { DateTime } from "luxon";
 const BookingForm = ({
   doctors,
   setDoctors,
@@ -8,20 +9,20 @@ const BookingForm = ({
   selectedDate,
   setSelectedDate,
 }) => {
-  function getBookableDates(daysAhead = 3) {
+  function getBookableDates(daysAhead = 7) {
     const dates = [];
-    const today = new Date();
+    const now = DateTime.local();
+    const startOffset = now.hour >= 20 ? 1 : 0; // if it's 8 PM or later, skip today
 
-    for (let i = 0; i <= daysAhead; i++) {
-      const date = new Date(today);
-      date.setDate(today.getDate() + i);
-      dates.push(date.toISOString().split("T")[0]); // "YYYY-MM-DD"
+    for (let i = startOffset; i <= daysAhead; i++) {
+      const date = now.plus({ days: i });
+      dates.push(date.toISODate()); // "YYYY-MM-DD"
     }
 
     return dates;
   }
 
-  const availableDates = getBookableDates(2);
+  const availableDates = getBookableDates(7);
 
   return (
     <div className="flex gap-4 mb-4">

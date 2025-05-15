@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const MedicalUser = require("../models/medicalUser");
 const DutyRosterDoctor = require("../models/dutyRosterDoctor");
+const { DateTime } = require("luxon");
 const router = express.Router();
 const {
   generateTimeSlots,
@@ -37,15 +38,13 @@ router.get("/available-doctors", async (req, res) => {
     const { date } = req.query;
     if (!date) return res.status(400).json({ error: "Date is required" });
 
-    const selectedDate = new Date(date);
-    const dayofWeek = selectedDate.toLocaleDateString("en-us", {
-      weekday: "long",
-    });
-
+    const selectedDate = DateTime.fromISO(date).setZone("Asia/Dhaka");
+    const dayofWeek = selectedDate.toFormat("cccc"); // gives "Monday", etc.
+    console.log(dayofWeek);
     const roster = await DutyRosterDoctor.find({ day: dayofWeek }).populate(
       "doctor"
     );
-
+    console.log(roster);
     res.json({ availableDoctors: roster });
   } catch (err) {
     console.log(err);
@@ -69,9 +68,13 @@ router.get("/slots", async (req, res) => {
       return res.status(404).json({ error: "Doctor not found" });
     }
 
-    const dayOfWeek = new Date(date).toLocaleDateString("en-US", {
-      weekday: "long",
-    });
+    const selectedDate = DateTime.fromISO(date, { zone: "Asia/Dhaka" });
+    const today = DateTime.local().setZone("Asia/Dhaka");
+
+    const isToday = selectedDate.hasSame(today, "day");
+
+    const dayOfWeek = selectedDate.toFormat("cccc");
+    const baseDate = selectedDate.toJSDate();
 
     const rosterEntry = await DutyRosterDoctor.findOne({
       doctor: doctorId,
@@ -81,7 +84,7 @@ router.get("/slots", async (req, res) => {
     if (!rosterEntry) {
       return res.status(404).json({ error: "Doctor is not on duty that day" });
     }
-    const baseDate = new Date(date);
+
     // Step 1: Generate all time slots
     let timeSlots = generateTimeSlots(
       rosterEntry.startTime,
@@ -109,6 +112,20 @@ router.get("/slots", async (req, res) => {
         });
         await slot.save();
       }
+      // Convert slot time to Luxon DateTime
+      const slotDateTime = DateTime.fromFormat(
+        `${date} ${timeStr}`,
+        "yyyy-MM-dd h:mm a",
+        {
+          zone: "Asia/Dhaka",
+        }
+      );
+
+      // If today, and slot is in the past, and still available, mark as unavailable
+      if (isToday && slotDateTime < today && slot.status === "available") {
+        slot.status = "unavailable";
+        await slot.save(); // persist the change
+      }
 
       return {
         _id: slot._id,
@@ -132,10 +149,21 @@ router.get("/slots", async (req, res) => {
 //handle booking a slot
 router.post("/book/:slotId", async (req, res) => {
   const { slotId } = req.params;
-  const { patientId } = req.body;
-  console.log(patientId);
+  const { patientId, date } = req.body;
+  console.log(date);
 
   try {
+    // Check if the patient already has a booking on the same date
+    const existingBooking = await TimeSlot.findOne({
+      bookedBy: patientId,
+      date: date, // Ensure the patient has not already booked for the same date
+    });
+
+    if (existingBooking) {
+      return res.status(400).json({
+        message: "You have already booked a slot for this day.",
+      });
+    }
     const slot = await TimeSlot.findById(slotId);
 
     if (!slot) {
