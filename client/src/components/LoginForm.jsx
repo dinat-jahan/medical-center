@@ -9,6 +9,11 @@ const LoginForm = () => {
   const [password, setPassword] = useState("");
   const [redirect, setRedirect] = useState(false);
   const { setUser } = useContext(UserContext);
+
+  const backendURL = import.meta.env.DEV
+    ? "http://localhost:2000"
+    : import.meta.env.VITE_API_BASE_URL;
+
   async function loginUser(ev) {
     ev.preventDefault();
     try {
@@ -35,7 +40,7 @@ const LoginForm = () => {
       <div className="p-5">
         <div>
           <a
-            href={`${import.meta.env.VITE_API_BASE_URL}/auth/google`}
+            href={`${backendURL}/auth/google`}
             className="flex mt-3 justify-center items-center gap-5 border border-gray-500 bg-white text-primary p-2 rounded"
           >
             <FcGoogle className="text-2xl bg-white rounded-full" />

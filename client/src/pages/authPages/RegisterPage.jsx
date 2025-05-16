@@ -15,6 +15,10 @@ const RegisterPage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
+  const backendURL = import.meta.env.DEV
+    ? "http://localhost:2000"
+    : import.meta.env.VITE_API_BASE_URL;
+
   // Conditional top margin classes
   const getStepMargin = () => {
     if (step === 2) return "mt-8"; // Slightly higher
@@ -109,7 +113,7 @@ const RegisterPage = () => {
         {step === 1 && (
           <div className="flex justify-center mb-4">
             <a
-              href={`${import.meta.env.VITE_API_BASE_URL}/auth/google`}
+              href={`${backendURL}/auth/google`}
               className="w-[400px] bg-violet-600 hover:bg-teal-500 text-white font-bold py-2 px-4 rounded-3xl flex items-center justify-center gap-2"
             >
               <FcGoogle className="text-2xl bg-white rounded-full" />

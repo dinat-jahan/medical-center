@@ -16,12 +16,18 @@ const store = new MongoDBStore({
   collection: "sessions",
 });
 
+const allowedOrigins = [
+  "http://localhost:5173", // for local React dev
+  "https://medical-center-tawny.vercel.app", // your Vercel link
+];
+
 app.use(
   cors({
+    origin: allowedOrigins,
     credentials: true,
-    origin: process.env.CLIENT_URL || "http://localhost:5173/",
   })
 );
+
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
