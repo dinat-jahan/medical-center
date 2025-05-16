@@ -124,9 +124,9 @@ const PrescriptionForm = () => {
   const today = new Date().toLocaleDateString("en-US");
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 min-h-screen flex flex-col">
+    <div className="max-w-5xl mx-auto px-4 py-6 min-h-screen flex flex-col">
       <div className="bg-white rounded-2xl shadow-xl p-6 space-y-6 border border-gray-500 flex-grow">
-        {/* Patient & Doctor Header */}
+        {/* Patient Header */}
         {patient ? (
           <div className="flex justify-between items-start border-b border-gray-300 pb-4 mb-4">
             <div className="text-gray-700 space-y-1 text-base leading-relaxed font-semibold">
@@ -145,20 +145,26 @@ const PrescriptionForm = () => {
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-          {/* 🧩 Left Column */}
+          {/* Left Column */}
           <div className="space-y-6">
+            {/* Diagnosis Select */}
             <DiagnosisSelect diagnoses={diagnoses} setDiagnoses={setDiagnoses} />
-            <MedicineEntry entry={entry} setEntry={setEntry} items={items} setItems={setItems} />
-          </div>
+            
+            {/* Medicine Entry */}
+            <MedicineEntry
+              entry={entry}
+              setEntry={setEntry}
+              items={items}
+              setItems={setItems}
+            />
 
-          {/* 🧩 Right Column */}
-          <div className="space-y-6 flex flex-col justify-between h-full">
+            {/* ✅ Test Entry: now placed AFTER Add Medicine */}
             <TestEntry tests={tests} setTests={setTestts} />
 
+            {/* ✅ Advice + Follow-Up (Side-by-Side) */}
             <div className="flex flex-col lg:flex-row gap-4">
-              {/* Advice Section */}
               <div className="w-full lg:w-1/2">
-                <label className="block font-semibold text-gray-800 mb-1 text-lg ">
+                <label className="block font-semibold text-gray-800 mb-1 text-lg">
                   Advice (optional)
                 </label>
                 <textarea
@@ -168,21 +174,22 @@ const PrescriptionForm = () => {
                   placeholder="General advice..."
                 />
               </div>
-
-              {/* Follow-Up Section */}
               <div className="w-full lg:w-1/2">
                 <label className="block text-lg font-semibold text-gray-800 mb-1">
                   Follow-Up Date (optional)
                 </label>
                 <input
                   type="date"
-                  className="w-full h-10 border border-gray-500 p-3 rounded-3xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-15 h-10 border border-gray-500 p-3 rounded-3xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={followUpDate}
                   onChange={(e) => setFollowUpDate(e.target.value)}
                 />
               </div>
             </div>
+          </div>
 
+          {/* Right Column */}
+          <div className="flex flex-col gap-y-10 h-full">
             <MedicineList items={items} setItems={setItems} setEntry={setEntry} />
 
             <div className="text-right text-gray-600 text-sm font-semibold whitespace-nowrap">
@@ -191,8 +198,7 @@ const PrescriptionForm = () => {
             </div>
 
             <button
-               className="bg-sky-500 hover:bg-teal-700 text-white font-medium w-[350px] border-none px-2 rounded-3xl text-lg transition duration-200"
-        
+              className="bg-sky-500 hover:bg-teal-700 text-white font-medium w-[350px] border-none px-2 rounded-3xl text-lg transition duration-200 mx-auto-block"
               onClick={handleSaveClick}
             >
               Save Prescription

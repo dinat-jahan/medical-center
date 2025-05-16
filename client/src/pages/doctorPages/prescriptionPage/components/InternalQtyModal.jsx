@@ -24,7 +24,7 @@ export default function InternalQtyModal({ items, onConfirm, onCancel }) {
         {/* Close button */}
         <button
           type="button"
-          className="absolute top-2 right-2 text-teal-500 hover:text-teal-800 border-none w-16"
+          className="absolute top-2 right-2 bg-teal-500 hover:text-teal-800 border-none w-16"
           onClick={onCancel}
         >
           &times;
@@ -54,7 +54,7 @@ export default function InternalQtyModal({ items, onConfirm, onCancel }) {
         <div className="mt-6 text-right">
           <button
             type="button"
-            className="bg-blue-600 text-white px-4 py-2 rounded"
+            className="bg-teal-500 text-white px-4 py-2 rounded-3xl border-none w-[250px]  mx-auto block "
             onClick={() => onConfirm(local)}
           >
             OK, Save

@@ -27,7 +27,7 @@ export default function TestEntry({ tests, setTests }) {
 
   return (
     <div className="col-span-2">
-      <label className="block text-sm font-medium text-gray-700">
+      <label className="block text-lg font-medium text-gray-800">
         Recommended Tests
       </label>
       <AsyncCreatableSelect
