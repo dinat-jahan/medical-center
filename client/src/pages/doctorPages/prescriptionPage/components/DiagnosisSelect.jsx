@@ -29,12 +29,17 @@ const DiagnosisSelect = ({ diagnoses, setDiagnoses }) => {
       setDiagnoses((prev) => [...prev, res.data]);
     } catch (err) {
       console.error("Error creating diagnosis", err);
+      // fallback: push as free-text entry if server creation fails
+      setDiagnoses((prev) => [
+        ...prev,
+        { _id: null, name: inputValue, displayName: inputValue },
+      ]);
     }
   };
 
   return (
     <div className="space-y-2">
-      <label className="block text-lg font-semibold text-gray-800">
+      <label className="block text-lg font-semibold text-gray-800" >
         Diagnosis / Symptoms
       </label>
 
@@ -55,7 +60,7 @@ const DiagnosisSelect = ({ diagnoses, setDiagnoses }) => {
         />
       </div>
 
-      <p className="text-lg text-gray-800 ">
+      <p className="text-xs text-gray-800 italic">
         Pick from common diagnoses or create a new one.
       </p>
     </div>

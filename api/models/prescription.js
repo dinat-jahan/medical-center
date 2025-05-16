@@ -8,7 +8,31 @@ const DiagnosisSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
+const PrescriptionDiagnosisSchema = new mongoose.Schema(
+  {
+    diagnosis: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Diagnosis",
+      default: null,
+    },
+    displayName: { type: String, required: true },
+  },
+  { _id: false }
+);
+const PrescriptionTestSchema = new mongoose.Schema(
+  {
+    test: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Test",
+      default: null,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+  },
+  { _id: false }
+);
 // Counter for prescription numbers
 const CounterSchema = new mongoose.Schema({
   _id: String,
@@ -34,12 +58,11 @@ const PrescriptionSchema = new mongoose.Schema(
       required: true,
     },
     date: { type: Date, default: Date.now },
-    diagnoses: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Diagnosis",
-      },
-    ],
+    // Allows saving either a ref or custom name
+    diagnoses: [PrescriptionDiagnosisSchema],
+
+    // Allows saving either a ref or custom name for tests
+    tests: [PrescriptionTestSchema],
     age: { type: Number },
     followUpDate: { type: Date },
     advice: { type: String },

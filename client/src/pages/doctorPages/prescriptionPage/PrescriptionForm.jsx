@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import DiagnosisSelect from "./components/DiagnosisSelect";
 import MedicineEntry from "./components/MedicineEntry";
 import MedicineList from "./components/MedicineList";
+import TestEntry from "./components/TestEntry";
 import { useNavigate, useParams } from "react-router-dom";
 import { UserContext } from "../../../UserContext";
 import axios from "axios";
@@ -15,6 +16,7 @@ const PrescriptionForm = () => {
   const { user: doctor } = useContext(UserContext);
 
   const [diagnoses, setDiagnoses] = useState([]);
+  const [tests, setTestts] = useState([]);
   const [entry, setEntry] = useState({
     medicine: null,
     medicineName: "",
@@ -45,17 +47,25 @@ const PrescriptionForm = () => {
     }
   }, [uniqueId]);
 
-  const savePrescription = async () => {
+  const savePrescription = async (itemsToSend = items) => {
     if (!patient) return;
+
     const payload = {
       patient: patient._id,
       doctor: doctor.id,
       date: new Date(),
-      diagnoses: diagnoses.map((d) => d._id),
+      diagnoses: diagnoses.map((d) => ({
+        diagnosis: d._id,
+        displayName: d.displayName || d.name,
+      })),
+      tests: tests.map((t) => ({
+        test: t._id,
+        name: t.name,
+      })),
       age: patient.age,
       followUpDate: followUpDate || null,
       advice: advice || "",
-      medicines: items.map((m) => ({
+      medicines: itemsToSend.map((m) => ({
         medicine: m.medicine ? m.medicine._id : null,
         medicineName: m.medicineName,
         dose: m.dose || "",
@@ -68,17 +78,24 @@ const PrescriptionForm = () => {
         startDate: m.startDate || new Date(),
       })),
     };
+
     try {
       const { data } = await axios.post("/doctor/create-prescription", payload);
-      console.log(data);
-      // navigate(`/prescriptions/${data.prescription._id}`);
+      const { prescription, dispenseRecord } = data;
+      if (prescription && prescription._id) {
+        navigate(`/show-prescription/${prescription._id}`, {
+          state: { dispenseRecord },
+        });
+      }
     } catch (err) {
       console.error(err);
     }
   };
 
   const handleSaveClick = () => {
-    const internals = items.map((m, idx) => ({ ...m, idx })).filter((m) => m.dispensedFrom === "internal");
+    const internals = items
+      .map((m, idx) => ({ ...m, idx }))
+      .filter((m) => m.dispensedFrom === "internal");
     if (internals.length) {
       setModalItems(internals);
       setShowModal(true);
@@ -101,70 +118,87 @@ const PrescriptionForm = () => {
     });
     setItems(newItems);
     setShowModal(false);
-    savePrescription();
+    savePrescription(newItems);
   };
 
   const today = new Date().toLocaleDateString("en-US");
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 min-h-screen flex flex-col">
-      <div className="bg-teal-50 rounded-2xl shadow-lg p-6 space-y-6 border border-gray-200 flex-grow">
-        {/* Patient Info (inline in main form) */}
+    <div className="max-w-7xl mx-auto px-4 py-6 min-h-screen flex flex-col">
+      <div className="bg-white rounded-2xl shadow-xl p-6 space-y-6 border border-gray-500 flex-grow">
+        {/* Patient & Doctor Header */}
         {patient ? (
-          <div className="text-gray-700 space-y-1 text-base leading-relaxed font-semibold">
-            <div><span className="font-bold" >Name:</span> {patient.name}</div>
-            <div><span className="font-bold">Unique ID:</span> {patient.uniqueId}</div>
-            <div><span className="font-bold">Age:</span> {patient.age}</div>
-            <div><span className="font-bold" >Sex:</span> {patient.sex}</div>
+          <div className="flex justify-between items-start border-b border-gray-300 pb-4 mb-4">
+            <div className="text-gray-700 space-y-1 text-base leading-relaxed font-semibold">
+              <div><span className="font-bold">Name:</span> {patient.name}</div>
+              <div><span className="font-bold">Unique ID:</span> {patient.uniqueId}</div>
+              <div><span className="font-bold">Age:</span> {patient.age}</div>
+              <div><span className="font-bold">Sex:</span> {patient.sex}</div>
+            </div>
+            <div className="text-right text-gray-600 text-sm font-semibold whitespace-nowrap">
+              <div>Doctor: {doctor.name} (ID: {doctor.uniqueId})</div>
+              <div>Date: {today}</div>
+            </div>
           </div>
         ) : (
           <div className="text-gray-500">Loading patient info...</div>
         )}
 
-        <DiagnosisSelect diagnoses={diagnoses} setDiagnoses={setDiagnoses} />
-
-        <MedicineEntry entry={entry} setEntry={setEntry} items={items} setItems={setItems} />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block font-semibold text-gray-800 mb-1 text-lg">Advice (optional)</label>
-            <textarea
-              className="w-full border  border-gray-300 p-3 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={advice}
-              onChange={(e) => setAdvice(e.target.value)}
-              placeholder="General advice..."
-            />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+          {/* 🧩 Left Column */}
+          <div className="space-y-6">
+            <DiagnosisSelect diagnoses={diagnoses} setDiagnoses={setDiagnoses} />
+            <MedicineEntry entry={entry} setEntry={setEntry} items={items} setItems={setItems} />
           </div>
 
-          <div>
-            <label className="block text-lg font-semibold text-gray-800 mb-1">Follow-Up Date (optional)</label>
-            <input
-              type="date"
-              className="w-full border border-gray-300 p-3 rounded-3xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={followUpDate}
-              onChange={(e) => setFollowUpDate(e.target.value)}
-            />
+          {/* 🧩 Right Column */}
+          <div className="space-y-6 flex flex-col justify-between h-full">
+            <TestEntry tests={tests} setTests={setTestts} />
+
+            <div className="flex flex-col lg:flex-row gap-4">
+              {/* Advice Section */}
+              <div className="w-full lg:w-1/2">
+                <label className="block font-semibold text-gray-800 mb-1 text-lg ">
+                  Advice (optional)
+                </label>
+                <textarea
+                  className="w-full h-10 border border-gray-500 p-3 rounded-3xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={advice}
+                  onChange={(e) => setAdvice(e.target.value)}
+                  placeholder="General advice..."
+                />
+              </div>
+
+              {/* Follow-Up Section */}
+              <div className="w-full lg:w-1/2">
+                <label className="block text-lg font-semibold text-gray-800 mb-1">
+                  Follow-Up Date (optional)
+                </label>
+                <input
+                  type="date"
+                  className="w-full h-10 border border-gray-500 p-3 rounded-3xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={followUpDate}
+                  onChange={(e) => setFollowUpDate(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <MedicineList items={items} setItems={setItems} setEntry={setEntry} />
+
+            <div className="text-right text-gray-600 text-sm font-semibold whitespace-nowrap">
+              <div>Doctor: {doctor.name} (ID: {doctor.uniqueId})</div>
+              <div>Date: {today}</div>
+            </div>
+
+            <button
+               className="bg-sky-500 hover:bg-teal-700 text-white font-medium w-[350px] border-none px-2 rounded-3xl text-lg transition duration-200"
+        
+              onClick={handleSaveClick}
+            >
+              Save Prescription
+            </button>
           </div>
         </div>
-
-        <MedicineList items={items} setItems={setItems} setEntry={setEntry} />
-
-        {/* Doctor Info */}
-        <div className="flex justify-end items-center border-t border-gray-300 pt-5 mt-6">
-          <div className="text-right text-gray-600 text-sm font-semibold whitespace-nowrap">
-            <div>Doctor: {doctor.name} (ID: {doctor.uniqueId})</div>
-            <div>Date: {today}</div>
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-6 flex justify-center">
-        <button
-          className="bg-blue-500 hover:bg-teal-700 text-white font-medium w-[350px] border-none px-6 py-2 rounded-3xl text-xl transition duration-200"
-          onClick={handleSaveClick}
-        >
-          Save Prescription
-        </button>
       </div>
 
       {showModal && (

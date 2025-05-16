@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
 export default function InternalQtyModal({ items, onConfirm, onCancel }) {
+  console.log("modalitem", items);
   const [local, setLocal] = useState(
     items.map((m) => ({ ...m, internalQuantity: m.requestedQuantity }))
   );
@@ -13,6 +14,7 @@ export default function InternalQtyModal({ items, onConfirm, onCancel }) {
           : m
       )
     );
+    console.log("local", local);
   };
 
   return (
