@@ -1,7 +1,7 @@
 export const roleMenus = {
   patient: [
     { name: "Profile", path: "/profile" },
-    { name: "Medical History", path: "patient/medical-history" },
+    { name: "Medical History", path: "/patient/medical-history" },
     { name: "Book appointment", path: "book-appointment" },
   ],
   doctor: [

@@ -24,12 +24,12 @@ export default function InternalQtyModal({ items, onConfirm, onCancel }) {
         {/* Close button */}
         <button
           type="button"
-          className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
+          className="absolute top-2 right-2 text-teal-500 hover:text-teal-800 border-none w-16"
           onClick={onCancel}
         >
           &times;
         </button>
-        <h3 className="text-xl font-semibold mb-4">Pharmacy will provide…</h3>
+        <h3 className="text-xl font-semibold mb-4 text-gray-800">Pharmacy will provide…</h3>
         <div className="space-y-4">
           {local.map((m, i) => (
             <div key={i} className="flex items-center justify-between">

@@ -253,3 +253,19 @@ exports.getPrescription = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+
+//get prescription history for patients
+exports.getPrescriptionHistory = async (req, res) => {
+  try {
+    const prescriptions = await Prescription.find({ patient: req.params.id })
+      .sort({ date: -1 })
+      .limit(50)
+      .populate("doctor", "name")
+      .lean();
+
+    res.json({ prescriptions });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
