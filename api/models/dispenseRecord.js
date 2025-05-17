@@ -33,10 +33,11 @@ const DispenseRecordSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "MedicalUser",
     },
-    recordedAt: {
-      type: Date,
-      default: Date.now,
+    doctor: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "MedicalUser",
     },
+    dispensedAt: { type: Date },
     medicines: [DispensedItemSchema],
     overallStatus: {
       type: String,
@@ -44,7 +45,7 @@ const DispenseRecordSchema = new mongoose.Schema(
       default: "pending",
     },
   },
-  { timestamps: true }
+  { timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" } }
 );
 
 module.exports = mongoose.model("DispenseRecord", DispenseRecordSchema);

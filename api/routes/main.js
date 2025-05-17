@@ -48,7 +48,7 @@ router.use("/admin/medical", require("./medicalAdminRoutes"));
 router.use("/admin/university", require("./universityAdminRoutes"));
 router.use("/doctor", require("./doctorRoutes"));
 router.use("/patient", require("./patientRoutes"));
-// router.use("/medical-staff", require("./medicalStaffRoutes"));
+router.use("/medical-staff", require("./medicalStaffRoutes"));
 router.use("/auth", authenticationRoutes);
 router.use("/booking", require("./bookingRoutes"));
 

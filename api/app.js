@@ -7,8 +7,12 @@ const bodyParser = require("body-parser");
 const passport = require("passport");
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
+const http = require("http");
+const { Server } = require("socket.io");
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, { cors: { origin: "*" } });
 const PORT = process.env.PORT || 2000;
 const connectDB = require("./config/db");
 const store = new MongoDBStore({
@@ -25,6 +29,7 @@ app.use(
   cors({
     origin: allowedOrigins,
     credentials: true,
+    exposedHeaders: ["X-Total-Count"],
   })
 );
 
@@ -48,6 +53,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 app.use("/", require("./routes/main"));
+app.set("io", io);
 
 connectDB();
 

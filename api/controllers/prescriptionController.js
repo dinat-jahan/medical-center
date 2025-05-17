@@ -195,15 +195,23 @@ exports.postPrescription = async (req, res) => {
       dispenseRecord = new DispenseRecord({
         prescription: prescription._id,
         patient,
+        doctor,
         pharmacyStaff: null, // to be set when staff fulfills
         medicines: dispenseItems,
         overallStatus,
       });
 
       await dispenseRecord.save();
+
+      //emit socket event
+      const io = req.app.get("io");
+      io.emit("new-dispense-request", {
+        recordId: dispenseRecord._id,
+        patient: prescription.patient,
+      });
     }
-    console.log(prescription);
-    console.log(dispenseRecord);
+    // console.log(prescription);
+    // console.log(dispenseRecord);
     // Return both records
     res.status(201).json({ prescription, dispenseRecord });
   } catch (err) {

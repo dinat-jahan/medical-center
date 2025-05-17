@@ -31,6 +31,8 @@ import PrescriptionForm from "./pages/doctorPages/prescriptionPage/PrescriptionF
 import PrescriptionView from "./pages/doctorPages/prescriptionPage/PrescriptionView";
 import PrescriptionHistory from "./pages/patientPages/prescriptionPages/PrescriptionHistory";
 import DutyRosterOfDoctorsPage from "./pages/DutyRosterOfDoctorsPage";
+import DispenseMedicine from "./pages/medicalStaffPages/DispenseMedicine";
+import MedicineDetailPage from "./pages/medicalStaffPages/MedicineDetail";
 axios.defaults.baseURL = import.meta.env.DEV
   ? "http://localhost:2000"
   : import.meta.env.VITE_API_BASE_URL;
@@ -77,7 +79,10 @@ function App() {
             element={<PatientProfilePage />}
           />
           <Route path="/write-prescription" element={<WritePrescription />} />
-          <Route path="/manage-medicine" element={<ManageMedicinePage />} />
+          <Route
+            path="/medical-staff/manage-medicine"
+            element={<ManageMedicinePage />}
+          />
           <Route
             path="/medicine-out-of stock"
             element={<MedicineOutOfStockPage />}
@@ -116,6 +121,14 @@ function App() {
           <Route
             path="/patient/medical-history"
             element={<PrescriptionHistory />}
+          />
+          <Route
+            path="/medical-staff/pending-medicine-requests"
+            element={<DispenseMedicine />}
+          />
+          <Route
+            path="/medical-staff/medicines/:id"
+            element={<MedicineDetailPage />}
           />
         </Route>
       </Routes>
