@@ -43,7 +43,7 @@ const TimeSlotTable = ({ slots, patient, handleBooking, handleCancel }) => {
                   slot.bookedBy === patient.id ? (
                   // If the slot is booked by the logged-in user, show the red cross to cancel
                   <button
-                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                    className="bg-teal-500 hover:bg-teal-800 text-white px-3 py-1 rounded"
                     onClick={() => handleCancel(slot._id)} // Handle cancellation
                   >
                     ❌ {/* Red cross */}

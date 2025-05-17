@@ -22,10 +22,10 @@ const PrescriptionHistory = () => {
   }, []);
 
   return (
-    <div className="w-full min-h-screen px-8 sm:px-16 md:px-24 lg:px-32 xl:px-48 py-10">
+    <div className="w-full min-h-screen px-8 sm:px-16 md:px-24 lg:px-32 xl:px-48 py-10 bg-teal-50">
       <div className="border border-gray-400 shadow-lg rounded-xl p-10 bg-white">
         {/* Title */}
-        <h2 className="text-center text-2xl font-bold mb-6 text-gray-800">
+        <h2 className="text-center text-2xl font-bold mb-6 text-teal-700">
           Your Prescriptions
         </h2>
 

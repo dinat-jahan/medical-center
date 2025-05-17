@@ -34,7 +34,7 @@ const PrescriptionCard = ({ prescription }) => {
             e.stopPropagation(); // Prevent box click from navigating
             navigate(`/show-prescription/${_id}`);
           }}
-          className="bg-sky-500 text-white font-semibold py-2 w-[200px] rounded-2xl hover:bg-teal-700 border-none"
+          className="bg-teal-500 text-white font-semibold py-2 w-[200px] rounded-2xl hover:bg-teal-700 border-none"
         >
           View
         </button>
@@ -43,4 +43,4 @@ const PrescriptionCard = ({ prescription }) => {
   );
 };
 
-export default PrescriptionCard;
+export default  PrescriptionCard;
