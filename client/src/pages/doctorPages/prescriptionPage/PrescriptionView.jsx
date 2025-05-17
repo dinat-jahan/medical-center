@@ -35,30 +35,31 @@ export default function PrescriptionView() {
   const externalMeds = prescription.medicines.filter(
     (m) => m.dispensedFrom === "external"
   );
-  const logoUrl = "/university-logo.png"; // Replace with your actual logo path
+  const logoUrl = "/university-logo.png";
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-lg relative min-h-[700px]">
-      {/* Header Row: Date, Rx #, Logo */}
-      <div className="flex justify-between items-center mb-6">
-        <span className="text-gray-500 text-sm">
-          {new Date(prescription.date).toLocaleDateString()}
-        </span>
-        <div className="flex items-center space-x-4">
+      <div className="grid grid-cols-3 items-center mb-6">
+        <div>
+          <span className="text-gray-500 text-sm">
+            {new Date(prescription.date).toLocaleDateString()}
+          </span>
+        </div>
+        <div className="flex justify-center">
+          <img src={logoUrl} alt="University Logo" className="h-10 w-auto" />
+        </div>
+        <div className="flex justify-end">
           <span className="text-gray-500 text-sm">
             Rx # {prescription.prescriptionNumber}
           </span>
-          <img src={logoUrl} alt="University Logo" className="h-8 w-auto" />
         </div>
       </div>
 
-      {/* Patient & Doctor Info */}
       <section className="grid grid-cols-2 gap-4 mb-6">
         <div>
           <h4 className="font-semibold mb-2 text-lg">Patient</h4>
           <p className="text-sm">
-            <span className="font-medium">Name:</span>{" "}
-            {prescription.patient.name}
+            <span className="font-medium">Name:</span> {prescription.patient.name}
           </p>
           <p className="text-sm">
             <span className="font-medium">ID:</span> {prescription.patient.uniqueId}
@@ -74,12 +75,9 @@ export default function PrescriptionView() {
           <h4 className="font-semibold mb-2 text-lg">Doctor</h4>
           <p className="text-sm font-medium">{prescription.doctor.name}</p>
           <p className="text-sm">ID: {prescription.doctor.uniqueId}</p>
-          <div className="mt-6 border-t border-gray-300"></div>
-          <p className="text-sm text-gray-500 mt-1">Signature</p>
         </div>
       </section>
 
-      {/* Diagnoses (Optional) */}
       {prescription.diagnoses.length > 0 && (
         <section className="mb-6">
           <h4 className="font-semibold mb-2 text-lg">Diagnoses</h4>
@@ -91,9 +89,7 @@ export default function PrescriptionView() {
         </section>
       )}
 
-      {/* Medicines Section */}
       <section className="mb-6">
-        {/* Internal Pharmacy */}
         {internalMeds.length > 0 && (
           <>
             <h4 className="font-semibold mb-2 text-lg text-gray-800">
@@ -101,7 +97,7 @@ export default function PrescriptionView() {
             </h4>
             {internalMeds.map((m, i) => (
               <div key={i} className="border rounded p-4 mb-3">
-                <div className="flex justify-start space-x-2">
+                <div className="flex justify-start gap-2 flex-wrap items-center">
                   <span className="font-medium">{m.medicineName}</span>
                   <span className="text-sm text-gray-600">{m.dose}</span>
                 </div>
@@ -116,15 +112,14 @@ export default function PrescriptionView() {
           </>
         )}
 
-        {/* External Pharmacy */}
         {externalMeds.length > 0 && (
           <>
-            <h4 className="font-semibold mb-2 text-gray-800 text-lg">
+            <h4 className="font-semibold mb-2 text-gray-800 text-lg ">
               Medicine dispensed from External Pharmacy
             </h4>
             {externalMeds.map((m, i) => (
               <div key={i} className="border rounded p-4 mb-3">
-                <div className="flex justify-start space-x-2">
+                <div className="flex justify-start gap-2 flex-wrap items-center">
                   <span className="font-medium">{m.medicineName}</span>
                   <span className="text-sm text-gray-600">{m.dose}</span>
                 </div>
@@ -140,7 +135,6 @@ export default function PrescriptionView() {
         )}
       </section>
 
-      {/* Tests (Optional) */}
       {prescription.tests && prescription.tests.length > 0 && (
         <section className="mb-6">
           <h4 className="font-semibold mb-2 text-lg">Recommended Tests</h4>
@@ -152,13 +146,13 @@ export default function PrescriptionView() {
         </section>
       )}
 
-      {/* Advice & Follow-Up */}
       {prescription.advice && (
         <section className="mb-6">
           <h4 className="font-semibold mb-2 text-lg">Advice</h4>
           <p className="text-sm">{prescription.advice}</p>
         </section>
       )}
+
       {prescription.followUpDate && (
         <section className="mb-6">
           <h4 className="font-semibold mb-2 text-lg">Follow-Up Date</h4>
@@ -168,7 +162,14 @@ export default function PrescriptionView() {
         </section>
       )}
 
-      {/* Dispense Record (Collapsible) and Print Button in one row */}
+      <div className="text-right">
+        <h4 className="font-semibold mb-2 text-lg">Doctor</h4>
+        <p className="text-sm font-medium">{prescription.doctor.name}</p>
+        <p className="text-sm">ID: {prescription.doctor.uniqueId}</p>
+        <div className="mt-6 border-t border-gray-300"></div>
+        <p className="text-sm text-gray-500 mt-1">Signature</p>
+      </div>
+
       {dispenseRecord && (
         <section className="mb-6">
           <div className="flex justify-between items-center mt-6 gap-10">

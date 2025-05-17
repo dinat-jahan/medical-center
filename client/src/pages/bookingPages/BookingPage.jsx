@@ -82,17 +82,17 @@ const BookingPage = () => {
   };
 
   return (
-    <div className="p-4 md:p-8 max-w-5xl mx-auto space-y-6 bg-white-50">
+    <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-6 bg-teal-50">
       {/* Patient Info */}
-      <div className="bg-teal-50 rounded-2xl shadow p-4 w-[400px]">
-        <h2 className="text-xl font-bold mb-2 text-teal-700">
+      <div className="p-3 md:p-8 max-w-3xl mx-auto space-y-6 bg-white">
+        <h2 className="text-xl font-bold text-teal-700 mb-1">
           Patient Information
         </h2>
         <PatientInfoCard patient={patient} />
       </div>
 
       {/* Booking Form */}
-      <div className="bg-teal-50 rounded-2xl shadow p-4">
+      <div className="p-3 md:p-8 max-w-3xl mx-auto space-y-6 bg-white">
         <h2 className="text-xl font-bold mb-2 text-teal-700">
           Book an Appointment
         </h2>
@@ -107,7 +107,7 @@ const BookingPage = () => {
       </div>
 
       {/* Slot Table */}
-      <div className="bg-white rounded-2xl shadow p-4">
+      <div className="p-3 md:p-8 max-w-3xl mx-auto space-y-6 bg-white">
         <h2 className="text-xl font-bold mb-2 text-teal-700">
           Available Slots
         </h2>

@@ -68,7 +68,7 @@ const MedicineList = ({ items, setItems, setEntry }) => {
   return (
     <div className="col-span-2">
       <section>
-        <h4 className="block text-lg font-semibold text-gray-800">
+        <h4 className="block text-lg font-bold text-gray-800 pb-3">
           Medicine dispensed from Medical Centre Pharmacy
         </h4>
         {internalList.length === 0 ? (
@@ -78,7 +78,7 @@ const MedicineList = ({ items, setItems, setEntry }) => {
         )}
       </section>
       <section className="mt-4">
-        <h4 className="block text-lg font-semibold text-gray-800">
+        <h4 className="block text-lg font-bold text-gray-800 pb-3">
           Medicine dispensed from External Pharmacy
         </h4>
         {externalList.length === 0 ? (
