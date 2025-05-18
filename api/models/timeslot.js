@@ -34,5 +34,18 @@ const TimeSlotSchema = new mongoose.Schema({
   },
 });
 
+const DoctorDayOffSchema = new mongoose.Schema({
+  doctor: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "MedicalUser",
+    required: true,
+  },
+  date: { type: Date, required: true },
+  reason: { type: String, default: "Day off" },
+});
+DoctorDayOffSchema.index({ doctor: 1, date: 1 }, { unique: true });
+
+const DoctorDayOff = mongoose.model("DoctorDayOff", DoctorDayOffSchema);
+
 const TimeSlot = mongoose.model("TimeSlot", TimeSlotSchema);
-module.exports = TimeSlot;
+module.exports = { TimeSlot, DoctorDayOff };

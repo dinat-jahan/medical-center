@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { Dialog } from "@headlessui/react";
 import { PencilIcon, TrashIcon, XIcon } from "lucide-react";
@@ -20,8 +20,8 @@ export default function ManageMedicinePage() {
 
   const pageSize = 10;
 
-  // Fetch table data based on search and filters
-  useEffect(() => {
+  // Fetch medicines from backend
+  const fetchMedicines = useCallback(async () => {
     setLoading(true);
     const params = new URLSearchParams();
     if (search) params.append("search", search);
@@ -30,18 +30,25 @@ export default function ManageMedicinePage() {
     params.append("page", page);
     params.append("limit", pageSize);
 
-    axios
-      .get(`/medical-staff/medicines?${params.toString()}`)
-      .then(({ data }) => {
-        setMedicines(data.items);
-        setTotalPages(data.totalPages);
-        setError(null);
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+    try {
+      const { data } = await axios.get(
+        `/medical-staff/medicines?${params.toString()}`
+      );
+      setMedicines(data.items);
+      setTotalPages(data.totalPages);
+      setError(null);
+    } catch (err) {
+      setError(err.message || "Error fetching medicines");
+    } finally {
+      setLoading(false);
+    }
   }, [search, genericFilter, manufacturerFilter, page]);
 
-  // Load suggestions for search
+  useEffect(() => {
+    fetchMedicines();
+  }, [fetchMedicines]);
+
+  // Live search suggestions
   const loadSearchOptions = async (inputValue) => {
     if (!inputValue) return [];
     try {
@@ -64,19 +71,21 @@ export default function ManageMedicinePage() {
     setCurrentMed(null);
   };
 
+  // Update stock and expiry
   const handleUpdate = async (e) => {
     e.preventDefault();
-    const { quantity, expiryDate } = Object.fromEntries(new FormData(e.target));
+    const { monthlyStockQuantity, expiryDate } = Object.fromEntries(
+      new FormData(e.target)
+    );
     try {
       await axios.put(`/medical-staff/medicines/${currentMed._id}`, {
-        quantity,
+        monthlyStockQuantity,
         expiryDate,
       });
-      setPage(1);
+      closeModal();
+      fetchMedicines();
     } catch (err) {
       console.error(err);
-    } finally {
-      closeModal();
     }
   };
 
@@ -84,7 +93,7 @@ export default function ManageMedicinePage() {
     if (!confirm("Are you sure you want to delete this medicine?")) return;
     try {
       await axios.delete(`/medical-staff/medicines/${id}`);
-      setPage(1);
+      fetchMedicines();
     } catch (err) {
       console.error(err);
     }
@@ -92,18 +101,15 @@ export default function ManageMedicinePage() {
 
   return (
     <div className="p-6 bg-gray-50 rounded-lg shadow">
+      {/* Filters */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
         <AsyncCreatableSelect
           cacheOptions
           defaultOptions
           loadOptions={loadSearchOptions}
           onChange={(option) => {
-            if (option) {
-              setSearch(option.value);
-              setPage(1);
-            } else {
-              setSearch("");
-            }
+            setSearch(option?.value || "");
+            setPage(1);
           }}
           onCreateOption={(input) => {
             setSearch(input);
@@ -116,14 +122,20 @@ export default function ManageMedicinePage() {
           type="text"
           placeholder="Filter by generic name"
           value={genericFilter}
-          onChange={(e) => setGenericFilter(e.target.value)}
+          onChange={(e) => {
+            setGenericFilter(e.target.value);
+            setPage(1);
+          }}
           className="border rounded px-3 py-2 text-sm focus:outline-none focus:ring"
         />
         <input
           type="text"
           placeholder="Filter by manufacturer"
           value={manufacturerFilter}
-          onChange={(e) => setManufacturerFilter(e.target.value)}
+          onChange={(e) => {
+            setManufacturerFilter(e.target.value);
+            setPage(1);
+          }}
           className="border rounded px-3 py-2 text-sm focus:outline-none focus:ring"
         />
         <button
@@ -134,6 +146,7 @@ export default function ManageMedicinePage() {
         </button>
       </div>
 
+      {/* Table */}
       {loading ? (
         <p className="text-gray-500">Loading...</p>
       ) : error ? (
@@ -194,6 +207,7 @@ export default function ManageMedicinePage() {
             </tbody>
           </table>
 
+          {/* Pagination */}
           <div className="flex justify-end mt-4 space-x-2">
             <button
               onClick={() => setPage((p) => Math.max(p - 1, 1))}
@@ -216,6 +230,7 @@ export default function ManageMedicinePage() {
         </div>
       )}
 
+      {/* Update Modal */}
       <Dialog open={isModalOpen} onClose={closeModal} className="relative z-50">
         <div className="fixed inset-0 bg-black/30" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
@@ -234,11 +249,13 @@ export default function ManageMedicinePage() {
             {currentMed && (
               <form onSubmit={handleUpdate} className="mt-4 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium">Quantity</label>
+                  <label className="block text-sm font-medium">
+                    Monthly Stock Qty
+                  </label>
                   <input
-                    name="quantity"
+                    name="monthlyStockQuantity"
                     type="number"
-                    defaultValue={currentMed.quantity}
+                    defaultValue={currentMed.monthlyStockQuantity}
                     required
                     className="mt-1 block w-full border rounded px-3 py-2 focus:outline-none focus:ring"
                   />

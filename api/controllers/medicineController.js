@@ -162,6 +162,7 @@ exports.updateMedicine = async (req, res) => {
       { $set: updates },
       { new: true, runValidators: true }
     );
+    console.log(med);
     if (!med) return res.status(404).json({ error: "Medicine not found" });
     res.json(med);
   } catch (err) {
@@ -206,5 +207,21 @@ exports.searchMedicine = async (req, res) => {
     if (req.xhr || req.headers.accept.includes("application/json")) {
       return res.status(500).json({ error: "Server error" });
     }
+  }
+};
+
+//get low of stock medicine
+exports.getLowStockMeds = async (req, res) => {
+  try {
+    const threshold = parseInt(req.query.threshold, 10) || 5;
+    const meds = await Medicine.find({
+      monthlyStockQuantity: { $lte: threshold },
+    }).select(
+      "_id name genericName manufacturer type batchNumber expiryDate monthlyStockQuantity"
+    );
+    res.json(meds);
+  } catch (err) {
+    console.error("Error fetching low-stock medicines:", err);
+    res.status(500).json({ message: "Server Error" });
   }
 };

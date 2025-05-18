@@ -8,6 +8,7 @@ export const roleMenus = {
     { name: "Profile", path: "/profile" },
     { name: "Available Medicines", path: "/doctor/available-medicine" },
     { name: "Write Prescription", path: "/doctor/write-prescription" },
+    { name: "View Booking Info", path: "book-appointment" },
   ],
   "medical-staff": [
     { name: "Profile", path: "/profile" },
@@ -35,5 +36,6 @@ export const roleMenus = {
       name: "Manage Medical Staff",
       path: "/admin/manage-medical-staff",
     },
+    { name: "View Booking Info", path: "book-appointment" },
   ],
 };
