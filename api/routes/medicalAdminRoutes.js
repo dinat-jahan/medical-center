@@ -25,23 +25,23 @@ const isMedicalAdmin = (req, res, next) => {
   return res.status(403).send("Access denied");
 };
 
-//show the doctor's duty roster list
+// Fetch all duty entries and list of doctors
 router.get("/duty-roster-doctor", isMedicalAdmin, async (req, res) => {
   try {
     const dutyRosterDoctor = await DutyRosterDoctor.find().populate("doctor");
     const doctors = await MedicalUser.find({ role: "doctor" });
     res.json({ dutyRosterDoctor, doctors });
-    // console.log("doctors", doctors);
-    // console.log("duty roster", dutyRosterDoctor);
   } catch (err) {
-    console.log(err);
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
-//add a new doctor duty roster entry
+// Add a new duty entry
 router.post("/duty-roster-doctor/add", isMedicalAdmin, async (req, res) => {
   try {
-    const { doctor, day, shift } = req.body;
+    const { doctor, day, shift, startTime, endTime } = req.body;
+    // check for existing
     const exists = await DutyRosterDoctor.findOne({ doctor, day, shift });
     if (exists) {
       return res.status(400).json({
@@ -49,20 +49,15 @@ router.post("/duty-roster-doctor/add", isMedicalAdmin, async (req, res) => {
       });
     }
     const newDuty = await DutyRosterDoctor.create({
-      doctor: req.body.doctor,
-      day: req.body.day,
-      shift: req.body.shift,
-      startTime: req.body.startTime,
-      endTime: req.body.endTime,
+      doctor,
+      day,
+      shift,
+      startTime,
+      endTime,
     });
-
-    // populate the doctor field so it comes back as { _id, name, … }
     await newDuty.populate("doctor");
-
-    // return the full document
     res.status(200).json(newDuty);
   } catch (err) {
-    // Duplicate key?
     if (err.code === 11000) {
       return res.status(400).json({
         error: "That doctor is already scheduled for this day & shift.",
@@ -73,7 +68,7 @@ router.post("/duty-roster-doctor/add", isMedicalAdmin, async (req, res) => {
   }
 });
 
-//delete a duty roster entry
+// Delete a duty entry by ID
 router.post(
   "/duty-roster-doctor/delete/:id",
   isMedicalAdmin,
@@ -82,8 +77,10 @@ router.post(
       await DutyRosterDoctor.findByIdAndDelete(req.params.id);
       res.status(200).json({ success: true });
     } catch (err) {
-      console.log(err);
+      console.error(err);
+      res.status(500).json({ error: "Server error." });
     }
   }
 );
+
 module.exports = router;

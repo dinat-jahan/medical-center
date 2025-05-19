@@ -137,48 +137,18 @@ router.get("/api/medical-staff", async (req, res) => {
   }
 });
 
-router.get("/api/duty-roster", async (req, res) => {
+router.get("/api/duty-roster-doctor", async (req, res) => {
   try {
-    const dutyRoster = await DutyRosterDoctor.aggregate([
-      {
-        $lookup: {
-          from: "medicalusers", // The collection that stores doctors
-          localField: "doctor", // The field in the DutyRosterDoctor collection
-          foreignField: "_id", // The field in the MedicalUser collection
-          as: "doctorDetails", // The alias for the populated data
-        },
-      },
-      {
-        $unwind: "$doctorDetails", // Unwind the populated doctor details array
-      },
-      {
-        $group: {
-          _id: "$day", // Group by day of the week
-          morning: {
-            $push: {
-              doctor: "$doctorDetails.name", // Include doctor name
-              startTime: "$startTime",
-              endTime: "$endTime",
-            },
-          },
-          evening: {
-            $push: {
-              doctor: "$doctorDetails.name", // Include doctor name
-              startTime: "$startTime",
-              endTime: "$endTime",
-            },
-          },
-        },
-      },
-      { $sort: { _id: 1 } }, // Sort days of the week
-    ]);
-
-    console.log(dutyRoster);
-    res.json(dutyRoster); // Return the data as a JSON response
+    const entries = await DutyRosterDoctor.find()
+      .populate("doctor", "name")
+      .sort({ day: 1, shift: 1, startTime: 1 });
+    res.json({ dutyRosterDoctor: entries });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Error fetching roster:", err);
+    res.status(500).json({ message: "Server error loading roster" });
   }
 });
+
 router.get("/doctor-list", async (req, res) => {
   try {
     const dutyRosterDoctor = await DutyRosterDoctor.find().populate("doctor");

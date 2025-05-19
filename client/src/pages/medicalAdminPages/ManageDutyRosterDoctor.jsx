@@ -1,133 +1,201 @@
 import React, { useEffect, useState } from "react";
-import AddNewDutyForm from "../../components/AddNewDutyForm";
 import axios from "axios";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
-const ManageDutyRosterDoctor = () => {
-  const [dutyRosterDoctors, setDutyRosterDoctors] = useState([]);
+// Define days and shifts
+const days = [
+  "Saturday",
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+];
+const shifts = ["Morning", "Evening", "Full Day"];
+
+// Preset times for each shift
+const timeMap = {
+  Morning: { startTime: "8:00 am", endTime: "2:00 pm" },
+  Evening: { startTime: "2:00 pm", endTime: "8:00 pm" },
+  "Full Day": { startTime: "9:00 am", endTime: "5:00 pm" },
+};
+
+const ManageDutyRosterDragDrop = () => {
   const [doctors, setDoctors] = useState([]);
-  const [selectedDay, setSelectedDay] = useState("Saturday"); // default day
+  const [assignments, setAssignments] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { data } = await axios.get("/admin/medical/duty-roster-doctor");
-        setDutyRosterDoctors(data.dutyRosterDoctor || []);
-        setDoctors(data.doctors || []);
+        const response = await axios.get("/admin/medical/duty-roster-doctor");
+        const { dutyRosterDoctor, doctors } = response.data;
+
+        setDoctors(doctors);
+
+        const initial = {};
+        dutyRosterDoctor.forEach((item) => {
+          const key = `${item.day}___${item.shift}`;
+          initial[key] = initial[key] || [];
+          initial[key].push(item);
+        });
+        setAssignments(initial);
       } catch (err) {
-        console.log(err);
+        console.error("Error fetching duty roster:", err);
       }
     };
-
     fetchData();
   }, []);
 
-  const handleDelete = (id) => {
-    axios
-      .post(`/admin/medical/duty-roster-doctor/delete/${id}`)
-      .then(() => {
-        setDutyRosterDoctors((prev) =>
-          prev.filter((doctor) => doctor._id !== id)
-        );
-      })
-      .catch((err) => console.log(err));
+  const onDragEnd = async (result) => {
+    const { source, destination, draggableId } = result;
+    if (!destination) return;
+    if (
+      source.droppableId === "DOCTOR_LIST" &&
+      destination.droppableId !== "DOCTOR_LIST"
+    ) {
+      const [day, shift] = destination.droppableId.split("___");
+      const times = timeMap[shift] || timeMap.Morning;
+      try {
+        const res = await axios.post("/admin/medical/duty-roster-doctor/add", {
+          doctor: draggableId,
+          day,
+          shift,
+          ...times,
+        });
+        const newRecord = res.data;
+        setAssignments((prev) => {
+          const key = destination.droppableId;
+          const existing = prev[key] || [];
+          return { ...prev, [key]: [...existing, newRecord] };
+        });
+      } catch (err) {
+        console.error("Failed to add duty:", err.response?.data || err.message);
+      }
+    }
   };
 
-  const handleAddDuty = (newDuty) => {
-    setDutyRosterDoctors((prev) => [...prev, newDuty]);
+  const handleRemove = async (assignId, cellId) => {
+    try {
+      await axios.post(`/admin/medical/duty-roster-doctor/delete/${assignId}`);
+      setAssignments((prev) => {
+        const updated = { ...prev };
+        updated[cellId] = updated[cellId].filter((a) => a._id !== assignId);
+        return updated;
+      });
+    } catch (err) {
+      console.error("Failed to remove duty:", err);
+    }
   };
-
-  // Filter data by selected day
-  const filteredRoster = dutyRosterDoctors.filter(
-    (item) => item.day === selectedDay
-  );
 
   return (
-    <div className="bg-white min-h-screen py-20">
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left Column - Add New Duty */}
-          <div>
-            <h2 className="text-3xl font-poetsen mb-6 text-center text-teal-700 pb-4">
-              Add New Duty
-            </h2>
-            <div className="w-full bg-teal-100 p-6 shadow-lg rounded-3xl">
-              <AddNewDutyForm doctors={doctors} onAddDuty={handleAddDuty} />
-            </div>
-          </div>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8 bg-white">
+      <h1 className="text-2xl sm:text-3xl font-poetsen text-teal-700 mb-4 sm:mb-6 text-center">
+        Doctor Duty Roster
+      </h1>
 
-          {/* Right Column - Duty Roster Table */}
-          <div>
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-3xl font-poetsen mb-6 text-center text-teal-700 pb-2">
-                Duty Roster of Doctors
-              </h2>
-              {/* Day Filter Dropdown */}
-              <select
-                value={selectedDay}
-                onChange={(e) => setSelectedDay(e.target.value)}
-                className="px-4 py-2 border rounded-2xl shadow-sm focus:ring-teal-500 focus:border-teal-500"
+      <DragDropContext onDragEnd={onDragEnd}>
+        <div className="flex flex-col lg:flex-row lg:space-x-6">
+          {/* Doctor List Sidebar */}
+          <Droppable droppableId="DOCTOR_LIST">
+            {(provided) => (
+              <div
+                className="w-full lg:w-48 p-4 bg-teal-50 rounded-lg shadow-inner mb-4 lg:mb-0"
+                ref={provided.innerRef}
+                {...provided.droppableProps}
               >
-                <option value="Saturday">Saturday</option>
-                <option value="Sunday">Sunday</option>
-                <option value="Monday">Monday</option>
-                <option value="Tuesday">Tuesday</option>
-                <option value="Wednesday">Wednesday</option>
-                <option value="Thursday">Thursday</option>
-                <option value="Friday">Friday</option>
-              </select>
-            </div>
-
-            <div className="overflow-x-auto shadow rounded-lg">
-              <table className="min-w-full divide-y divide-gray-200 bg-white">
-                <thead className="bg-teal-100">
-                  <tr className="text-left text-gray-800 font-semibold">
-                    <th className="px-4 py-3">Doctor</th>
-                    <th className="px-4 py-3">Day</th>
-                    <th className="px-4 py-3">Shift</th>
-                    <th className="px-4 py-3">Time</th>
-                    <th className="px-4 py-3">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {filteredRoster.length > 0 ? (
-                    filteredRoster.map((e) => (
-                      <tr key={e._id} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 text-sm">
-                          {e.doctor?.name || "Unknown"}
-                        </td>
-                        <td className="px-4 py-3 text-sm">{e.day}</td>
-                        <td className="px-4 py-3 text-sm">{e.shift}</td>
-                        <td className="px-4 py-3 text-sm">
-                          {e.startTime} - {e.endTime}
-                        </td>
-                        <td className="px-4 py-3">
-                          <button
-                            onClick={() => handleDelete(e._id)}
-                            className="bg-teal-500 hover:bg-teal-700 text-white px-3 py-1 text-sm rounded-3xl w-40 border-none"
-                          >
-                            Delete
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td
-                        colSpan="5"
-                        className="text-center text-blue-700 py-6 font-semibold"
+                <h2 className="font-semibold mb-2">Doctors</h2>
+                {doctors.map((doc, idx) => (
+                  <Draggable key={doc._id} draggableId={doc._id} index={idx}>
+                    {(prov) => (
+                      <div
+                        className="p-2 mb-2 bg-white rounded cursor-move shadow"
+                        ref={prov.innerRef}
+                        {...prov.draggableProps}
+                        {...prov.dragHandleProps}
                       >
-                        No duty roster found for {selectedDay}
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                        {doc.name}
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+
+          {/* Roster Grid */}
+          <div className="flex-1 overflow-x-auto lg:overflow-visible">
+            <div className="min-w-max lg:min-w-full grid grid-cols-8 sm:grid-cols-8 border border-gray-200 rounded-lg">
+              {/* corner */}
+              <div className="p-2 bg-gray-50"></div>
+
+              {/* Day headers */}
+              {days.map((day) => (
+                <div
+                  key={day}
+                  className="p-2 bg-teal-100 text-sm sm:text-base text-center font-semibold text-gray-800 border-l border-gray-200"
+                >
+                  {day}
+                </div>
+              ))}
+
+              {/* Shift rows */}
+              {shifts.map((shift) => (
+                <React.Fragment key={shift}>
+                  <div className="p-2 bg-teal-100 text-sm sm:text-base font-semibold border-t border-gray-200">
+                    <div>{shift}</div>
+                    <div className="text-xs sm:text-sm text-gray-600">
+                      {timeMap[shift].startTime} - {timeMap[shift].endTime}
+                    </div>
+                  </div>
+
+                  {days.map((day) => {
+                    const cellId = `${day}___${shift}`;
+                    const cellItems = assignments[cellId] || [];
+                    return (
+                      <Droppable droppableId={cellId} key={cellId}>
+                        {(prov, snapshot) => (
+                          <div
+                            ref={prov.innerRef}
+                            {...prov.droppableProps}
+                            className={
+                              `min-h-[4rem] p-2 border-t border-l border-gray-200 rounded ` +
+                              (snapshot.isDraggingOver
+                                ? "bg-green-50"
+                                : "bg-white")
+                            }
+                          >
+                            {cellItems.map((rec, idx) => (
+                              <div
+                                key={rec._id}
+                                className="flex justify-between items-center p-1 mb-1 bg-teal-50 rounded"
+                              >
+                                <span className="text-sm sm:text-base">
+                                  {rec.doctor.name}
+                                </span>
+                                <button
+                                  onClick={() => handleRemove(rec._id, cellId)}
+                                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 text-[0.6rem] w-4 h-4 flex items-center justify-center rounded-full"
+                                >
+                                  ×
+                                </button>
+                              </div>
+                            ))}
+                            {prov.placeholder}
+                          </div>
+                        )}
+                      </Droppable>
+                    );
+                  })}
+                </React.Fragment>
+              ))}
             </div>
           </div>
         </div>
-      </div>
+      </DragDropContext>
     </div>
   );
 };
 
-export default ManageDutyRosterDoctor;
+export default ManageDutyRosterDragDrop;
