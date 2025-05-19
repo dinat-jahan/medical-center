@@ -60,6 +60,7 @@ const LoginForm = () => {
   }
 
   if (redirect) {
+    window.location.reload();
     return <Navigate to="/" replace />;
   }
 

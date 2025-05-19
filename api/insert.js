@@ -1,29 +1,52 @@
+// scripts/sync-university-to-medical.js
+
+require("dotenv").config();
 const mongoose = require("mongoose");
-require("dotenv").config(); // Load environment variables from .env file
+const bcrypt = require("bcrypt");
+const UniversityMember = require("../api/models/universityMember");
+const MedicalUser = require("../api/models/medicalUser");
 
-// Import the TimeSlot model
-const Medicine = require("../api/models/medicine"); // Adjust the path as per your project structure
+const MALE_PHOTO =
+  "bb9eb535d096f173f9338f7a12e266961108a5ee96a5eb414624cde5a04affce";
+const FEMALE_PHOTO =
+  "9ee1a43f0e7c040655c1f29228b2c78624b9f903c1d9d9f12064ffa3b8f94e08";
 
-// Connect to MongoDB
-mongoose
-  .connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
-    console.log("Connected to MongoDB");
+async function main() {
+  await mongoose.connect(process.env.MONGODB_URI);
 
-    // Delete all time slots from the TimeSlot collection
-    Medicine.deleteMany({})
-      .then(() => {
-        console.log("All Medicine deleted successfully.");
-        mongoose.connection.close(); // Close the connection after operation
-      })
-      .catch((err) => {
-        console.error("Error deleting time slots:", err);
-        mongoose.connection.close();
-      });
-  })
-  .catch((err) => {
-    console.error("Error connecting to MongoDB:", err);
-  });
+  // 1) UniversityMember
+  const umMale = await UniversityMember.updateMany(
+    { sex: "male" },
+    { $set: { photo: MALE_PHOTO } }
+  );
+  const umFemale = await UniversityMember.updateMany(
+    { sex: "female" },
+    { $set: { photo: FEMALE_PHOTO } }
+  );
+
+  console.log(
+    `UniversityMember: ${umMale.modifiedCount} male docs, ${umFemale.modifiedCount} female docs updated.`
+  );
+
+  // 2) MedicalUser
+  const muMale = await MedicalUser.updateMany(
+    { sex: "male" },
+    { $set: { photo: MALE_PHOTO } }
+  );
+  const muFemale = await MedicalUser.updateMany(
+    { sex: "female" },
+    { $set: { photo: FEMALE_PHOTO } }
+  );
+
+  console.log(
+    `MedicalUser: ${muMale.modifiedCount} male docs, ${muFemale.modifiedCount} female docs updated.`
+  );
+
+  await mongoose.disconnect();
+  console.log("Done.");
+}
+
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

@@ -23,6 +23,7 @@ exports.fetchMember = async (req, res) => {
     if (!member) {
       return res.json({ success: false, message: "No member found" });
     }
+    console.log(member);
     res.json({
       success: true,
       member,
@@ -63,8 +64,8 @@ exports.sendOtp = async (req, res) => {
 
     await transporter.sendMail({
       from: process.env.MAIL_USER,
-      // to: emailForOtp,
-      to: "it20009@mbstu.ac.bd",
+      to: emailForOtp,
+      // to: "it20009@mbstu.ac.bd",
       subject: "Your OTP for MBSTU Medical Center registration",
       text: `Your OTP code is ${otp}`,
     });
@@ -111,6 +112,12 @@ exports.saveUserPassword = async (req, res) => {
   console.log(password);
   try {
     const user = await UniversityMember.findOne({ uniqueId });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "University member not found for password setup.",
+      });
+    }
 
     const role = MedicalUser.determineRole(
       user.userType,
@@ -163,12 +170,10 @@ exports.login = async (req, res) => {
   const { uniqueId, password } = req.body;
   // Validation
   if (!uniqueId || !password) {
-    return res
-      .status(400)
-      .json({
-        success: false,
-        message: "Both uniqueId and password are required.",
-      });
+    return res.status(400).json({
+      success: false,
+      message: "Both uniqueId and password are required.",
+    });
   }
 
   try {

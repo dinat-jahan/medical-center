@@ -38,7 +38,7 @@ const MedicalStaffPage = () => {
                 {member.name}
               </h3>
 
-              <p className="text-sm text-gray-700">{member.designation_2}</p>
+              <p className="text-sm text-gray-700">{member.designation}</p>
               <p className="text-sm text-gray-700">{member.office}</p>
               <p className="text-sm text-gray-700">
                 Mawlana Bhashani Science and Technology University

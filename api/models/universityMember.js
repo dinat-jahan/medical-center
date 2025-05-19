@@ -46,7 +46,6 @@ const universityMemberSchema = new mongoose.Schema({
   dob: { type: Date, required: true },
   emails: {
     type: [String],
-    required: true,
   },
   phone: {
     type: String,
