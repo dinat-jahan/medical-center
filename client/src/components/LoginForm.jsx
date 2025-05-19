@@ -24,6 +24,7 @@ const LoginForm = () => {
       console.log("Logged in user:", data);
       setUser(data);
       setRedirect(true);
+      window.location.reload();
       document.getElementById("login_modal").close();
     } catch (e) {
       console.log(e);

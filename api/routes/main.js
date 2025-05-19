@@ -102,6 +102,41 @@ router.get("/api/doctors", async (req, res) => {
   }
 });
 
+router.get("/api/medical-staff", async (req, res) => {
+  try {
+    const staff = await MedicalUser.find({ role: "medical-staff" }).lean();
+
+    if (staff.length === 0) {
+      return res.status(404).json({
+        message: "No medical staff found",
+        staff: null,
+      });
+    }
+
+    for (let member of staff) {
+      const photoUrl = await getSignedUrl(
+        s3Client,
+        new GetObjectCommand({
+          Bucket: process.env.AWS_BUCKET_NAME,
+          Key: member.photo,
+        })
+      );
+      member.photoUrl = photoUrl;
+    }
+
+    return res.json({
+      staff,
+      message: "Medical staff found successfully",
+    });
+  } catch (err) {
+    console.error("Error fetching medical staff:", err);
+    return res.status(500).json({
+      message: "An error occurred while fetching medical staff",
+      error: err.message,
+    });
+  }
+});
+
 router.get("/api/duty-roster", async (req, res) => {
   try {
     const dutyRoster = await DutyRosterDoctor.aggregate([

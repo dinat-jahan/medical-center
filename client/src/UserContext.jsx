@@ -19,6 +19,7 @@ export function UserContextProvider({ children }) {
   }, []);
   return (
     <UserContext.Provider value={{ user, setUser, ready }}>
+      {console.log("user in context", user)}
       {children}
     </UserContext.Provider>
   );

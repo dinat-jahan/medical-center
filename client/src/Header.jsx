@@ -112,9 +112,10 @@ const Header = () => {
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           >
-            <Link className="hover:text-blue-900" to="/people">
+            {/* <Link className="hover:text-blue-900" to="/people">
               People
-            </Link>
+            </Link> */}
+            <div className="hover:text-blue-900">People</div>
             {isPeopleDropdownOpen && (
               <div className="absolute left-0 mt-2 bg-base-200 rounded-md shadow-lg w-32 z-20">
                 <ul className="flex flex-col p-2">

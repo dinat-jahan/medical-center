@@ -37,7 +37,9 @@ const ManageDutyRosterDoctor = () => {
   };
 
   // Filter data by selected day
-  const filteredRoster = dutyRosterDoctors.filter((item) => item.day === selectedDay);
+  const filteredRoster = dutyRosterDoctors.filter(
+    (item) => item.day === selectedDay
+  );
 
   return (
     <div className="bg-white min-h-screen py-20">
@@ -57,7 +59,7 @@ const ManageDutyRosterDoctor = () => {
           <div>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-3xl font-poetsen mb-6 text-center text-teal-700 pb-2">
-                 Duty Roster of Doctors
+                Duty Roster of Doctors
               </h2>
               {/* Day Filter Dropdown */}
               <select
