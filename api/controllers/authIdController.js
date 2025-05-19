@@ -161,42 +161,55 @@ exports.saveUserPassword = async (req, res) => {
 //log in operation
 exports.login = async (req, res) => {
   const { uniqueId, password } = req.body;
-  const lowerUniqueId = uniqueId.toLowerCase();
+  // Validation
+  if (!uniqueId || !password) {
+    return res
+      .status(400)
+      .json({
+        success: false,
+        message: "Both uniqueId and password are required.",
+      });
+  }
 
   try {
+    const lowerId = uniqueId.toLowerCase();
     const user =
-      (await MedicalUser.findOne({ uniqueId: lowerUniqueId })) ||
-      (await UniversityDBAdmin.findOne({ uniqueId: lowerUniqueId })) ||
-      (await MedicalDBAdmin.findOne({ uniqueId: lowerUniqueId }));
+      (await MedicalUser.findOne({ uniqueId: lowerId })) ||
+      (await UniversityDBAdmin.findOne({ uniqueId: lowerId })) ||
+      (await MedicalDBAdmin.findOne({ uniqueId: lowerId }));
 
     if (!user) {
-      return res.status(401).send("User not found");
+      return res
+        .status(401)
+        .json({ success: false, message: "User not found." });
     }
+
     if (!user.password) {
-      return res.redirect(`/set-password?uniqueId=${user.uniqueId}`);
+      return res
+        .status(403)
+        .json({ success: false, message: "Please set your password first." });
     }
 
-    const passwordMatch = await bcrypt.compare(password, user.password);
-    if (!passwordMatch) {
-      return res.status(401).send("Invalid password");
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid password." });
     }
 
-    // Set session
+    // Save session and respond
     req.session.user = {
       id: user._id.toString(),
       uniqueId: user.uniqueId,
       name: user.name,
       role: user.role,
     };
-    return res.json({
-      id: user._id,
-      uniqueId: user.uniqueId,
-      name: user.name,
-      role: user.role,
-    });
+    return res.json({ success: true, user: req.session.user });
   } catch (err) {
-    console.log(err);
-    res.status(500).send("Server error");
+    console.error("Login error:", err);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error." });
   }
 };
 

@@ -1,53 +1,48 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 
-const SearchSuggestions = ({ suggestions, onSelect, fields }) => {
+const SearchSuggestions = ({
+  suggestions,
+  onSelect,
+  fields,
+  selectedIndex,
+}) => {
   const suggestionsRef = useRef(null);
-  const [showSuggestions, setShowSuggestions] = useState(true);
 
-  // Close the suggestions if the user clicks outside of the suggestions div
+  // Close handled upstream
+
+  // Scroll active item into view
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        suggestionsRef.current &&
-        !suggestionsRef.current.contains(event.target)
-      ) {
-        setShowSuggestions(false); // Close suggestions
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+    if (selectedIndex >= 0 && suggestionsRef.current) {
+      const node = suggestionsRef.current.querySelectorAll("li")[selectedIndex];
+      if (node) node.scrollIntoView({ block: "nearest" });
+    }
+  }, [selectedIndex]);
 
   return (
-    <div className="absolute mt-12 w-full" ref={suggestionsRef}>
-      {showSuggestions && (
-        <ul className="bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto">
-          {suggestions.length === 0 ? (
-            <li className="p-2 text-center text-gray-500">
-              No suggestions found
-            </li>
-          ) : (
-            suggestions.map((suggestion, index) => (
-              <li
-                key={suggestion.uniqueId || suggestion.name || index}
-                className="p-2 hover:bg-gray-100 cursor-pointer"
-                onClick={() => onSelect(suggestion)}
-              >
-                {/* Dynamically render based on fields */}
-                {fields.map((field) => (
-                  <div key={field} className="text-sm text-gray-500">
-                    <strong>{suggestion[field]}</strong>
-                  </div>
-                ))}
-              </li>
-            ))
-          )}
-        </ul>
-      )}
+    <div
+      className="absolute mt-2 w-full bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto"
+      ref={suggestionsRef}
+    >
+      <ul>
+        {suggestions.map((suggestion, idx) => (
+          <li
+            key={suggestion._id || idx}
+            className={`p-2 cursor-pointer hover:bg-gray-100 ${
+              idx === selectedIndex ? "bg-gray-200" : ""
+            }`}
+            onMouseEnter={() => {
+              /* optionally set highlight on hover */
+            }}
+            onClick={() => onSelect(suggestion)}
+          >
+            {fields.map((field) => (
+              <div key={field} className="text-sm text-gray-800">
+                <strong>{suggestion[field]}</strong>
+              </div>
+            ))}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };

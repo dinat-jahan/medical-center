@@ -10,6 +10,7 @@ const { calculateAge } = require("../helper/utils");
 // const Prescription = require("../models/prescription");
 const Medicine = require("../models/medicine");
 const prescriptionController = require("../controllers/prescriptionController");
+const medicineController = require("../controllers/medicineController");
 const router = express.Router();
 
 const isDoctor = (req, res, next) => {
@@ -187,6 +188,102 @@ router.get("/medicine/:medicineId", async (req, res) => {
     res.json(medicine);
   } catch (err) {
     res.status(500).json({ message: "Error fetching medicine data" });
+  }
+});
+
+router.get("/medicines", async (req, res) => {
+  try {
+    // Parse query parameters
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 10;
+    const { search, type } = req.query;
+
+    // Build base query
+    const query = {};
+    if (search) {
+      const regex = new RegExp(search, "i");
+      query.$or = [
+        { name: { $regex: regex } },
+        { genericName: { $regex: regex } },
+      ];
+    }
+    if (type) {
+      query.type = type;
+    }
+
+    // Pagination calculations
+    const skip = (page - 1) * limit;
+
+    // Fetch paginated medicines
+    const medicines = await Medicine.find(query)
+      .select("-mainStockQuantity") // hide main stock
+      .sort({ name: 1 })
+      .skip(skip)
+      .limit(limit);
+
+    // (Optional) Total count for UI
+    const totalCount = await Medicine.countDocuments(query);
+
+    res.json({
+      success: true,
+      medicines,
+      page,
+      limit,
+      totalCount,
+    });
+  } catch (err) {
+    console.error("Error fetching medicines:", err);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+});
+router.get("/medicines/:id", medicineController.getSingleMedicine);
+
+router.get("/search", async (req, res) => {
+  const query = (req.query.q || "").trim();
+  if (!query) {
+    return res.json({ results: [] });
+  }
+
+  const regex = new RegExp(query, "i");
+
+  try {
+    // Search only users with role 'patient'
+    const [patients, medicines] = await Promise.all([
+      MedicalUser.find({
+        role: "patient",
+        $or: [{ name: regex }, { uniqueId: regex }],
+      })
+        .limit(10)
+        .lean(),
+
+      Medicine.find({
+        $or: [{ name: regex }, { genericName: regex }, { manufacturer: regex }],
+      })
+        .limit(10)
+        .lean(),
+    ]);
+
+    // Tag items with type
+    const patientResults = patients.map((u) => ({
+      type: "patient",
+      name: u.name,
+      uniqueId: u.uniqueId,
+      _id: u._id,
+    }));
+
+    const medicineResults = medicines.map((m) => ({
+      type: "medicine",
+      name: m.name,
+      genericName: m.genericName,
+      manufacturer: m.manufacturer,
+      _id: m._id,
+    }));
+
+    // Merge and send
+    res.json({ results: [...patientResults, ...medicineResults] });
+  } catch (err) {
+    console.error("Search error:", err);
+    res.status(500).json({ error: "Server error" });
   }
 });
 

@@ -1,144 +1,103 @@
-import { roleMenus } from "../constants/index";
+import React, { useContext, useEffect, useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import axios from "axios";
 import { UserContext } from "../UserContext";
-import { useContext, useEffect, useState } from "react";
-import { Link, useSearchParams, useNavigate } from "react-router-dom";
+import { roleMenus } from "../constants/index";
 import SearchInput from "./SearchInput";
 import SearchSuggestions from "./SearchSuggestions";
-import axios from "axios";
-const RoleMenu = () => {
+
+export default function RoleMenu() {
   const { user } = useContext(UserContext);
-  const [activeTab, setActiveTab] = useState(0);
-  const [patientSearch, setPatientSearch] = useState("");
-  const [medicineSearch, setMedicineSearch] = useState("");
-  const [patientSuggestions, setPatientSuggestions] = useState([]);
-  const [medicineSuggestions, setMedicineSuggestions] = useState([]);
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+
   if (!user || !user.role) return null;
+  const menuItems = roleMenus[user.role] || [];
 
-  const menuItems = roleMenus[user.role];
-  if (!menuItems) return null;
-  const fetchPatientSuggestions = async () => {
-    if (patientSearch.trim() === "") {
-      setPatientSuggestions([]);
-      return;
-    }
-    try {
-      const { data } = await axios.get("/doctor/search-patient", {
-        params: { patient: patientSearch },
-      });
-      setPatientSuggestions(data.patients || []);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  // Move this function outside useEffect for both useEffect and button click access
-  const fetchMedicineSuggestions = async () => {
-    if (medicineSearch.trim() === "") {
-      setMedicineSuggestions([]);
-      return;
-    }
-    try {
-      const { data } = await axios.get("/doctor/search-medicine", {
-        params: { medicine: medicineSearch }, // Send medicine search query to backend
-      });
-      setMedicineSuggestions(data.medicines || []);
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  useEffect(() => setSelectedIndex(-1), [suggestions]);
 
   useEffect(() => {
-    fetchMedicineSuggestions(); // fetch medicine suggestions whenever the search input changes
-  }, [medicineSearch]);
+    const fetchSuggestions = async () => {
+      if (!searchTerm.trim()) return setSuggestions([]);
+      try {
+        const { data } = await axios.get("/doctor/search", {
+          params: { q: searchTerm },
+        });
+        setSuggestions(data.results || []);
+      } catch {}
+    };
+    fetchSuggestions();
+  }, [searchTerm]);
 
-  const handlePatientSelect = (patient) => {
-    console.log("Selected patient", patient);
-    navigate(`/patient-profile/${patient.uniqueId}`);
-  };
-
-  const handleMedicineSearchClick = () => {
-    navigate(`search-medicine/${medicineSearch}`);
-  };
-
-  const handleEnterPress = (e) => {
+  const handleKeyDown = (e) => {
+    if (!suggestions.length) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setSelectedIndex((i) => Math.min(i + 1, suggestions.length - 1));
+    }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setSelectedIndex((i) => Math.max(i - 1, 0));
+    }
     if (e.key === "Enter") {
-      fetchPatientSuggestions(); // Trigger patient search when Enter key is pressed
+      e.preventDefault();
+      const item =
+        selectedIndex >= 0 ? suggestions[selectedIndex] : suggestions[0];
+      selectSuggestion(item);
     }
   };
 
-  useEffect(() => {
-    fetchPatientSuggestions(); // Fetch patient suggestions when the patient search input changes
-  }, [patientSearch]);
-
-  const handleMedicineSelect = (medicine) => {
-    console.log("Selected Medicine:", medicine);
-    navigate(`/search-medicine/${medicine._id}`);
+  const selectSuggestion = (item) => {
+    if (item.type === "patient") navigate(`/patient-profile/${item.uniqueId}`);
+    else if (item.type === "medicine")
+      navigate(`/doctor/medicines/${item._id}`);
+    setSearchTerm("");
   };
 
   return (
-    <div className="lg:block hidden">
-      <nav className="flex flex-row gap-2 p-4 bg-gray-100 rounded-lg">
-        <div className="tabs tabs-lift" role="tablist">
-          {menuItems.map((item, index) => {
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`tab ${activeTab === index ? "tab-active" : ""}`}
-                role="tab"
-                onClick={() => setActiveTab(index)}
-              >
-                {item.name}
-              </Link>
-            );
-          })}
-
-          {/* Conditionally render search options for doctor role */}
-          {user.role === "doctor" && (
-            <div className="flex gap-4 ml-4 relative">
-              {/* Search Patient */}
-              <SearchInput
-                placeholder="Search Patient by id, name..."
-                value={patientSearch}
-                onChange={setPatientSearch}
-                onKeyPress={handleEnterPress}
-              />
-              <button>Search</button>
-              {/* Show suggestions only if there are any */}
-              {patientSuggestions.length > 0 && (
-                <SearchSuggestions
-                  suggestions={patientSuggestions}
-                  onSelect={handlePatientSelect} // Pass the selection handler
-                  fields={["name", "uniqueId"]}
-                />
-              )}
-              {/* Search Medicine */}
-              <SearchInput
-                placeholder="Search Medicine"
-                value={medicineSearch}
-                onChange={setMedicineSearch}
-              />{" "}
-              <button
-                onClick={handleMedicineSearchClick}
-                className="bg-red-500 text-white p-2 rounded"
-              >
-                Search
-              </button>
-              {/* Show suggestions for medicines */}
-              {medicineSuggestions.length > 0 && (
-                <SearchSuggestions
-                  suggestions={medicineSuggestions}
-                  onSelect={handleMedicineSelect}
-                  fields={["name", "genericName", "manufacturer"]}
-                />
-              )}
-            </div>
-          )}
+    <div className="hidden lg:block bg-white shadow">
+      <nav className="flex justify-between items-center overflow-x-auto whitespace-nowrap px-6 py-3">
+        {/* Tabs container */}
+        <div className="flex space-x-4">
+          {menuItems.map(({ name, path }) => (
+            <NavLink
+              key={path}
+              to={path}
+              className={({ isActive }) =>
+                `inline-block px-4 py-2 rounded-t-lg transition-colors duration-150 ${
+                  isActive
+                    ? "border-b-2 border-teal-500 text-teal-600 font-semibold"
+                    : "text-gray-600 hover:text-gray-800"
+                }`
+              }
+            >
+              {name}
+            </NavLink>
+          ))}
         </div>
+
+        {/* Search for doctor */}
+        {user.role === "doctor" && (
+          <div className="relative w-64">
+            <SearchInput
+              placeholder="Search patient or medicine..."
+              value={searchTerm}
+              onChange={setSearchTerm}
+              onKeyDown={handleKeyDown}
+            />
+            {suggestions.length > 0 && (
+              <SearchSuggestions
+                suggestions={suggestions}
+                onSelect={selectSuggestion}
+                selectedIndex={selectedIndex}
+                fields={["name", "uniqueId"]}
+              />
+            )}
+          </div>
+        )}
       </nav>
     </div>
   );
-};
-
-export default RoleMenu;
+}

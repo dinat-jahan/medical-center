@@ -32,8 +32,10 @@ import PrescriptionView from "./pages/doctorPages/prescriptionPage/PrescriptionV
 import PrescriptionHistory from "./pages/patientPages/prescriptionPages/PrescriptionHistory";
 import DutyRosterOfDoctorsPage from "./pages/DutyRosterOfDoctorsPage";
 import DispenseMedicine from "./pages/medicalStaffPages/DispenseMedicine";
-import MedicineDetailPage from "./pages/medicalStaffPages/MedicineDetail";
 import EditMedicinePage from "./pages/medicalStaffPages/EditMedicinePage";
+import MedicineView from "./pages/doctorPages/MedicineView";
+import DoctorMedicineDetailPage from "./pages/doctorPages/MedicineDetail";
+import StaffMedicineDetailPage from "./pages/medicalStaffPages/MedicineDetail";
 axios.defaults.baseURL = import.meta.env.DEV
   ? "http://localhost:2000"
   : import.meta.env.VITE_API_BASE_URL;
@@ -50,7 +52,6 @@ function App() {
           <Route path="/doctors" element={<DoctorsPage />} />
           <Route path="/medical-staffs" element={<MedicalStaffsPage />} />
           <Route path="/contact" element={<ContactPage />} />
-
           <Route path="/register" element={<RegisterPage />} />
           <Route
             path="/profile"
@@ -61,9 +62,9 @@ function App() {
               />
             }
           />
-
           <Route path="/set-password" element={<SetPasswordPage />} />
           <Route path="/available-medicine" element={<AvailableMedicine />} />
+          <Route path="/doctor/available-medicine" element={<MedicineView />} />
           <Route
             path="/university-admin/add-member"
             element={
@@ -74,7 +75,6 @@ function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/google-redirect" element={<GoogleRedirect />} />
           <Route path="/set-password-google" element={<SetPasswordGoogle />} />
-
           <Route
             path="/patient-profile/:uniqueId"
             element={<PatientProfilePage />}
@@ -95,7 +95,6 @@ function App() {
           />
           <Route path="/search-medicine" element={<SearchMedicinesPage />} />
           <Route path="/telemedicine" element={<TelemedicinePage />} />
-
           <Route
             path="/search-medicine/:medicineId"
             element={<SearchMedicinesPage />}
@@ -129,7 +128,11 @@ function App() {
           />
           <Route
             path="/medical-staff/medicines/:id"
-            element={<MedicineDetailPage />}
+            element={<StaffMedicineDetailPage />}
+          />{" "}
+          <Route
+            path="/doctor/medicines/:id"
+            element={<DoctorMedicineDetailPage />}
           />
           <Route path="/medicines/:id/edit" element={<EditMedicinePage />} />
         </Route>
