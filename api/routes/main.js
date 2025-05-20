@@ -9,7 +9,7 @@ const TimeSlot = require("../models/timeslot");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const { GetObjectAclCommand, GetObjectCommand } = require("@aws-sdk/client-s3");
 const s3Client = require("../config/awsConfig");
-
+const TelemedicineDuty = require("../models/telemedicineDuty");
 router.use((err, req, res, next) => {
   console.error(err.stack);
   res
@@ -172,6 +172,36 @@ router.delete("/delete-all-time-slots", async (req, res) => {
     res
       .status(500)
       .json({ message: "Error deleting time slots", error: err.message });
+  }
+});
+
+router.get("/api/telemedicine-duty", async (req, res) => {
+  try {
+    // Find all duties, populate doctor info
+    const duties = await TelemedicineDuty.find({})
+      .populate({
+        path: "doctor",
+        select: "name phone role", // select needed fields
+        match: { role: "doctor" }, // ensure only doctors
+      })
+      .lean();
+
+    // Filter out any duties where doctor was not found or not role doctor
+    const filteredDuties = duties.filter((duty) => duty.doctor);
+
+    // Map to desired format
+    const responseDuties = filteredDuties.map(({ day, doctor }) => ({
+      day,
+      doctor: {
+        name: doctor.name,
+        phone: doctor.phone,
+      },
+    }));
+
+    res.json({ duties: responseDuties });
+  } catch (err) {
+    console.error("Error fetching telemedicine duties:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 

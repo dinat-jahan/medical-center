@@ -18,7 +18,7 @@ const multer = require("multer");
 const DutyRoster = require("../models/dutyRoster");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-
+const TelemedicineDuty = require("../models/telemedicineDuty");
 const isMedicalAdmin = (req, res, next) => {
   if (req.session.user && req.session.user.role === "medical-admin") {
     return next();
@@ -183,4 +183,49 @@ router.post("/duty-roster/delete/:id", isMedicalAdmin, async (req, res) => {
   }
 });
 
+// GET all duties with doctor populated + all doctors with role "doctor"
+router.get("/telemedicine-duty", async (req, res) => {
+  try {
+    const duties = await TelemedicineDuty.find()
+      .populate("doctor", "name phone") // populate only name and phone fields
+      .sort({ day: 1 });
+
+    const doctors = await MedicalUser.find({ role: "doctor" }).select(
+      "name phone"
+    );
+
+    res.json({ duties, doctors });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch duties" });
+  }
+});
+
+// Add a duty
+router.post("/telemedicine-duty/add", async (req, res) => {
+  const { day, doctor } = req.body;
+  try {
+    const exists = await TelemedicineDuty.findOne({ day, doctor });
+    if (exists) {
+      return res
+        .status(400)
+        .json({ error: "Doctor already assigned for this day" });
+    }
+    const newDuty = await TelemedicineDuty.create({ day, doctor });
+    const populated = await newDuty.populate("doctor");
+    res.json(populated);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to assign duty" });
+  }
+});
+
+// Remove a duty
+router.post("/telemedicine-duty/delete/:id", async (req, res) => {
+  try {
+    await TelemedicineDuty.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to remove duty" });
+  }
+});
 module.exports = router;

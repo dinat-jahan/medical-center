@@ -34,7 +34,11 @@ export const roleMenus = {
     },
     {
       name: "Manage Medical Staff",
-      path: "/admin/manage-medical-staff",
+      path: "/medical-admin/manage-medical-staff",
+    },
+    {
+      name: "Manage Telemedicine",
+      path: "/medical-admin/telemedicine-duty",
     },
     { name: "View Booking Info", path: "/book-appointment" },
   ],
