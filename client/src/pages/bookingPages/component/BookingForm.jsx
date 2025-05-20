@@ -19,7 +19,7 @@ const BookingForm = ({
     setMessage("");
   }, [selectedDate, selectedDoctor]);
 
-  const getBookableDates = (daysAhead = 30) => {
+  const getBookableDates = (daysAhead = 3) => {
     const dates = [];
     const now = DateTime.local();
     const startOffset = now.hour >= 20 ? 1 : 0;

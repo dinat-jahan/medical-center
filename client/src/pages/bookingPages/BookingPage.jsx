@@ -6,6 +6,7 @@ import PatientInfoCard from "./component/PatientInfoCard";
 import BookingForm from "./component/BookingForm";
 import TimeSlotTable from "./component/TimeSlotTable";
 import ErrorModal from "./component/ErrorModal";
+import { useNavigate } from "react-router-dom";
 
 const BookingPage = () => {
   const { user } = useContext(UserContext);
@@ -21,7 +22,7 @@ const BookingPage = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [dayOffMessage, setDayOffMessage] = useState("");
-
+  const navigate = useNavigate();
   const [showErrorModal, setShowErrorModal] = useState(false);
 
   // Fetch slots when date or doctor changes
@@ -107,6 +108,31 @@ const BookingPage = () => {
       });
   };
 
+  const onPatientClick = (slot) => {
+    if (!slot.bookedBy) return;
+
+    navigate(`/write-prescription/${slot.bookedBy.uniqueId}`);
+
+    if (handleMarkAsSeen) {
+      handleMarkAsSeen(slot._id);
+    }
+  };
+
+  const handleMarkAsSeen = (slotId) => {
+    axios
+      .post(`/booking/mark-seen/${slotId}`)
+      .then((res) => {
+        setSlots((prev) =>
+          prev.map((s) => (s._id === slotId ? res.data.slot : s))
+        );
+      })
+      .catch((err) => {
+        const msg = err.response?.data?.message || err.message;
+        setErrorMessage(msg);
+        setShowErrorModal(true);
+      });
+  };
+
   return (
     <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-6 bg-teal-50">
       {/* Info Card */}
@@ -166,6 +192,8 @@ const BookingPage = () => {
             handleBooking={handleBooking}
             handleCancel={handleCancel}
             handleMakeUnavailable={handleMakeUnavailable}
+            handleMarkAsSeen={handleMarkAsSeen}
+            onPatientClick={onPatientClick}
           />
         )}
         {/* Error Modal */}

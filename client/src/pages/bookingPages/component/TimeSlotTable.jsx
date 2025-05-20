@@ -11,6 +11,8 @@ const TimeSlotTable = ({
   handleBooking,
   handleCancel,
   handleMakeUnavailable,
+  onPatientClick,
+  handleMarkAsSeen,
 }) => (
   <table className="w-full border-collapse border">
     <thead>
@@ -34,9 +36,39 @@ const TimeSlotTable = ({
           <tr key={slot._id} className="text-center">
             <td className="border p-2">{slot.queueNumber}</td>
             <td className="border p-2">
-              {showInfo && slot.bookedBy?.uniqueId}
+              {showInfo && slot.bookedBy ? (
+                isDoctor ? (
+                  <button
+                    onClick={() => onPatientClick(slot)}
+                    className="text-gray-900 underline bg-none cursor-pointer"
+                    type="button"
+                  >
+                    {slot.bookedBy.uniqueId}
+                  </button>
+                ) : (
+                  slot.bookedBy.uniqueId
+                )
+              ) : (
+                "-"
+              )}
             </td>
-            <td className="border p-2">{showInfo && slot.bookedBy?.name}</td>
+            <td className="border p-2">
+              {showInfo && slot.bookedBy ? (
+                isDoctor ? (
+                  <button
+                    onClick={() => onPatientClick(slot)}
+                    className="text-gray-900 underline cursor-pointer bg-none"
+                    type="button"
+                  >
+                    {slot.bookedBy.name}
+                  </button>
+                ) : (
+                  slot.bookedBy.name
+                )
+              ) : (
+                "-"
+              )}
+            </td>
             <td className="border p-2">{slot.time}</td>
             <td className="border p-2">{slot.status}</td>
             <td className="border p-2">{slot.bookingStatus}</td>

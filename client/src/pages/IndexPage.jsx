@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import doctor_standing from "../assets/doctor_standing.jpg";
-import ServicePage from "./commonPages/ServicePage";
+import ServicePage from "./commonPages/servicePages.jsx/ServicePage";
 
 const IndexPage = () => {
   return (

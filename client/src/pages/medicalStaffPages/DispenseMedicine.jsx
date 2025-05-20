@@ -126,7 +126,7 @@ const DispenseMedicine = () => {
                   <p className="text-sm">
                     <span className="text-gray-700 font-medium">Patient: </span>
                     <span className="text-blue-600 font-semibold">
-                      {rec.patient.name}
+                      {rec.patient?.name}
                     </span>
                   </p>
                   <p className="text-sm text-gray-600">

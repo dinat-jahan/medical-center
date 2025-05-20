@@ -25,6 +25,15 @@ const TestSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    availableInMedicalCenter: {
+      type: Boolean,
+      default: false, // true if this test is offered in Medical Center
+    },
+    price: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
   },
   {
     timestamps: true,

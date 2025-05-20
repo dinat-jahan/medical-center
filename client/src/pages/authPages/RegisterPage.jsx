@@ -1,8 +1,10 @@
-// === src/pages/RegisterPage.jsx ===
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
 import api from "../../utils/api";
+
+const OTP_VALIDITY_SECONDS = 20; // 2 minutes
+const MAX_OTP_RETRIES = 3;
 
 const RegisterPage = () => {
   const [step, setStep] = useState(1);
@@ -14,11 +16,26 @@ const RegisterPage = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [isFetching, setIsFetching] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // For OTP resend logic:
+  const [otpTimeout, setOtpTimeout] = useState(0);
+  const [otpRetries, setOtpRetries] = useState(0);
+  const timerRef = useRef(null);
+
   const navigate = useNavigate();
 
   const backendURL = import.meta.env.DEV
     ? "http://localhost:2000"
     : import.meta.env.VITE_API_BASE_URL;
+
+  useEffect(() => {
+    if (otpTimeout > 0) {
+      timerRef.current = setTimeout(() => setOtpTimeout(otpTimeout - 1), 1000);
+    } else {
+      clearTimeout(timerRef.current);
+    }
+    return () => clearTimeout(timerRef.current);
+  }, [otpTimeout]);
 
   const getStepMargin = () => {
     if (step === 2) return "mt-8";
@@ -28,6 +45,7 @@ const RegisterPage = () => {
 
   const fetchMemberInfo = async () => {
     setErrorMessage("");
+    setSuccessMessage("");
     if (!uniqueId.trim()) {
       setErrorMessage("Please enter your Unique ID.");
       return;
@@ -53,6 +71,7 @@ const RegisterPage = () => {
 
   const sendOtp = async () => {
     setErrorMessage("");
+    setSuccessMessage("");
     if (!emailForOtp) {
       setErrorMessage("Please select an email.");
       return;
@@ -62,16 +81,22 @@ const RegisterPage = () => {
       if (data.success) {
         setSuccessMessage(data.message);
         setStep(3);
+        setOtpRetries((prev) => prev + 1);
+        setOtpTimeout(OTP_VALIDITY_SECONDS);
       } else {
         setErrorMessage(data.message);
       }
     } catch (err) {
-      setErrorMessage(`Error sending OTP: ${err.message}`);
+      // Handle backend errors like retry limits or OTP already sent
+      const msg =
+        err.response?.data?.message || `Error sending OTP: ${err.message}`;
+      setErrorMessage(msg);
     }
   };
 
   const verifyOtp = async () => {
     setErrorMessage("");
+    setSuccessMessage("");
     if (!otp.trim()) {
       setErrorMessage("Please enter the OTP.");
       return;
@@ -86,10 +111,23 @@ const RegisterPage = () => {
         setErrorMessage(data.message);
       }
     } catch (err) {
-      setErrorMessage(`Error verifying OTP: ${err.message}`);
+      const msg =
+        err.response?.data?.message || `Error verifying OTP: ${err.message}`;
+      setErrorMessage(msg);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Back button handler
+  const handleBack = () => {
+    setErrorMessage("");
+    setSuccessMessage("");
+    if (step === 3) {
+      // Reset OTP input if going back from OTP step
+      setOtp("");
+    }
+    setStep((prev) => (prev > 1 ? prev - 1 : prev));
   };
 
   const dateOfBirth = new Date(memberInfo?.dob);
@@ -193,14 +231,36 @@ const RegisterPage = () => {
                 ))}
               </select>
             </div>
-            <div className="flex justify-center mt-6">
+
+            <div className="flex justify-between mt-6 w-[400px]">
+              <button
+                onClick={handleBack}
+                className="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-6 rounded-3xl"
+              >
+                Back
+              </button>
+
               <button
                 onClick={sendOtp}
-                className="w-[400px] bg-blue-500 hover:bg-teal-500 text-white py-2 mt-3 rounded-3xl"
+                disabled={isFetching || otpRetries >= MAX_OTP_RETRIES}
+                className={`py-2 px-6 rounded-3xl text-white ${
+                  otpRetries >= MAX_OTP_RETRIES
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-blue-500 hover:bg-teal-500"
+                }`}
               >
-                Send OTP
+                {isFetching ? "Sending…" : "Send OTP"}
               </button>
             </div>
+
+            {otpRetries > 0 && (
+              <p className="mt-2 text-center text-sm text-gray-700 w-[400px]">
+                OTP sent {otpRetries} time{otpRetries > 1 ? "s" : ""}.
+                {otpRetries >= MAX_OTP_RETRIES
+                  ? " You have reached the maximum number of OTP attempts."
+                  : ""}
+              </p>
+            )}
           </div>
         )}
 
@@ -214,13 +274,43 @@ const RegisterPage = () => {
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
             />
-            <button
-              onClick={verifyOtp}
-              disabled={loading}
-              className="w-[400px] bg-teal-500 hover:bg-teal-500 text-white py-2 mt-3 rounded-3xl"
-            >
-              {loading ? "Verifying..." : "Verify OTP"}
-            </button>
+            <div className="flex justify-between w-[400px]">
+              <button
+                onClick={handleBack}
+                className="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-6 rounded-3xl"
+              >
+                Back
+              </button>
+              <button
+                onClick={verifyOtp}
+                disabled={loading}
+                className="bg-teal-500 hover:bg-teal-500 text-white py-2 px-6 rounded-3xl"
+              >
+                {loading ? "Verifying..." : "Verify OTP"}
+              </button>
+            </div>
+
+            {otpTimeout > 0 && (
+              <p className="mt-2 text-center text-sm text-gray-700 w-[400px]">
+                OTP expires in: {otpTimeout} second{otpTimeout !== 1 ? "s" : ""}
+              </p>
+            )}
+
+            {otpTimeout === 0 && otpRetries < MAX_OTP_RETRIES && (
+              <button
+                onClick={sendOtp}
+                disabled={isFetching}
+                className="mt-2 bg-blue-600 hover:bg-teal-600 text-white py-2 px-6 rounded-3xl"
+              >
+                Resend OTP
+              </button>
+            )}
+
+            {otpRetries >= MAX_OTP_RETRIES && (
+              <p className="mt-2 text-center text-sm text-red-600 w-[400px]">
+                Maximum OTP retries reached. Please try again later.
+              </p>
+            )}
           </div>
         )}
 

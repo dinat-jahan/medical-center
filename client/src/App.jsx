@@ -1,7 +1,7 @@
 import { Link, Routes, Route } from "react-router-dom";
 import IndexPage from "./pages/IndexPage";
 import Layout from "./Layout";
-import ServicePage from "./pages/commonPages/ServicePage";
+import ServicePage from "./pages/commonPages/servicePages.jsx/ServicePage";
 import DoctorsPage from "./pages/commonPages/DoctorsPage";
 import MedicalStaffsPage from "./pages/commonPages/MedicalStaffsPage";
 import ContactPage from "./pages/commonPages/ContactPage";

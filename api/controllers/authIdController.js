@@ -38,6 +38,9 @@ exports.fetchMember = asyncHandler(async (req, res, next) => {
   res.json({ success: true, member });
 });
 
+const OTP_EXPIRATION_MS = 20 * 10000; //2 * 60 * 1000; // 2 minutes
+const MAX_OTP_RETRIES = 3;
+
 //send otp to email
 exports.sendOtp = asyncHandler(async (req, res, next) => {
   await check("uniqueId", "Unique ID is required").notEmpty().run(req);
@@ -58,6 +61,29 @@ exports.sendOtp = asyncHandler(async (req, res, next) => {
       .status(404)
       .json({ success: false, message: "Member not found" });
   }
+  const now = Date.now();
+  const existingOtp = await OtpModel.findOne({ uniqueId });
+
+  if (existingOtp) {
+    const elapsed = now - existingOtp.createdAt.getTime();
+
+    // If OTP still valid (within expiry window)
+    if (elapsed < OTP_EXPIRATION_MS) {
+      if (existingOtp.retryCount >= MAX_OTP_RETRIES) {
+        return res.status(429).json({
+          success: false,
+          message:
+            "Maximum OTP retries reached. Please wait before trying again.",
+        });
+      }
+      return res.status(429).json({
+        success: false,
+        message: `OTP already sent. Please wait ${Math.ceil(
+          (OTP_EXPIRATION_MS - elapsed) / 1000
+        )} seconds before requesting a new one.`,
+      });
+    }
+  }
 
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   await OtpModel.findOneAndUpdate(
@@ -65,7 +91,7 @@ exports.sendOtp = asyncHandler(async (req, res, next) => {
     { uniqueId, otp, createdAt: Date.now() },
     { upsert: true, new: true }
   );
-
+  console.log(otp);
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -101,6 +127,15 @@ exports.verifyOtp = asyncHandler(async (req, res, next) => {
     return res
       .status(410)
       .json({ success: false, message: "OTP expired or not found" });
+  }
+
+  const now = Date.now();
+  if (now - record.createdAt.getTime() > OTP_EXPIRATION_MS) {
+    await OtpModel.deleteOne({ uniqueId });
+    return res.status(410).json({
+      success: false,
+      message: "OTP expired. Please request a new one.",
+    });
   }
 
   if (record.otp !== otp) {

@@ -1,0 +1,14 @@
+code,name,description,availableInMedicalCenter,price
+CBC with ESR,Complete Blood Count (CBC) with ESR,Measures overall health and detects a wide range of disorders.,TRUE,350
+Blood Sugar,Blood Sugar,Measures glucose level in the blood.,TRUE,150
+S. Creatinin,Serum Creatinine,Evaluates kidney function.,TRUE,200
+S. Bilirubin,Serum Bilirubin,Checks liver function and bile duct obstruction.,TRUE,180
+S. SGPT,Serum SGPT,Detects liver damage.,TRUE,220
+S. Cholesterol,Serum Cholesterol,Measures cholesterol levels in blood.,TRUE,250
+S. HDL,Serum HDL,High-density lipoprotein cholesterol level.,TRUE,230
+S. TG,Serum Triglycerides (TG),Measures fats in the blood.,TRUE,210
+Lipid Profile,Lipid Profile,Assesses risk of cardiovascular disease.,TRUE,400
+Widal Test,Widal Test,Detects typhoid fever.,TRUE,350
+HBsAg (ICT),Hepatitis B Surface Antigen (ICT),Detects Hepatitis B infection.,TRUE,300
+Blood Group,Blood Group,Determines blood type.,TRUE,100
+Urine PT,Urine Pregnancy Test (PT),Confirms pregnancy.,TRUE,120

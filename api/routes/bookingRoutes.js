@@ -318,4 +318,20 @@ router.post("/unavailable/:slotId", async (req, res) => {
   }
 });
 
+router.post("/mark-seen/:slotId", async (req, res) => {
+  const { slotId } = req.params;
+
+  try {
+    const slot = await Slot.findById(slotId);
+    if (!slot) return res.status(404).json({ message: "Slot not found" });
+
+    slot.status = "seen"; // Or whatever status value you want
+    await slot.save();
+
+    res.json({ slot });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 module.exports = router;

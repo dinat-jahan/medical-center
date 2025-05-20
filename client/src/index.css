@@ -8,9 +8,9 @@ input[type="text"],
 input[type="password"] {
   @apply w-full border border-gray-400 rounded-2xl p-2 my-2;
 }
-button {
+/* button {
   @apply w-full border border-primary bg-primary text-white font-poetsen rounded-2xl py-2;
-}
-.addMember{
+} */
+.addMember {
   @apply text-teal-500;
 }
