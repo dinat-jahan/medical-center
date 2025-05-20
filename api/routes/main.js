@@ -10,6 +10,12 @@ const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const { GetObjectAclCommand, GetObjectCommand } = require("@aws-sdk/client-s3");
 const s3Client = require("../config/awsConfig");
 
+router.use((err, req, res, next) => {
+  console.error(err.stack);
+  res
+    .status(err.status || 500)
+    .json({ success: false, message: err.message || "Internal Server Error" });
+});
 router.get("/api/whoami", async (req, res) => {
   if (req.session && req.session.user) {
     const user = req.session.user;

@@ -12,7 +12,10 @@ const SetPasswordPage = () => {
   const uniqueId = params.get("uniqueId");
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    if (password.length < 6) {
+      setErrorMessage("Password must be at least 6 characters");
+      return;
+    }
     if (password != confirmPassword) {
       setErrorMessage("Password do not match");
       return;

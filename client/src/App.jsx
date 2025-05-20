@@ -36,6 +36,7 @@ import EditMedicinePage from "./pages/medicalStaffPages/EditMedicinePage";
 import MedicineView from "./pages/doctorPages/MedicineView";
 import DoctorMedicineDetailPage from "./pages/doctorPages/MedicineDetail";
 import StaffMedicineDetailPage from "./pages/medicalStaffPages/MedicineDetail";
+import ForgotPasswordPage from "./pages/authPages/ForgotPasswordPage";
 axios.defaults.baseURL = import.meta.env.DEV
   ? "http://localhost:2000"
   : import.meta.env.VITE_API_BASE_URL;
@@ -135,6 +136,7 @@ function App() {
             element={<DoctorMedicineDetailPage />}
           />
           <Route path="/medicines/:id/edit" element={<EditMedicinePage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         </Route>
       </Routes>
     </UserContextProvider>

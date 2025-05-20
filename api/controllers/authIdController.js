@@ -1,228 +1,198 @@
+// === controllers/authIdController.js ===
 require("dotenv").config();
 const bcrypt = require("bcrypt");
 const UniversityMember = require("../models/universityMember");
 const nodemailer = require("nodemailer");
+const { check, validationResult } = require("express-validator");
 const OtpModel = require("../models/otp");
 const MedicalUser = require("../models/medicalUser");
 const { UniversityDBAdmin, MedicalDBAdmin } = require("../models/admin");
 
+// Utility: wrap async routes
+const asyncHandler = (fn) => (req, res, next) => {
+  Promise.resolve(fn(req, res, next)).catch(next);
+};
+
 //fetch member by unique id
-exports.fetchMember = async (req, res) => {
-  try {
-    const { uniqueId } = req.params;
-    const user = await MedicalUser.findOne({
-      uniqueId: uniqueId.toLowerCase(),
-    });
-    if (user) {
-      return res.json({ success: false, message: "User already exists" });
-    }
-    const member = await UniversityMember.findOne({
-      uniqueId: uniqueId.toLowerCase(),
-    });
-
-    if (!member) {
-      return res.json({ success: false, message: "No member found" });
-    }
-    console.log(member);
-    res.json({
-      success: true,
-      member,
-    });
-  } catch (err) {
-    console.log(err);
+exports.fetchMember = asyncHandler(async (req, res, next) => {
+  // Validate input
+  if (!req.params.uniqueId) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Unique ID is required" });
   }
-};
 
-//send otp to gmail
-exports.sendOtp = async (req, res) => {
+  const uniqueId = req.params.uniqueId.toLowerCase();
+  const existing = await MedicalUser.findOne({ uniqueId });
+  if (existing) {
+    return res
+      .status(409)
+      .json({ success: false, message: "User already exists" });
+  }
+
+  const member = await UniversityMember.findOne({ uniqueId });
+  if (!member) {
+    return res.status(404).json({ success: false, message: "No member found" });
+  }
+
+  res.json({ success: true, member });
+});
+
+//send otp to email
+exports.sendOtp = asyncHandler(async (req, res, next) => {
+  await check("uniqueId", "Unique ID is required").notEmpty().run(req);
+  await check("emailForOtp", "Valid email is required").isEmail().run(req);
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res
+      .status(400)
+      .json({ success: false, message: errors.array()[0].msg });
+  }
+
   const { uniqueId, emailForOtp } = req.body;
-  console.log("emailforotp", emailForOtp);
-  try {
-    const member = await UniversityMember.findOne({
-      uniqueId: uniqueId.toLowerCase(),
-    });
-    if (!member) {
-      return res.json({ success: false, message: "Member not found" });
-    }
-
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-    // Save OTP in DB
-    await OtpModel.findOneAndUpdate(
-      { uniqueId },
-      { uniqueId, otp, createdAt: Date.now() },
-      { upsert: true, new: true }
-    );
-
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS,
-      },
-    });
-
-    await transporter.sendMail({
-      from: process.env.MAIL_USER,
-      to: emailForOtp,
-      // to: "it20009@mbstu.ac.bd",
-      subject: "Your OTP for MBSTU Medical Center registration",
-      text: `Your OTP code is ${otp}`,
-    });
-    console.log("otp", otp);
-    res.json({ success: true, message: `OTP sent to ${emailForOtp}` });
-  } catch (err) {
-    console.log(err);
-    res
-      .status(500)
-      .json({ success: false, message: "Server error while sending OTP" });
+  const member = await UniversityMember.findOne({
+    uniqueId: uniqueId.toLowerCase(),
+  });
+  if (!member) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Member not found" });
   }
-};
+
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  await OtpModel.findOneAndUpdate(
+    { uniqueId },
+    { uniqueId, otp, createdAt: Date.now() },
+    { upsert: true, new: true }
+  );
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.MAIL_USER,
+      pass: process.env.MAIL_PASS,
+    },
+  });
+
+  await transporter.sendMail({
+    from: process.env.MAIL_USER,
+    to: emailForOtp,
+    subject: "Your OTP for MBSTU Medical Center registration",
+    text: `Your OTP code is ${otp}`,
+  });
+
+  res.json({ success: true, message: `OTP sent to ${emailForOtp}` });
+});
 
 //verify otp
-exports.verifyOtp = async (req, res) => {
-  const { uniqueId, otp } = req.body;
-  console.log("otp", otp);
-
-  try {
-    const foundOtp = await OtpModel.findOne({ uniqueId });
-    if (!foundOtp) {
-      return res.json({ success: false, message: "OTP expired or not found." });
-    }
-
-    if (foundOtp.otp === otp) {
-      // Delete OTP from DB after use
-      await OtpModel.deleteOne({ uniqueId });
-      return res.json({ success: true, message: "OTP verified successfully" });
-    } else {
-      return res.json({ success: false, message: "Invalid OTP" });
-    }
-  } catch (err) {
-    console.error(err);
-    res
-      .status(500)
-      .json({ success: false, message: "Server error verifying OTP" });
+exports.verifyOtp = asyncHandler(async (req, res, next) => {
+  await check("uniqueId", "Unique ID is required").notEmpty().run(req);
+  await check("otp", "OTP is required").notEmpty().run(req);
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res
+      .status(400)
+      .json({ success: false, message: errors.array()[0].msg });
   }
-};
+
+  const { uniqueId, otp } = req.body;
+  const record = await OtpModel.findOne({ uniqueId });
+  if (!record) {
+    return res
+      .status(410)
+      .json({ success: false, message: "OTP expired or not found" });
+  }
+
+  if (record.otp !== otp) {
+    return res.status(401).json({ success: false, message: "Invalid OTP" });
+  }
+
+  await OtpModel.deleteOne({ uniqueId });
+  res.json({ success: true, message: "OTP verified successfully" });
+});
 
 //save password in db
-exports.saveUserPassword = async (req, res) => {
-  const { uniqueId, password } = req.body;
-  console.log(uniqueId);
-  console.log(password);
-  try {
-    const user = await UniversityMember.findOne({ uniqueId });
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "University member not found for password setup.",
-      });
-    }
-
-    const role = MedicalUser.determineRole(
-      user.userType,
-      user.designation,
-      user.office
-    );
-
-    console.log(user);
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newMedicalUser = new MedicalUser({
-      uniqueId: user.uniqueId,
-      name: user.name,
-      userType: user.userType,
-      sex: user.sex,
-      department: user.department,
-      office: user.office,
-      designation: user.designation,
-      designation_2: user.designation_2,
-      program: user.program,
-      hall: user.hall,
-      session: user.session,
-      bloodGroup: user.bloodGroup,
-      dob: user.dob,
-      emails: user.emails,
-      phone: user.phone,
-      photo: user.photo,
-      password: hashedPassword, // after bcrypt hash
-      role: role,
-    });
-    await newMedicalUser.save();
-    req.session.user = {
-      id: user._id.toString(),
-      uniqueId: user.uniqueId,
-      name: user.name,
-
-      role: role,
-    };
-    res.json({ success: true, role: role });
-  } catch (err) {
-    console.log(err);
-    res
-      .status(500)
-      .json({ success: false, message: "Server error while saving password" });
+exports.saveUserPassword = asyncHandler(async (req, res, next) => {
+  await check("uniqueId", "Unique ID is required").notEmpty().run(req);
+  await check("password", "Password is required").isLength({ min: 6 }).run(req);
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res
+      .status(400)
+      .json({ success: false, message: errors.array()[0].msg });
   }
-};
+
+  const { uniqueId, password } = req.body;
+  const user = await UniversityMember.findOne({ uniqueId });
+  if (!user) {
+    return res
+      .status(404)
+      .json({ success: false, message: "University member not found" });
+  }
+
+  const role = MedicalUser.determineRole(
+    user.userType,
+    user.designation,
+    user.office
+  );
+  const hashed = await bcrypt.hash(password, 10);
+
+  const newUser = new MedicalUser({
+    ...user.toObject(),
+    password: hashed,
+    role,
+  });
+  await newUser.save();
+
+  req.session.user = {
+    id: user._id.toString(),
+    uniqueId: user.uniqueId,
+    name: user.name,
+    role,
+  };
+  res.json({ success: true, role });
+});
 
 //log in operation
-exports.login = async (req, res) => {
-  const { uniqueId, password } = req.body;
-  // Validation
-  if (!uniqueId || !password) {
-    return res.status(400).json({
-      success: false,
-      message: "Both uniqueId and password are required.",
-    });
-  }
-
-  try {
-    const lowerId = uniqueId.toLowerCase();
-    const user =
-      (await MedicalUser.findOne({ uniqueId: lowerId })) ||
-      (await UniversityDBAdmin.findOne({ uniqueId: lowerId })) ||
-      (await MedicalDBAdmin.findOne({ uniqueId: lowerId }));
-
-    if (!user) {
-      return res
-        .status(401)
-        .json({ success: false, message: "User not found." });
-    }
-
-    if (!user.password) {
-      return res
-        .status(403)
-        .json({ success: false, message: "Please set your password first." });
-    }
-
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Invalid password." });
-    }
-
-    // Save session and respond
-    req.session.user = {
-      id: user._id.toString(),
-      uniqueId: user.uniqueId,
-      name: user.name,
-      role: user.role,
-    };
-    return res.json({ success: true, user: req.session.user });
-  } catch (err) {
-    console.error("Login error:", err);
+exports.login = asyncHandler(async (req, res, next) => {
+  await check("uniqueId", "Unique ID is required").notEmpty().run(req);
+  await check("password", "Password is required").notEmpty().run(req);
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
     return res
-      .status(500)
-      .json({ success: false, message: "Internal server error." });
+      .status(400)
+      .json({ success: false, message: errors.array()[0].msg });
   }
-};
 
-//get set-password page
-// router.get("/set-password", (req, res) => {
-//   const { uniqueId } = req.query;
-//   if (!uniqueId) {
-//     return res.status(400).send("Missing unique Id");
-//   }
-//   res.render("auth-views/setPassword", { uniqueId });
-// });
+  const { uniqueId, password } = req.body;
+  const lower = uniqueId.toLowerCase();
+  const user =
+    (await MedicalUser.findOne({ uniqueId: lower })) ||
+    (await UniversityDBAdmin.findOne({ uniqueId: lower })) ||
+    (await MedicalDBAdmin.findOne({ uniqueId: lower }));
+
+  if (!user) {
+    return res.status(404).json({ success: false, message: "User not found" });
+  }
+
+  if (!user.password) {
+    return res
+      .status(403)
+      .json({ success: false, message: "Set password first" });
+  }
+
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) {
+    return res
+      .status(401)
+      .json({ success: false, message: "Invalid password" });
+  }
+
+  req.session.user = {
+    id: user._id.toString(),
+    uniqueId: user.uniqueId,
+    name: user.name,
+    role: user.role,
+  };
+  res.json({ success: true, user: req.session.user });
+});

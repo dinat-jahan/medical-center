@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
-import api from "../utils/api";
+import api from "../../utils/api";
 
 const RegisterPage = () => {
   const [step, setStep] = useState(1);
