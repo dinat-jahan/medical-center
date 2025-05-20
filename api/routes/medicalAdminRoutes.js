@@ -1,5 +1,6 @@
 const express = require("express");
 const MedicalDBAdmin = require("../models/admin");
+const mongoose = require("mongoose");
 
 const router = express.Router();
 const UniversityMember = require("../models/universityMember");
@@ -14,7 +15,7 @@ const s3Client = require("../config/awsConfig");
 const DutyRosterDoctor = require("../models/dutyRosterDoctor");
 const { generateFileName } = require("../helper/utils");
 const multer = require("multer");
-
+const DutyRoster = require("../models/dutyRoster");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
@@ -82,5 +83,104 @@ router.post(
     }
   }
 );
+
+// Helper to normalize department strings (trim + lowercase)
+function normalizeDept(dept) {
+  return dept ? dept.trim().toLowerCase() : null;
+}
+
+// Get duties for a given normalized department
+router.get("/duty-roster", isMedicalAdmin, async (req, res) => {
+  try {
+    let { department } = req.query;
+    if (!department)
+      return res.status(400).json({ error: "Department is required" });
+    department = normalizeDept(department);
+
+    const duties = await DutyRoster.find({ department }).populate(
+      "staff",
+      "_id name department"
+    );
+    res.json(duties);
+  } catch (err) {
+    console.error("GET /duty-roster error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Get medical staff users by normalized department
+router.get("/medical-users", isMedicalAdmin, async (req, res) => {
+  try {
+    let { department } = req.query;
+    if (!department)
+      return res.status(400).json({ error: "Department is required" });
+    department = normalizeDept(department);
+
+    const staff = await MedicalUser.find({
+      userType: "staff",
+      department,
+    }).select("_id name department");
+    res.json(staff);
+  } catch (err) {
+    console.error("GET /medical-users error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Add new staff duty roster record with normalized department
+router.post("/duty-roster/add", isMedicalAdmin, async (req, res) => {
+  try {
+    console.log("inside add");
+    console.log(req.body);
+    let { staff, department, day, shift, startTime, endTime } = req.body;
+
+    if (!staff || !department || !day || !shift || !startTime || !endTime) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+    if (!mongoose.Types.ObjectId.isValid(staff)) {
+      return res.status(400).json({ error: "Invalid staff ID" });
+    }
+    department = normalizeDept(department);
+
+    const exists = await DutyRoster.findOne({ staff, day, shift });
+    if (exists) {
+      return res
+        .status(400)
+        .json({ error: "Staff already scheduled for this day & shift" });
+    }
+
+    const newDuty = await DutyRoster.create({
+      staff,
+      department,
+      day,
+      shift,
+      startTime,
+      endTime,
+    });
+    await newDuty.populate("staff", "_id name department");
+    res.json(newDuty);
+  } catch (err) {
+    console.error("POST /duty-roster/add error:", err);
+    if (err.code === 11000) {
+      return res.status(400).json({ error: "Duplicate duty entry" });
+    }
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Delete staff duty roster record by ID
+router.post("/duty-roster/delete/:id", isMedicalAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid duty record ID" });
+    }
+    await DutyRoster.findByIdAndDelete(id);
+    res.json({ success: true });
+  } catch (err) {
+    console.error("POST /duty-roster/delete error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
 module.exports = router;
