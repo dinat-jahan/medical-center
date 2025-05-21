@@ -21,8 +21,8 @@ const DoctorsPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] px-4 py-10">
-      <h2 className="text-3xl font-bold text-center text-[#2B2D42] mb-10">
+    <div className="min-h-screen bg-teal-50 px-4 py-10">
+      <h2 className="text-3xl text-center text-teal-500 font-poetsen mb-10">
         Our Doctors
       </h2>
       <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">

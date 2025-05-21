@@ -1,16 +1,11 @@
-import doctor_standing from "../../assets/doctor_standing.jpg";
 import { useState } from "react";
+import doctor_standing from "../../assets/doctor_standing.jpg";
 
-const AboutPage = ({ shortMode = false }) => {
-  const [showFull, setShowFull] = useState(false);
-
+const About = () => {
   const paragraphs = [
     "The Medical Center at Mawlana Bhashani Science and Technology University (MBSTU) provides basic healthcare services to the university community — including students, faculty members, and administrative staff. Situated within the campus, the center primarily offers free consultations and limited free medication for students, while faculty and staff members can access medical consultations and purchase prescribed medicines as needed.",
     "Though modest in size and resources, the center plays a key role in addressing day-to-day health needs of the campus population.",
-
     "The Medical Center operates under the supervision of several medical officers, supported by nurses, attendants, and administrative staff. Healthcare services are generally available in two shifts (Morning & Evening), based on a weekly duty roster. Telemedicine support is also available for basic consultations, with doctors reachable by phone on specific days.",
-
-    "🧪 Available Services", // We'll render this as heading before the list
   ];
 
   const services = [
@@ -23,8 +18,8 @@ const AboutPage = ({ shortMode = false }) => {
     "Telemedicine support via mobile",
   ];
 
-  const visibleParagraphs =
-    shortMode && !showFull ? paragraphs.slice(0, 2) : paragraphs;
+  // State to toggle see more/less
+  const [showFull, setShowFull] = useState(false);
 
   return (
     <div className="bg-teal-50 pt-20 pb-10 px-4 md:px-12 mx-auto min-h-screen">
@@ -48,38 +43,37 @@ const AboutPage = ({ shortMode = false }) => {
               We Take Care Of Your Healthy Life
             </h3>
 
-            {visibleParagraphs.map((para, idx) =>
-              para === "🧪 Available Services" ? (
-                <div key={idx} className="mb-4">
-                  <h4 className="text-xl font-semibold text-gray-700 mb-2">
-                    🧪 Available Services
-                  </h4>
-                  <ul className="list-disc list-inside text-gray-600 space-y-1 ml-4">
-                    {services.map((item, i) => (
-                      <li key={i}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-              ) : (
-                <p
-                  key={idx}
-                  className="text-gray-600 leading-7 mb-4 whitespace-pre-wrap"
-                >
-                  {para}
-                </p>
-              )
+            {/* Show limited paragraphs or full based on showFull */}
+            {(showFull ? paragraphs : paragraphs.slice(0, 2)).map((para, idx) => (
+              <p
+                key={idx}
+                className="text-gray-600 leading-7 mb-4 whitespace-pre-wrap"
+              >
+                {para}
+              </p>
+            ))}
+
+            {/* Show services list only if showFull is true */}
+            {showFull && (
+              <div className="mb-4">
+                <h4 className="text-xl font-semibold text-gray-700 mb-2">
+                  🧪 Available Services
+                </h4>
+                <ul className="list-disc list-inside text-gray-600 space-y-1 ml-4">
+                  {services.map((item, i) => (
+                    <li key={i}>{item}</li>
+                  ))}
+                </ul>
+              </div>
             )}
 
-            {/* Learn More button only for shortMode */}
-            {shortMode && !showFull && (
-              <button
-                type="button"
-                className="bg-teal-500 hover:bg-sky-800 text-white font-bold py-2 px-6 rounded-3xl focus:outline-none focus:shadow-outline w-fit border-none"
-                onClick={() => setShowFull(true)}
-              >
-                Learn More
-              </button>
-            )}
+            {/* See More / See Less button */}
+            <button
+              className="text-teal-600 underline font-semibold mt-2 self-start"
+              onClick={() => setShowFull(!showFull)}
+            >
+              {showFull ? "See Less" : "See More"}
+            </button>
           </div>
         </div>
       </div>
@@ -87,4 +81,4 @@ const AboutPage = ({ shortMode = false }) => {
   );
 };
 
-export default AboutPage;
+export default About;

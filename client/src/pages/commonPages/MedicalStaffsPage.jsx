@@ -18,8 +18,8 @@ const MedicalStaffPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#f1f5f9] px-4 py-10">
-      <h2 className="text-3xl font-bold text-center text-[#1e3a8a] mb-10">
+    <div className="min-h-screen bg-teal-50 px-4 py-10">
+      <h2 className="text-3xl font-poetsen text-center text-teal-500 mb-10">
         Our Medical Staff
       </h2>
       <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
