@@ -9,6 +9,7 @@ const { GetObjectAclCommand, GetObjectCommand } = require("@aws-sdk/client-s3");
 const s3Client = require("../config/awsConfig");
 const TelemedicineDuty = require("../models/telemedicineDuty");
 const { Test } = require("../models/diagnosis");
+const DutyRoster = require("../models/dutyRoster");
 const { AmbulanceAssignment } = require("../models/driver");
 router.get("/whoami", async (req, res) => {
   if (req.session && req.session.user) {
@@ -229,6 +230,63 @@ router.get("/ambulance/current-driver", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
+  }
+});
+
+// 1) Get distinct departments from roster
+router.get("/departments", async (req, res) => {
+  try {
+    const departments = await DutyRoster.distinct("department");
+    res.json(departments);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error fetching departments" });
+  }
+});
+
+// 2) Get staff list by department
+router.get("/staff/:department", async (req, res) => {
+  try {
+    const { department } = req.params;
+
+    // Find distinct staff IDs in this department
+    const staffIds = await DutyRoster.find({ department }).distinct("staff");
+
+    // Find staff user info
+    const staff = await MedicalUser.find({ _id: { $in: staffIds } }).select(
+      "name role"
+    );
+
+    res.json(staff);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error fetching staff" });
+  }
+});
+
+// 3) Get duty roster grouped by day and shift for a department
+router.get("/roster/:department", async (req, res) => {
+  try {
+    const { department } = req.params;
+
+    const rosters = await DutyRoster.find({ department }).populate(
+      "staff",
+      "name"
+    );
+
+    // Group by day and shift
+    const grouped = {};
+
+    rosters.forEach((r) => {
+      if (!grouped[r.day]) grouped[r.day] = {};
+      if (!grouped[r.day][r.shift]) grouped[r.day][r.shift] = [];
+      grouped[r.day][r.shift].push(r.staff.name);
+    });
+
+    res.json(grouped);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error fetching roster" });
   }
 });
 

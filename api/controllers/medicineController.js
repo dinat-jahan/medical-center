@@ -94,37 +94,27 @@ exports.changeMonthlyStock = async (req, res) => {
 // List medicines with optional search, generic name, manufacturer filters and pagination
 exports.getAllMedicine = async (req, res) => {
   try {
-    const {
-      search = "",
-      genericName,
-      manufacturer,
-      page = 1,
-      limit = 10,
-    } = req.query;
-    // Build Mongo query
+    const { search = "", page = 1, limit = 10 } = req.query;
     const query = {};
     if (search) {
-      query.$text = { $search: search };
+      const regex = new RegExp(search, "i");
+      query.$or = [
+        { name: regex },
+        { genericName: regex },
+        { manufacturer: regex },
+        { dosage: regex },
+      ];
     }
-    if (genericName) {
-      query.genericName = { $regex: genericName, $options: "i" };
-    }
-    if (manufacturer) {
-      query.manufacturer = { $regex: manufacturer, $options: "i" };
-    }
-
     const skip = (Number(page) - 1) * Number(limit);
     const totalItems = await Medicine.countDocuments(query);
     const totalPages = Math.ceil(totalItems / Number(limit));
-
     const items = await Medicine.find(query)
       .sort({ name: 1 })
       .skip(skip)
       .limit(Number(limit));
-
     res.json({ items, totalPages, totalItems });
   } catch (err) {
-    console.error(err);
+    console.error("Error listing medicines:", err);
     res.status(500).json({ error: "Server error" });
   }
 };
@@ -188,12 +178,9 @@ exports.searchMedicine = async (req, res) => {
   try {
     const q = req.query.query || "";
     const regex = new RegExp(q, "i");
-
-    // find any medicines matching in name, genericName, or manufacturer
     const matched = await Medicine.find({
       $or: [{ name: regex }, { genericName: regex }, { manufacturer: regex }],
     }).limit(50);
-
     const suggestions = Array.from(
       new Set([
         ...matched.map((m) => m.name),
@@ -201,15 +188,12 @@ exports.searchMedicine = async (req, res) => {
         ...matched.map((m) => m.manufacturer),
       ])
     ).map((val) => ({ label: val, value: val }));
-    return res.json(suggestions);
+    res.json(suggestions);
   } catch (err) {
     console.error("Search error:", err);
-    if (req.xhr || req.headers.accept.includes("application/json")) {
-      return res.status(500).json({ error: "Server error" });
-    }
+    res.status(500).json({ error: "Server error" });
   }
 };
-
 //get low of stock medicine
 exports.getLowStockMeds = async (req, res) => {
   try {
@@ -223,5 +207,31 @@ exports.getLowStockMeds = async (req, res) => {
   } catch (err) {
     console.error("Error fetching low-stock medicines:", err);
     res.status(500).json({ message: "Server Error" });
+  }
+};
+
+/**
+ * Add stock incrementally and update expiry date
+ * PATCH /medicines/:id/add-stock
+ * Body: { addedQuantity: number, expiryDate: ISODateString }
+ */
+exports.addStockAndExpiry = async (req, res) => {
+  try {
+    const { addedQuantity, expiryDate } = req.body;
+    const increment = parseInt(addedQuantity, 10) || 0;
+
+    const med = await Medicine.findById(req.params.id);
+    if (!med) return res.status(404).json({ error: "Medicine not found" });
+
+    // Increment stock
+    med.monthlyStockQuantity = (med.monthlyStockQuantity || 0) + increment;
+    // Update expiry
+    if (expiryDate) med.expiryDate = new Date(expiryDate);
+
+    await med.save();
+    res.json(med);
+  } catch (err) {
+    console.error("Error adding stock to medicine:", err);
+    res.status(500).json({ error: "Server error" });
   }
 };

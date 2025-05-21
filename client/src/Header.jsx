@@ -153,7 +153,12 @@ const Header = () => {
             <Link className="hover:text-blue-900" to="/telemedicine">
               Telemedicine
             </Link>
-          </li>{" "}
+          </li>
+          <li>
+            <Link className="hover:text-blue-900" to="/duty-roster-staff">
+              Staff Duty Roster
+            </Link>
+          </li>
           {user ? (
             <li>
               <button
@@ -268,6 +273,14 @@ const Header = () => {
                 className="text-left w-full"
               >
                 Doctor Schedule
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => handleMobileMenuClick("/duty-roster-staff")}
+                className="text-left w-full"
+              >
+                Staff Duty Roster
               </button>
             </li>
             <li>
