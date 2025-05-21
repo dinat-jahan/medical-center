@@ -1,6 +1,8 @@
+// src/pages/ServicePage.jsx
 import React, { useState } from "react";
 import PathologyDetails from "./component/PathologyDetails";
 import { TelemedicineInfo } from "./component/TelemedicineInfo";
+import { AmbulanceInfo } from "./component/AmbulanceInfo";
 const ServicePage = () => {
   const [activeIndex, setActiveIndex] = useState(null);
 
@@ -17,15 +19,15 @@ const ServicePage = () => {
       title: "24/7 Ambulance",
       description:
         "We provide 24/7 ambulance services to ensure immediate care.",
-      moreInfo:
-        "Our ambulances are equipped with emergency life-saving tools and are operated by trained medical personnel to ensure safe and timely patient transport.",
+      moreInfo: <AmbulanceInfo />,
     },
     {
       icon: "fa fa-ambulance",
       title: "Emergency",
-      description: "Emergency medical care is available 24/7 for urgent needs.",
+      description:
+        "Emergency medical care is available daily for urgent needs.",
       moreInfo:
-        "Our emergency unit is equipped with necessary life-saving equipment and staff to handle all types of critical health situations promptly.",
+        "Our emergency unit operates during regular hours, equipped with life-saving devices and staffed by experienced medical professionals to handle critical situations swiftly.",
     },
     {
       icon: "fa fa-heartbeat",
@@ -33,6 +35,22 @@ const ServicePage = () => {
       description:
         "Access healthcare services conveniently from your home by speaking directly with doctors over the phone.",
       moreInfo: <TelemedicineInfo />,
+    },
+    {
+      icon: "fa fa-stethoscope",
+      title: "Free Consultation",
+      description:
+        "Students, faculty, and staff can visit our on-site clinic for free medical consultations during regular hours.",
+      moreInfo:
+        "Our clinic offers no-cost in-person consultations for all university members.",
+    },
+    {
+      icon: "fa fa-x-ray",
+      title: "X-ray & Ultrasonography",
+      description:
+        "Digital X-ray and ultrasound imaging are complimentary for students; faculty and staff incur a nominal diagnostic fee.",
+      moreInfo:
+        "Our radiology department provides digital X-ray and ultrasound imaging. Students receive these services free of charge, while faculty and staff pay a moderate fee per procedure. All scans are reviewed by certified radiologists for precise diagnostics.",
     },
     {
       icon: "fa fa-pills",
@@ -52,12 +70,12 @@ const ServicePage = () => {
   ];
 
   const OurServicesCard = ({ service, index }) => {
-    const handleLearnMore = () => {
-      setActiveIndex(index);
-    };
-
+    const handleLearnMore = () => setActiveIndex(index);
     return (
-      <div className="relative bg-teal-50 border border-teal-500 rounded-xl shadow-md p-6 flex flex-col items-center text-center transform transition duration-300 hover:scale-105 hover:shadow-lg">
+      <div
+        onClick={handleLearnMore}
+        className="relative bg-teal-50 border border-teal-500 rounded-xl shadow-md p-6 flex flex-col items-center text-center transform transition duration-300 hover:scale-105 hover:shadow-lg cursor-pointer"
+      >
         <div className="w-14 h-14 rounded-full bg-teal-50 text-teal-500 flex items-center justify-center mb-4 text-2xl">
           <i className={service.icon}></i>
         </div>
@@ -77,9 +95,7 @@ const ServicePage = () => {
     );
   };
 
-  const closePopup = () => {
-    setActiveIndex(null);
-  };
+  const closePopup = () => setActiveIndex(null);
 
   return (
     <div className="py-12 bg-teal-50">
@@ -96,8 +112,14 @@ const ServicePage = () => {
       </div>
 
       {activeIndex !== null && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="relative bg-teal-50 max-w-2xl w-full mx-4 rounded-lg shadow-lg p-6 min-h-[350px] max-h-[80vh] overflow-y-auto">
+        <div
+          onClick={closePopup}
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative bg-teal-50 max-w-2xl w-full mx-4 rounded-lg shadow-lg p-6 min-h-[350px] max-h-[80vh] overflow-y-auto"
+          >
             <button
               onClick={closePopup}
               className="absolute top-2 right-2 w-8 h-8 bg-teal-500 hover:bg-teal-700 text-white rounded-full flex items-center justify-center text-lg font-bold transition border-none"
@@ -107,7 +129,7 @@ const ServicePage = () => {
             <h3 className="text-2xl font-semibold text-center text-gray-800 mb-4">
               {services[activeIndex].title}
             </h3>
-            <p className="text-gray-700  text-base">
+            <p className="text-gray-700 text-base">
               {services[activeIndex].description}
             </p>
             <div className="text-gray-700 text-base mt-4 space-y-2 overflow-y-auto">

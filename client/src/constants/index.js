@@ -41,5 +41,9 @@ export const roleMenus = {
       path: "/medical-admin/telemedicine-duty",
     },
     { name: "View Booking Info", path: "/book-appointment" },
+    {
+      name: "Manage Ambulance",
+      path: "/medical-admin/set-driver",
+    },
   ],
 };

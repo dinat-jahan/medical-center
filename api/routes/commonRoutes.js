@@ -9,7 +9,7 @@ const { GetObjectAclCommand, GetObjectCommand } = require("@aws-sdk/client-s3");
 const s3Client = require("../config/awsConfig");
 const TelemedicineDuty = require("../models/telemedicineDuty");
 const { Test } = require("../models/diagnosis");
-
+const { AmbulanceAssignment } = require("../models/driver");
 router.get("/whoami", async (req, res) => {
   if (req.session && req.session.user) {
     const user = req.session.user;
@@ -208,6 +208,26 @@ router.get("/pathology-tests", async (req, res) => {
 
     res.json(tests);
   } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+function parseMonth(str) {
+  const [year, mon] = str.split("-").map((n) => parseInt(n, 10));
+  return new Date(year, mon - 1, 1);
+}
+
+//get current driver
+router.get("/ambulance/current-driver", async (req, res) => {
+  try {
+    const monthParam = req.query.month || new Date().toISOString().slice(0, 7);
+    const monthDate = parseMonth(monthParam);
+    const assignment = await AmbulanceAssignment.findOne({
+      month: monthDate,
+    }).populate("drivers");
+    res.json({ drivers: assignment ? assignment.drivers : [] });
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 });

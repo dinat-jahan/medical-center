@@ -133,7 +133,7 @@ const ForgotPasswordPage = () => {
               </label>
               <select
                 id="emailSelect"
-                className="w-full px-3 py-2 border rounded-3xl text-center"
+                className="w-90% px-3 py-2 border rounded-3xl text-center"
                 value={emailForOtp}
                 onChange={(e) => setEmailForOtp(e.target.value)}
               >
