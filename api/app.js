@@ -19,6 +19,9 @@ const store = new MongoDBStore({
   uri: process.env.MONGODB_URI,
   collection: "sessions",
 });
+store.on("error", function (error) {
+  console.error("SESSION STORE ERROR:", error);
+});
 
 const allowedOrigins = [
   process.env.FRONTEND_URL,

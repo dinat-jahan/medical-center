@@ -12,11 +12,15 @@ const { Test } = require("../models/diagnosis");
 const DutyRoster = require("../models/dutyRoster");
 const { AmbulanceAssignment } = require("../models/driver");
 router.get("/whoami", async (req, res) => {
+  console.log("=== WHOAMI ROUTE HIT ===");
+  console.log("Cookies:", req.cookies);
+  console.log("Session:", req.session);
   if (req.session && req.session.user) {
     const user = req.session.user;
     console.log("user", user);
     return res.json(user);
   } else {
+    console.log("no user");
     return res.json(null);
   }
 });
