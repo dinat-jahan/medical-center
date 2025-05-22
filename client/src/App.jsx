@@ -41,10 +41,11 @@ import ManageStaffDutyRoster from "./pages/medicalAdminPages/ManageStaffDutyRost
 import TelemedicineDuty from "./pages/medicalAdminPages/TelemedicineDuty";
 import AmbulanceAssignmentPage from "./pages/medicalAdminPages/AmbulanceAssignmentPage";
 import DutyRosterViewer from "./pages/commonPages/DutyRosterViewer";
-axios.defaults.baseURL = import.meta.env.DEV
-  ? "http://localhost:2000"
-  : import.meta.env.VITE_API_BASE_URL;
+const backendURL = import.meta.env.DEV
+  ? import.meta.env.VITE_API_BASE_URL // localhost for dev
+  : import.meta.env.VITE_API_BASE_URL; // production URL
 
+axios.defaults.baseURL = backendURL;
 axios.defaults.withCredentials = true;
 
 function App() {

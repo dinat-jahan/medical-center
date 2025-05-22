@@ -14,7 +14,7 @@ const LoginForm = () => {
   const navigate = useNavigate();
 
   const backendURL = import.meta.env.DEV
-    ? "http://localhost:2000"
+    ? import.meta.env.VITE_API_BASE_URL // localhost for dev
     : import.meta.env.VITE_API_BASE_URL;
 
   async function loginUser(ev) {

@@ -16,7 +16,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "http://localhost:2000/auth/google/callback",
+      callbackURL: process.env.GOOGLE_CALLBACK_URL,
       passReqToCallback: true,
     },
     async (req, accessToken, refreshToken, profile, done) => {
@@ -128,9 +128,9 @@ module.exports.auth_google_callback = (req, res, next) => {
 
         // Conditional redirect based on password status
         if (req.session.needsPassword) {
-          return res.redirect("http://localhost:5173/set-password-google");
+          return res.redirect(process.env.REDIRECT_URL_SET_PASSWORD);
         } else {
-          return res.redirect("http://localhost:5173/google-redirect");
+          return res.redirect(process.env.REDIRECT_URL_GOOGLE_REDIRECT);
         }
       });
     });

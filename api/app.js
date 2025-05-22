@@ -21,8 +21,8 @@ const store = new MongoDBStore({
 });
 
 const allowedOrigins = [
-  "http://localhost:5173", // for local React dev
-  "https://medical-center-tawny.vercel.app", // your Vercel link
+  process.env.FRONTEND_URL,
+  process.env.BACKEND_URL, // sometimes useful to add your backend here
 ];
 
 app.use(
@@ -38,14 +38,19 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+const isProduction = process.env.NODE_ENV === "production";
+
 app.use(
   session({
-    secret: "secret",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
     store: store,
     cookie: {
-      maxAge: 1000 * 60 * 60 * 24, // 1 day session expiration
+      maxAge: 1000 * 60 * 60 * 24,
+      httpOnly: true,
+      sameSite: isProduction ? "none" : "lax", // 👈 Dynamic fix
+      secure: isProduction, // 👈 Only secure in production
     },
   })
 );

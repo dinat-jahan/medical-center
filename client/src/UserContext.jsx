@@ -9,7 +9,7 @@ export function UserContextProvider({ children }) {
   useEffect(() => {
     if (!user) {
       axios
-        .get("/api/whoami")
+        .get("/api/whoami", { withCredentials: true })
         .then(({ data }) => {
           setUser(data);
           setReady(true);
