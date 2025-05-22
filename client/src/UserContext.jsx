@@ -15,7 +15,7 @@ export function UserContextProvider({ children }) {
           setUser(data);
           setReady(true);
         })
-        .catch(() => {
+        .catch((err) => {
           console.error("whoami error:", err);
           setReady(true);
         }); // Even on error, mark ready

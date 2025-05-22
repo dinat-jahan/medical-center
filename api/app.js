@@ -22,11 +22,8 @@ const store = new MongoDBStore({
 store.on("error", function (error) {
   console.error("SESSION STORE ERROR:", error);
 });
-
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  process.env.BACKEND_URL, // sometimes useful to add your backend here
-];
+app.set("trust proxy", 1);
+const allowedOrigins = [process.env.FRONTEND_URL, process.env.BACKEND_URL];
 
 app.use(
   cors({
