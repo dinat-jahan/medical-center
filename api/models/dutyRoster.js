@@ -26,7 +26,7 @@ const DutyRosterSchema = new mongoose.Schema({
   },
   shift: {
     type: String,
-    enum: ["Morning", "Evening", "Full Day"],
+    enum: ["Morning", "Evening"],
     required: true,
   },
   startTime: { type: String, required: true }, // e.g. "8:00 am"

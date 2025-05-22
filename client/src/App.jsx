@@ -39,6 +39,8 @@ import StaffMedicineDetailPage from "./pages/medicalStaffPages/MedicineDetail";
 import ForgotPasswordPage from "./pages/authPages/ForgotPasswordPage";
 import ManageStaffDutyRoster from "./pages/medicalAdminPages/ManageStaffDutyRoster";
 import TelemedicineDuty from "./pages/medicalAdminPages/TelemedicineDuty";
+import AmbulanceAssignmentPage from "./pages/medicalAdminPages/AmbulanceAssignmentPage";
+import DutyRosterViewer from "./pages/commonPages/DutyRosterViewer";
 axios.defaults.baseURL = import.meta.env.DEV
   ? "http://localhost:2000"
   : import.meta.env.VITE_API_BASE_URL;
@@ -147,8 +149,14 @@ function App() {
             path="/medical-admin/telemedicine-duty"
             element={<TelemedicineDuty />}
           />
+
           <Route path="/doctor/write-prescription" element={<WritePrescription />} />
 
+          <Route
+            path="/medical-admin/set-driver"
+            element={<AmbulanceAssignmentPage />}
+          />
+          <Route path="/duty-roster-staff" element={<DutyRosterViewer />} />
         </Route>
       </Routes>
     </UserContextProvider>

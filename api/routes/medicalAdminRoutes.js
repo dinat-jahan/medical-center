@@ -19,6 +19,9 @@ const DutyRoster = require("../models/dutyRoster");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 const TelemedicineDuty = require("../models/telemedicineDuty");
+const { AmbulanceAssignment } = require("../models/driver");
+const { Driver } = require("../models/driver");
+
 const isMedicalAdmin = (req, res, next) => {
   if (req.session.user && req.session.user.role === "medical-admin") {
     return next();
@@ -202,7 +205,7 @@ router.get("/telemedicine-duty", async (req, res) => {
 });
 
 // Add a duty
-router.post("/telemedicine-duty/add", async (req, res) => {
+router.post("/telemedicine-duty/add", isMedicalAdmin, async (req, res) => {
   const { day, doctor } = req.body;
   try {
     const exists = await TelemedicineDuty.findOne({ day, doctor });
@@ -220,12 +223,79 @@ router.post("/telemedicine-duty/add", async (req, res) => {
 });
 
 // Remove a duty
-router.post("/telemedicine-duty/delete/:id", async (req, res) => {
+router.post(
+  "/telemedicine-duty/delete/:id",
+  isMedicalAdmin,
+  async (req, res) => {
+    try {
+      await TelemedicineDuty.findByIdAndDelete(req.params.id);
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ error: "Failed to remove duty" });
+    }
+  }
+);
+
+// Helper: parse "YYYY-MM" or "YYYY-MM-DD" → 1st of month
+function parseMonth(str) {
+  const [year, mon] = str.split("-").map((n) => parseInt(n, 10));
+  return new Date(year, mon - 1, 1);
+}
+
+// GET all drivers for checkbox list
+router.get("/get-drivers", isMedicalAdmin, async (req, res) => {
   try {
-    await TelemedicineDuty.findByIdAndDelete(req.params.id);
-    res.json({ success: true });
+    const drivers = await Driver.find().sort("name");
+    res.json(drivers);
   } catch (err) {
-    res.status(500).json({ error: "Failed to remove duty" });
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// GET assigned drivers for a specific month (YYYY-MM)
+router.get("/current-driver", isMedicalAdmin, async (req, res) => {
+  try {
+    const monthParam = req.query.month || new Date().toISOString().slice(0, 7);
+    const monthDate = parseMonth(monthParam);
+    const assignment = await AmbulanceAssignment.findOne({
+      month: monthDate,
+    }).populate("drivers");
+    res.json({ drivers: assignment ? assignment.drivers : [] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// POST assign or clear drivers for a given month
+router.post("/assign-driver", isMedicalAdmin, async (req, res) => {
+  try {
+    const monthDate = parseMonth(req.body.month);
+    const driverIds = req.body.driverIds || [];
+
+    if (!driverIds.length) {
+      // clear assignment
+      await AmbulanceAssignment.deleteOne({ month: monthDate });
+      return res.json({ cleared: true });
+    }
+
+    // upsert assignment
+    let assign = await AmbulanceAssignment.findOne({ month: monthDate });
+    if (assign) {
+      assign.drivers = driverIds;
+    } else {
+      assign = new AmbulanceAssignment({
+        month: monthDate,
+        drivers: driverIds,
+      });
+    }
+    await assign.save();
+    const full = await assign.populate("drivers");
+    res.json({ cleared: false, drivers: full.drivers });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Assignment failed" });
   }
 });
 module.exports = router;

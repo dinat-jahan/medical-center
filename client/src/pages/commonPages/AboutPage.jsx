@@ -1,4 +1,3 @@
-import { useState } from "react";
 import doctor_standing from "../../assets/doctor_standing.jpg";
 
 const About = () => {
@@ -17,9 +16,6 @@ const About = () => {
     "Ambulance facility (on-call)",
     "Telemedicine support via mobile",
   ];
-
-  // State to toggle see more/less
-  const [showFull, setShowFull] = useState(false);
 
   return (
     <div className="bg-teal-50 pt-20 pb-10 px-4 md:px-12 mx-auto min-h-screen">
@@ -43,8 +39,8 @@ const About = () => {
               We Take Care Of Your Healthy Life
             </h3>
 
-            {/* Show limited paragraphs or full based on showFull */}
-            {(showFull ? paragraphs : paragraphs.slice(0, 2)).map((para, idx) => (
+            {/* All Paragraphs */}
+            {paragraphs.map((para, idx) => (
               <p
                 key={idx}
                 className="text-gray-600 leading-7 mb-4 whitespace-pre-wrap"
@@ -53,27 +49,17 @@ const About = () => {
               </p>
             ))}
 
-            {/* Show services list only if showFull is true */}
-            {showFull && (
-              <div className="mb-4">
-                <h4 className="text-xl font-semibold text-gray-700 mb-2">
-                  🧪 Available Services
-                </h4>
-                <ul className="list-disc list-inside text-gray-600 space-y-1 ml-4">
-                  {services.map((item, i) => (
-                    <li key={i}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* See More / See Less button */}
-            <button
-              className="text-teal-600 underline font-semibold mt-2 self-start"
-              onClick={() => setShowFull(!showFull)}
-            >
-              {showFull ? "See Less" : "See More"}
-            </button>
+            {/* Services List */}
+            <div className="mb-4">
+              <h4 className="text-xl font-semibold text-gray-700 mb-2">
+                🧪 Available Services
+              </h4>
+              <ul className="list-disc list-inside text-gray-600 space-y-1 ml-4">
+                {services.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </div>

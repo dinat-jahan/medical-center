@@ -1,20 +1,24 @@
 import React, { useState } from "react";
 
 export default function InternalQtyModal({ items, onConfirm, onCancel }) {
-  console.log("modalitem", items);
+  // Initialize local state, setting internalQuantity = requestedQuantity
   const [local, setLocal] = useState(
     items.map((m) => ({ ...m, internalQuantity: m.requestedQuantity }))
   );
 
-  const updateQty = (i, v) => {
-    setLocal((local) =>
-      local.map((m, idx) =>
-        idx === i
-          ? { ...m, internalQuantity: Math.min(m.requestedQuantity, v) }
+  // Update a single item's internalQuantity, clamping at requestedQuantity
+  const updateQty = (index, value) => {
+    setLocal((prev) => {
+      const next = prev.map((m, idx) =>
+        idx === index
+          ? { 
+              ...m,
+              internalQuantity: Math.min(m.requestedQuantity, value) 
+            }
           : m
-      )
-    );
-    console.log("local", local);
+      );
+      return next;
+    });
   };
 
   return (
@@ -24,12 +28,16 @@ export default function InternalQtyModal({ items, onConfirm, onCancel }) {
         {/* Close button */}
         <button
           type="button"
-          className="absolute top-2 right-2 bg-teal-500 hover:text-teal-800 border-none w-16"
+          className="absolute top-2 right-2 bg-teal-500 hover:bg-teal-600 text-white w-8 h-8 flex items-center justify-center rounded-full"
           onClick={onCancel}
         >
           &times;
         </button>
-        <h3 className="text-xl font-semibold mb-4 text-gray-800">Pharmacy will provide…</h3>
+
+        <h3 className="text-xl font-semibold mb-4 text-gray-800">
+          Pharmacy will provide…
+        </h3>
+
         <div className="space-y-4">
           {local.map((m, i) => (
             <div key={i} className="flex items-center justify-between">
@@ -45,16 +53,17 @@ export default function InternalQtyModal({ items, onConfirm, onCancel }) {
                 min={0}
                 max={m.requestedQuantity}
                 value={m.internalQuantity}
-                onChange={(e) => updateQty(i, +e.target.value)}
+                onChange={(e) => updateQty(i, Number(e.target.value))}
                 className="w-20 border rounded p-1 text-center"
               />
             </div>
           ))}
         </div>
+
         <div className="mt-6 text-right">
           <button
             type="button"
-            className="bg-teal-500 text-white px-4 py-2 rounded-3xl border-none w-[250px]  mx-auto block "
+            className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-3xl w-full"
             onClick={() => onConfirm(local)}
           >
             OK, Save

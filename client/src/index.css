@@ -8,9 +8,22 @@ input[type="text"],
 input[type="password"] {
   @apply w-full border border-gray-400 rounded-2xl p-2 my-2;
 }
-/* button {
-  @apply w-full border border-primary bg-primary text-white font-poetsen rounded-2xl py-2;
-} */
+
 .addMember {
   @apply text-teal-500;
+}
+
+/* ================= Print CSS ===================== */
+@media print {
+  body > * {
+    display: none !important;
+  }
+
+  #prescription-print {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    padding: 20px !important;
+    background: white !important;
+  }
 }

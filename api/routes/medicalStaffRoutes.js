@@ -59,7 +59,27 @@ router.put(
   },
   medicineController.updateMedicine
 );
-
+// Incremental stock + expiry update
+router.patch(
+  "/medicines/:id/add-stock",
+  [
+    body("addedQuantity")
+      .isInt({ min: 0 })
+      .withMessage("Quantity must be non-negative integer"),
+    body("expiryDate")
+      .optional()
+      .isISO8601()
+      .withMessage("Invalid date format"),
+  ],
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+  },
+  medicineController.addStockAndExpiry
+);
 router.get("/low-stock", medicineController.getLowStockMeds);
 
 module.exports = router;

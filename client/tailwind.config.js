@@ -1,8 +1,11 @@
 /** @type {import('tailwindcss').Config} */
-import daisyui from "daisyui";
+const daisyui = require("daisyui");
 
-export default {
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+module.exports = {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
   theme: {
     extend: {
       fontFamily: {
@@ -10,10 +13,12 @@ export default {
         poetsen: ["Poetsen One", "cursive"],
       },
       colors: {
-        primary: "#A31D1D",
-      
+        primary: "#A31D1D", // Custom primary color
       },
     },
   },
   plugins: [daisyui],
+  daisyui: {
+    themes: false, // Disable default DaisyUI themes to avoid errors
+  },
 };

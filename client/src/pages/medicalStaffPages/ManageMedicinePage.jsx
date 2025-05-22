@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import axios from "axios";
 import { Dialog } from "@headlessui/react";
 import { PencilIcon, TrashIcon, XIcon } from "lucide-react";
@@ -7,26 +7,29 @@ import { useNavigate } from "react-router-dom";
 
 export default function ManageMedicinePage() {
   const navigate = useNavigate();
+  const selectRef = useRef(null);
+
   const [medicines, setMedicines] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
   const [search, setSearch] = useState("");
-  const [genericFilter, setGenericFilter] = useState("");
-  const [manufacturerFilter, setManufacturerFilter] = useState("");
+  const [inputValue, setInputValue] = useState("");
+  const [menuIsOpen, setMenuIsOpen] = useState(false);
+  const [stockFilter, setStockFilter] = useState("all"); // 'all', 'low', 'out'
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentMed, setCurrentMed] = useState(null);
 
   const pageSize = 10;
+  const lowStockThreshold = 5;
 
   // Fetch medicines from backend
   const fetchMedicines = useCallback(async () => {
     setLoading(true);
     const params = new URLSearchParams();
     if (search) params.append("search", search);
-    if (genericFilter) params.append("genericName", genericFilter);
-    if (manufacturerFilter) params.append("manufacturer", manufacturerFilter);
     params.append("page", page);
     params.append("limit", pageSize);
 
@@ -42,18 +45,18 @@ export default function ManageMedicinePage() {
     } finally {
       setLoading(false);
     }
-  }, [search, genericFilter, manufacturerFilter, page]);
+  }, [search, page]);
 
   useEffect(() => {
     fetchMedicines();
   }, [fetchMedicines]);
 
   // Live search suggestions
-  const loadSearchOptions = async (inputValue) => {
-    if (!inputValue) return [];
+  const loadSearchOptions = async (input) => {
+    if (!input) return [];
     try {
       const { data } = await axios.get(
-        `/medical-staff/search-medicine?query=${encodeURIComponent(inputValue)}`
+        `/medical-staff/search-medicine?query=${encodeURIComponent(input)}`
       );
       return data;
     } catch (err) {
@@ -61,6 +64,20 @@ export default function ManageMedicinePage() {
       return [];
     }
   };
+
+  // Filter medicines by stock status
+  const displayedMeds = medicines.filter((med) => {
+    if (stockFilter === "low") {
+      return (
+        med.monthlyStockQuantity > 0 &&
+        med.monthlyStockQuantity <= lowStockThreshold
+      );
+    }
+    if (stockFilter === "out") {
+      return med.monthlyStockQuantity === 0;
+    }
+    return true;
+  });
 
   const openModal = (medicine) => {
     setCurrentMed(medicine);
@@ -71,15 +88,18 @@ export default function ManageMedicinePage() {
     setCurrentMed(null);
   };
 
-  // Update stock and expiry
+  // Update stock + expiry
   const handleUpdate = async (e) => {
     e.preventDefault();
-    const { monthlyStockQuantity, expiryDate } = Object.fromEntries(
+    const { addedQuantity, expiryDate } = Object.fromEntries(
       new FormData(e.target)
     );
+    const increment = parseInt(addedQuantity, 10) || 0;
+    const updatedStock = (currentMed.monthlyStockQuantity || 0) + increment;
+
     try {
       await axios.put(`/medical-staff/medicines/${currentMed._id}`, {
-        monthlyStockQuantity,
+        monthlyStockQuantity: updatedStock,
         expiryDate,
       });
       closeModal();
@@ -101,48 +121,75 @@ export default function ManageMedicinePage() {
 
   return (
     <div className="p-6 bg-gray-50 rounded-lg shadow">
-      {/* Filters */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-        <AsyncCreatableSelect
-          cacheOptions
-          defaultOptions
-          loadOptions={loadSearchOptions}
-          onChange={(option) => {
-            setSearch(option?.value || "");
-            setPage(1);
-          }}
-          onCreateOption={(input) => {
-            setSearch(input);
-            setPage(1);
-          }}
-          placeholder="Search by name, generic, manufacturer or dosage"
-          className="col-span-1 md:col-span-4"
-        />
-        <input
-          type="text"
-          placeholder="Filter by generic name"
-          value={genericFilter}
+      <style>
+        {`@media print {
+          body * { visibility: hidden !important; }
+          .print-area, .print-area * { visibility: visible !important; }
+          .print-area { position: absolute; top: 0; left: 0; width: 100%; }
+        }`}
+      </style>
+      {/* Unified Search */}
+      <div className="flex items-center space-x-4 mb-4">
+        <div className="flex-1">
+          <AsyncCreatableSelect
+            ref={selectRef}
+            cacheOptions
+            defaultOptions
+            loadOptions={loadSearchOptions}
+            inputValue={inputValue}
+            menuIsOpen={menuIsOpen}
+            onMenuOpen={() => setMenuIsOpen(true)}
+            onMenuClose={() => setMenuIsOpen(false)}
+            onInputChange={(val, { action }) => {
+              if (action === "input-change") {
+                setInputValue(val);
+                setMenuIsOpen(true);
+              }
+            }}
+            onChange={(opt) => {
+              const val = opt?.value || "";
+              setSearch(val);
+              setInputValue(val);
+              setPage(1);
+              setMenuIsOpen(false);
+            }}
+            onCreateOption={(input) => {
+              setSearch(input);
+              setInputValue(input);
+              setPage(1);
+              setMenuIsOpen(false);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                if (inputValue) {
+                  setSearch(inputValue);
+                  setPage(1);
+                  setMenuIsOpen(false);
+                }
+              }
+            }}
+            placeholder="Search by name, generic, manufacturer, dosage..."
+            className="w-full"
+          />
+        </div>
+        <select
+          value={stockFilter}
           onChange={(e) => {
-            setGenericFilter(e.target.value);
+            setStockFilter(e.target.value);
             setPage(1);
           }}
-          className="border rounded px-3 py-2 text-sm focus:outline-none focus:ring"
-        />
-        <input
-          type="text"
-          placeholder="Filter by manufacturer"
-          value={manufacturerFilter}
-          onChange={(e) => {
-            setManufacturerFilter(e.target.value);
-            setPage(1);
-          }}
-          className="border rounded px-3 py-2 text-sm focus:outline-none focus:ring"
-        />
+          className="border rounded px-3 py-2"
+        >
+          <option value="all">All medicine</option>
+          <option value="low">Low stock (≤{lowStockThreshold})</option>
+          <option value="out">Out of stock</option>
+        </select>
         <button
-          onClick={() => setPage(1)}
+          onClick={() => window.print()}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500"
         >
-          Apply Filters
+          Print
         </button>
       </div>
 
@@ -151,14 +198,14 @@ export default function ManageMedicinePage() {
         <p className="text-gray-500">Loading...</p>
       ) : error ? (
         <p className="text-red-500">Error: {error}</p>
-      ) : medicines.length === 0 ? (
+      ) : displayedMeds.length === 0 ? (
         <p className="text-gray-500">No medicines found.</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white border border-gray-200">
             <thead className="bg-gray-800 text-white sticky top-0">
               <tr>
-                <th className="px-4 py-2">Name</th>
+                <th className="px-4 py-2 ">Name</th>
                 <th className="px-4 py-2">Generic</th>
                 <th className="px-4 py-2">Type</th>
                 <th className="px-4 py-2">Quantity</th>
@@ -167,7 +214,7 @@ export default function ManageMedicinePage() {
               </tr>
             </thead>
             <tbody>
-              {medicines.map((med) => {
+              {displayedMeds.map((med) => {
                 const expDate = new Date(med.expiryDate);
                 const isExpiringSoon =
                   (expDate - new Date()) / (1000 * 60 * 60 * 24) < 30;
@@ -249,13 +296,17 @@ export default function ManageMedicinePage() {
             {currentMed && (
               <form onSubmit={handleUpdate} className="mt-4 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium">
-                    Monthly Stock Qty
+                  <p className="text-sm text-gray-600">
+                    Current Stock: {currentMed.monthlyStockQuantity}
+                  </p>
+                  <label className="block text-sm font-medium mt-2">
+                    Add Stock Qty
                   </label>
                   <input
-                    name="monthlyStockQuantity"
+                    name="addedQuantity"
                     type="number"
-                    defaultValue={currentMed.monthlyStockQuantity}
+                    defaultValue={0}
+                    min={0}
                     required
                     className="mt-1 block w-full border rounded px-3 py-2 focus:outline-none focus:ring"
                   />
