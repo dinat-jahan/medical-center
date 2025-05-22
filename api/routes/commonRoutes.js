@@ -14,6 +14,7 @@ const { AmbulanceAssignment } = require("../models/driver");
 router.get("/whoami", async (req, res) => {
   if (req.session && req.session.user) {
     const user = req.session.user;
+    console.log("user", user);
     return res.json(user);
   } else {
     return res.json(null);

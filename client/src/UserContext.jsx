@@ -11,10 +11,14 @@ export function UserContextProvider({ children }) {
       axios
         .get("/api/whoami", { withCredentials: true })
         .then(({ data }) => {
+          console.log(data);
           setUser(data);
           setReady(true);
         })
-        .catch(() => setReady(true)); // Even on error, mark ready
+        .catch(() => {
+          console.error("whoami error:", err);
+          setReady(true);
+        }); // Even on error, mark ready
     }
   }, []);
   return (
