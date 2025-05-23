@@ -45,15 +45,7 @@ const IndexPage = () => {
                 We Take Care Of Your Healthy Life
               </h3>
               <p className="text-gray-600 leading-7 mb-4">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorum
-                dolorem nesciunt eos fugio minus eveniet ut accusamus distinctio
-                provident autem nemo cumque corporis odio ea ipsum eum quae modi
-                officiis.
-              </p>
-              <p className="text-gray-600 leading-7 mb-6">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi
-                corrupti dignissimos quos exercitationem placeat hic dolore
-                numquam facere sequi? Necessitatibus.
+               The Medical Center at Mawlana Bhashani Science and Technology University (MBSTU) provides basic healthcare services to the university community — including students, faculty members, and administrative staff. Situated within the campus, the center primarily offers free consultations and limited free medication for students, while faculty and staff members can access medical consultations and purchase prescribed medicines as needed.
               </p>
 
               {/* Learn More Button linking to /about */}

@@ -143,7 +143,7 @@ const RegisterPage = () => {
   return (
     <div className="flex justify-center items-start min-h-screen bg-teal-50">
       <div className={`bg-white shadow-lg p-8 rounded-xl ${getStepMargin()}`}>
-        <h2 className="text-4xl font-bold text-teal-500 text-center mb-6">
+        <h2 className="text-4xl font-bold text-teal-500 text-center mb-6 ">
           Register
         </h2>
 
@@ -159,6 +159,11 @@ const RegisterPage = () => {
                 Login with Google
               </a>
             </div>
+            <div className="flex items-center w-[400px] mx-auto mb-4">
+      <hr className="flex-grow border-t border-gray-300" />
+      <span className="mx-4 text-gray-500 text-sm">OR</span>
+      <hr className="flex-grow border-t border-gray-300" />
+    </div>
             <div className="flex flex-col items-center mb-4">
               <input
                 type="text"

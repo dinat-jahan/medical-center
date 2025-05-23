@@ -108,8 +108,8 @@ export default function MedicineOutOfStockPage() {
   }, []);
 
   return (
-    <div className="font-sans max-w-6xl mx-auto mt-12 px-6 pb-16">
-      <h2 className="text-4xl font-bold text-center text-gray-800 mb-8 underline decoration-gray-300 decoration-4 underline-offset-8">
+    <div className="font-sans max-w-6xl mx-auto mt-12 px-10 pb-16">
+      <h2 className="text-4xl font-poetsen text-center text-teal-500 mb-8 underline decoration-gray-300 decoration-4 underline-offset-8">
         Medicines Low & Out of Stock
       </h2>
 

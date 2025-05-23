@@ -150,6 +150,9 @@ function App() {
             path="/medical-admin/telemedicine-duty"
             element={<TelemedicineDuty />}
           />
+
+          <Route path="/doctor/write-prescription" element={<WritePrescription />} />
+
           <Route
             path="/medical-admin/set-driver"
             element={<AmbulanceAssignmentPage />}
