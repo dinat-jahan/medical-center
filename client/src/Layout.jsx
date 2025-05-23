@@ -1,20 +1,63 @@
+// src/Layout.jsx
+import React, { useContext } from "react";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import { FaArrowLeft } from "react-icons/fa";
 import Header from "./Header";
-import { Outlet } from "react-router-dom";
 import Footer from "./Footer";
-import LoginPage from "./pages/authPages/LoginPage";
-import { useContext } from "react";
 import { UserContext } from "./UserContext";
-import RoleMenu from "./components/RoleMenu";
+import LoginPage from "../src/pages/authPages/LoginPage";
 
 const Layout = () => {
-  const { user, ready } = useContext(UserContext);
-  if (!ready) return <p>Loading...</p>;
-  return (
-    <div className="p-4">
-      <Header />
-      <LoginPage />
+  const { ready, user } = useContext(UserContext);
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
 
-      <Outlet />
+  // Global loading spinner
+  if (!ready) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-teal-600"></div>
+      </div>
+    );
+  }
+
+  // Hide Back on home & login
+  const noBackPaths = ["/", "/login"];
+  const showBack = !noBackPaths.includes(pathname);
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      {/* Header + optional Back button in one relative container */}
+      <div className="relative z-20">
+        <Header />
+        <LoginPage />
+
+        {showBack && (
+          <button
+            onClick={() => navigate(-1)}
+            className="absolute top-[100px] left-4 flex items-center text-teal-600 hover:text-teal-700 p-1 bg-transparent"
+          >
+            <FaArrowLeft className="mr-1" size={16} />
+            <span className="text-sm font-medium">Back</span>
+          </button>
+        )}
+
+        {showBack && user && (
+          <button
+            onClick={() => navigate(-1)}
+            className="absolute top-[180px] left-4 flex items-center text-teal-600 hover:text-teal-700 p-1 bg-transparent"
+          >
+            <FaArrowLeft className="mr-1" size={16} />
+            <span className="text-sm font-medium">Back</span>
+          </button>
+        )}
+      </div>
+
+      {/* Page content */}
+      <main className="flex-grow">
+        <Outlet />
+      </main>
+
       <Footer />
     </div>
   );

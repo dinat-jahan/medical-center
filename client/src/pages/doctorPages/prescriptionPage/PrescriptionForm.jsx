@@ -132,8 +132,13 @@ const PrescriptionForm = () => {
         {patient ? (
           <div className="flex justify-between items-start border-b border-gray-300 pb-4 mb-4">
             <div className="text-gray-700 space-y-1 text-base leading-relaxed font-semibold">
-              <div>
-                <span className="font-bold">Name:</span> {patient.name}
+              <div
+                onClick={() => {
+                  navigate(`/patient-profile/${patient.uniqueId}`);
+                }}
+              >
+                <span className="font-bold ">Name: </span>
+                <span className="text-blue-400 underline">{patient.name}</span>
               </div>
               <div>
                 <span className="font-bold">Unique ID:</span> {patient.uniqueId}

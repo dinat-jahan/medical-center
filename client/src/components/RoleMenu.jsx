@@ -80,7 +80,7 @@ export default function RoleMenu() {
 
         {/* Search for doctor */}
         {user.role === "doctor" && (
-          <div className="relative w-64">
+          <div className="relative w-[300px] mr-4">
             <SearchInput
               placeholder="Search patient or medicine..."
               value={searchTerm}

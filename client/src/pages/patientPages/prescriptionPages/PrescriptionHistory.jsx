@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
-import PrescriptionCard from "./component/PrescriptionCard";
+import PrescriptionCard from "../../../components/PrescriptionCard";
 import { UserContext } from "../../../UserContext";
 
 const PrescriptionHistory = () => {

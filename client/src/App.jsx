@@ -41,6 +41,8 @@ import ManageStaffDutyRoster from "./pages/medicalAdminPages/ManageStaffDutyRost
 import TelemedicineDuty from "./pages/medicalAdminPages/TelemedicineDuty";
 import AmbulanceAssignmentPage from "./pages/medicalAdminPages/AmbulanceAssignmentPage";
 import DutyRosterViewer from "./pages/commonPages/DutyRosterViewer";
+import DoctorPatientHistory from "./pages/doctorPages/DoctorPatientHistory";
+import DoctorPrescriptionHistory from "./pages/doctorPages/DoctorPrescriptionHistory";
 const backendURL = import.meta.env.DEV
   ? import.meta.env.VITE_API_BASE_URL // localhost for dev
   : import.meta.env.VITE_API_BASE_URL; // production URL
@@ -150,14 +152,23 @@ function App() {
             path="/medical-admin/telemedicine-duty"
             element={<TelemedicineDuty />}
           />
-
-          <Route path="/doctor/write-prescription" element={<WritePrescription />} />
-
+          <Route
+            path="/doctor/write-prescription"
+            element={<WritePrescription />}
+          />
           <Route
             path="/medical-admin/set-driver"
             element={<AmbulanceAssignmentPage />}
           />
           <Route path="/duty-roster-staff" element={<DutyRosterViewer />} />
+          <Route
+            path="/doctor/patient-history/:uniqueId"
+            element={<DoctorPatientHistory />}
+          />
+          <Route
+            path="/doctor/prescription-history"
+            element={<DoctorPrescriptionHistory />}
+          />
         </Route>
       </Routes>
     </UserContextProvider>

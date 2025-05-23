@@ -12,7 +12,7 @@ const Medicine = require("../models/medicine");
 const prescriptionController = require("../controllers/prescriptionController");
 const medicineController = require("../controllers/medicineController");
 const router = express.Router();
-
+const Prescription = require("../models/prescription");
 const isDoctor = (req, res, next) => {
   if (req.session.user && req.session.user.role === "doctor") {
     return next();
@@ -284,6 +284,46 @@ router.get("/search", async (req, res) => {
   } catch (err) {
     console.error("Search error:", err);
     res.status(500).json({ error: "Server error" });
+  }
+});
+
+router.get("/patient-history/:uniqueId", isDoctor, async (req, res) => {
+  try {
+    const { uniqueId } = req.params;
+
+    // 1. Find the patient document by uniqueId
+    const patient = await MedicalUser.findOne({ uniqueId }).select("_id");
+    if (!patient) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Patient not found" });
+    }
+
+    // 2. Query prescriptions by the real ObjectId
+    const prescriptions = await Prescription.find({
+      patient: patient._id,
+    })
+      .sort({ createdAt: -1 })
+      .populate("doctor", "name uniqueId") // optional: pull in doctor info
+      .lean();
+
+    return res.json({ success: true, prescriptions });
+  } catch (error) {
+    console.error("Error fetching patient history:", error);
+    return res.status(500).json({ success: false, message: "Server Error" });
+  }
+});
+
+router.get("/my-prescriptions/:id", isDoctor, async (req, res) => {
+  try {
+    const prescriptions = await Prescription.find({ doctor: req.params.id })
+      .sort({ createdAt: -1 })
+      .populate("patient", "name uniqueId");
+
+    res.json({ success: true, prescriptions });
+  } catch (error) {
+    console.error("Error fetching doctor prescriptions:", error);
+    res.status(500).json({ success: false, message: "Server Error" });
   }
 });
 

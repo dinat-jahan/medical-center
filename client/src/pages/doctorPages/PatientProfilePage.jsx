@@ -10,6 +10,7 @@ import {
   FaTint,
   FaIdBadge,
 } from "react-icons/fa";
+import { FaArrowLeft } from "react-icons/fa";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { InfoField } from "../../components/InfoField";
@@ -195,10 +196,18 @@ const PatientProfilePage = () => {
         {/* Write Prescription Button */}
         <div className="mt-6 text-center">
           <button
-            className="px-6 py-2 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700"
+            className="px-6 py-2 bg-teal-500 mr-9 text-white font-semibold rounded-xl hover:bg-teal-700"
             onClick={handleWritePrescription}
           >
             Write Prescription
+          </button>
+          <button
+            className="px-6 py-2 bg-teal-600 ml-9 text-white font-semibold rounded-xl hover:bg-teal-700"
+            onClick={() => {
+              navigate(`/doctor/patient-history/${uniqueId}`);
+            }}
+          >
+            View Medical History
           </button>
         </div>
       </div>

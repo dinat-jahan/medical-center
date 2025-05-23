@@ -9,6 +9,10 @@ export const roleMenus = {
     { name: "Available Medicines", path: "/doctor/available-medicine" },
 
     { name: "View Booking Info", path: "/book-appointment" },
+    {
+      name: "Prescription History",
+      path: "/doctor/prescription-history",
+    },
   ],
   "medical-staff": [
     { name: "Profile", path: "/profile" },
