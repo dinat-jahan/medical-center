@@ -9,12 +9,16 @@ export function UserContextProvider({ children }) {
   useEffect(() => {
     if (!user) {
       axios
-        .get("/api/whoami")
+        .get("/api/whoami", { withCredentials: true })
         .then(({ data }) => {
+          console.log(data);
           setUser(data);
           setReady(true);
         })
-        .catch(() => setReady(true)); // Even on error, mark ready
+        .catch((err) => {
+          console.error("whoami error:", err);
+          setReady(true);
+        }); // Even on error, mark ready
     }
   }, []);
   return (

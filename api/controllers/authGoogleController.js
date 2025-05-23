@@ -16,7 +16,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "http://localhost:2000/auth/google/callback",
+      callbackURL: process.env.GOOGLE_CALLBACK_URL,
       passReqToCallback: true,
     },
     async (req, accessToken, refreshToken, profile, done) => {
@@ -105,36 +105,36 @@ module.exports.auth_google_callback = (req, res, next) => {
     if (err) return next(err);
     if (!user) return res.redirect("/");
 
-    req.logIn(user, (err) => {
+    req.session.regenerate((err) => {
       if (err) return next(err);
 
-      // Store user manually in session
-      req.session.user = {
-        id: user._id,
-        uniqueId: user.uniqueId,
-        name: user.name,
-        role: user.role,
-      };
-
-      // If user has no password, set a session flag
-      if (!user.password) {
-        req.session.needsPassword = true;
-      }
-
-      console.log("Session user set:", req.session.user);
-
-      req.session.save((err) => {
+      req.logIn(user, (err) => {
         if (err) return next(err);
 
-        // Conditional redirect based on password status
-        if (req.session.needsPassword) {
-          return res.redirect("http://localhost:5173/set-password-google");
-        } else {
-          return res.redirect("http://localhost:5173/google-redirect");
-        }
+        req.session.user = {
+          id: user._id,
+          uniqueId: user.uniqueId,
+          name: user.name,
+          role: user.role,
+        };
+
+        req.session.save((err) => {
+          if (err) {
+            console.error("❌ Session save failed:", err);
+            return next(err);
+          }
+
+          console.log("✅ Session saved with user:", req.session.user);
+
+          const redirectUrl = user.password
+            ? process.env.REDIRECT_URL_GOOGLE_REDIRECT
+            : process.env.REDIRECT_URL_SET_PASSWORD;
+
+          return res.redirect(redirectUrl);
+        });
       });
     });
-  })(req, res, next);
+  })(req, res, next); // ✅ Now valid — it's inside a function receiving req/res
 };
 
 module.exports.logout_get = (req, res) => {

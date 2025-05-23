@@ -6,6 +6,10 @@ import api from "../../utils/api";
 const OTP_VALIDITY_SECONDS = 20; // 2 minutes
 const MAX_OTP_RETRIES = 3;
 
+const backendURL = import.meta.env.DEV
+  ? import.meta.env.VITE_API_BASE_URL // localhost for dev
+  : import.meta.env.VITE_API_BASE_URL;
+
 const RegisterPage = () => {
   const [step, setStep] = useState(1);
   const [uniqueId, setUniqueId] = useState("");
@@ -23,10 +27,6 @@ const RegisterPage = () => {
   const timerRef = useRef(null);
 
   const navigate = useNavigate();
-
-  const backendURL = import.meta.env.DEV
-    ? "http://localhost:2000"
-    : import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
     if (otpTimeout > 0) {

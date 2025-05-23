@@ -19,11 +19,11 @@ const store = new MongoDBStore({
   uri: process.env.MONGODB_URI,
   collection: "sessions",
 });
-
-const allowedOrigins = [
-  "http://localhost:5173", // for local React dev
-  "https://medical-center-tawny.vercel.app", // your Vercel link
-];
+store.on("error", function (error) {
+  console.error("SESSION STORE ERROR:", error);
+});
+app.set("trust proxy", 1);
+const allowedOrigins = [process.env.FRONTEND_URL, process.env.BACKEND_URL];
 
 app.use(
   cors({
@@ -38,14 +38,19 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+const isProduction = process.env.NODE_ENV === "production";
+
 app.use(
   session({
-    secret: "secret",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
     store: store,
     cookie: {
-      maxAge: 1000 * 60 * 60 * 24, // 1 day session expiration
+      maxAge: 1000 * 60 * 60 * 24,
+      httpOnly: true,
+      sameSite: isProduction ? "none" : "lax", // 👈 Dynamic fix
+      secure: isProduction, // 👈 Only secure in production
     },
   })
 );

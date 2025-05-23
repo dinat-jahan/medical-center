@@ -229,5 +229,16 @@ exports.login = asyncHandler(async (req, res, next) => {
     name: user.name,
     role: user.role,
   };
-  res.json({ success: true, user: req.session.user });
+
+  req.session.save((err) => {
+    if (err) {
+      console.error("❌ Session save failed:", err);
+      return res
+        .status(500)
+        .json({ success: false, message: "Failed to save session" });
+    }
+
+    console.log("✅ Session saved for login:", req.session.user);
+    return res.json({ success: true, user: req.session.user });
+  });
 });
