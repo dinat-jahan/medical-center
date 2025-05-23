@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import PathologyDetails from "./component/PathologyDetails";
 import { TelemedicineInfo } from "./component/TelemedicineInfo";
 
-
 import { AmbulanceInfo } from "./component/AmbulanceInfo";
 
 const ServicePage = () => {
@@ -25,29 +24,17 @@ const ServicePage = () => {
       moreInfo: <AmbulanceInfo />,
     },
     {
-
-      icon: "fa fa-hospital",
-      title: "Emergency & Bed Facility",
-      description:
-        "Emergency care and inpatient beds available for critical and admitted patients.",
-      moreInfo: (
-        <>
-          <p>
-            Our emergency unit is equipped with life-saving equipment and trained staff available 24/7 to respond to all types of urgent situations.
-          </p>
-          <p className="mt-2">
-            Bed facilities are clean, well-ventilated, and maintained by professional medical staff to ensure comfort during inpatient care.
-          </p>
-        </>
-      ),
-
+      icon: "fa fa-bed",
+      title: "Bed Facility",
+      description: "Comfortable and clean bed facilities for in-patient care.",
+    },
+    {
       icon: "fa fa-ambulance",
       title: "Emergency",
       description:
         "Emergency medical care is available daily for urgent needs.",
       moreInfo:
         "Our emergency unit operates during regular hours, equipped with life-saving devices and staffed by experienced medical professionals to handle critical situations swiftly.",
-
     },
     {
       icon: "fa fa-heartbeat",
@@ -75,34 +62,9 @@ const ServicePage = () => {
     {
       icon: "fa fa-pills",
       title: "Medicines",
-      description:
-        "Genuine medicines are available at our on-campus pharmacy.",
+      description: "Genuine medicines are available at our on-campus pharmacy.",
       moreInfo:
         "Our pharmacy serves students, staff, and faculty with essential medicines. We ensure access to quality medication while managing stock responsibly.",
-    },
-    {
-      icon: "fa fa-user-md",
-      title: "Free Consultation",
-      description:
-        "Consult with experienced doctors without any charge.",
-      moreInfo:
-        "Students and staff can avail free consultation services during designated hours, making healthcare accessible to everyone.",
-    },
-    {
-      icon: "fa fa-x-ray",
-      title: "X-Ray",
-      description:
-        "On-campus X-Ray facility for diagnostic imaging.",
-      moreInfo:
-        "Our X-Ray unit is equipped with modern machines to support fast and accurate diagnosis, operated by trained radiographers.",
-    },
-    {
-      icon: "fa fa-stethoscope",
-      title: "Ultrasonography",
-      description:
-        "Diagnostic ultrasonography services available.",
-      moreInfo:
-        "We provide ultrasound scans with updated equipment and skilled sonographers, supporting both emergency and routine care needs.",
     },
   ];
 

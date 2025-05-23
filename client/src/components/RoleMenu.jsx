@@ -58,7 +58,7 @@ export default function RoleMenu() {
 
   return (
     <div className="hidden lg:block bg-white shadow">
-      <nav className="flex justify-between items-center overflow-x-auto whitespace-nowrap px-6 py-3">
+      <nav className="flex justify-between items-center overflow-visible whitespace-nowrap px-6 py-3">
         {/* Tabs container */}
         <div className="flex space-x-4">
           {menuItems.map(({ name, path }) => (

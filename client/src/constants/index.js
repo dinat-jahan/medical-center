@@ -7,12 +7,12 @@ export const roleMenus = {
   doctor: [
     { name: "Profile", path: "/profile" },
     { name: "Available Medicines", path: "/doctor/available-medicine" },
-    { name: "Write Prescription", path: "/doctor/write-prescription" },
+
     { name: "View Booking Info", path: "/book-appointment" },
   ],
   "medical-staff": [
     { name: "Profile", path: "/profile" },
-    { name: "Manage Medicine", path: "/medical-staff/manage-medicine" },
+    { name: "Available Medicine", path: "/medical-staff/manage-medicine" },
     {
       name: "Pending Medicine Requests",
       path: "/medical-staff/pending-medicine-requests",
@@ -26,8 +26,6 @@ export const roleMenus = {
     { name: "Add university member", path: "/university-admin/add-member" },
   ],
   "medical-admin": [
-    { name: "All Users", path: "/medical-admin/users" },
-    { name: "Manage Medicines", path: "/medical-admin/medicines" },
     {
       name: "Edit Doctor List",
       path: "/medical-admin/manage-duty-roster-doctor",

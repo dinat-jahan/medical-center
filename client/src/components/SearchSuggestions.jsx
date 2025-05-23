@@ -20,7 +20,7 @@ const SearchSuggestions = ({
 
   return (
     <div
-      className="absolute mt-2 w-full bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto"
+      className="absolute mt-2 z-50 w-full bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto"
       ref={suggestionsRef}
     >
       <ul>

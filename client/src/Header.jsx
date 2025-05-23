@@ -5,7 +5,7 @@ import { UserContext } from "./UserContext";
 import { roleMenus } from "./constants";
 import RoleMenu from "./components/RoleMenu";
 import axios from "axios";
-
+import logo from "../src/assets/mbstu_logo.png";
 const Header = () => {
   const { user, setUser } = useContext(UserContext);
   const [isPeopleDropdownOpen, setIsPeopleDropdownOpen] = useState(false);
@@ -86,7 +86,7 @@ const Header = () => {
           onClick={() => handleMobileMenuClick("/")}
         >
           <img
-            src="mbstu_logo.png"
+            src={logo}
             alt="MBSTU Logo"
             className="w-14 h-14 object-contain"
           />

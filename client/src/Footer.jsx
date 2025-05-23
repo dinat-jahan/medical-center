@@ -37,7 +37,7 @@ const Footer = () => {
           <h6 className="text-lg font-semibold mb-4">Important Links</h6>
           <ul className="list-none">
             <li className="mb-2">
-              <Link to="about-us" className="hover:text-blue-400">
+              <Link to="about" className="hover:text-blue-400">
                 About us
               </Link>
             </li>
@@ -56,9 +56,6 @@ const Footer = () => {
                 Services
               </Link>
             </li>
-            <li>
-              <Link to="add-member"  className="hover:text-blue-400">Add member</Link>
-            </li>
           </ul>
         </div>
         <div className="pr-10">
@@ -70,7 +67,7 @@ const Footer = () => {
           <p className="mb-2">
             <span className="font-semibold">Address:</span>
             <br />
-            123 Medical Street, Dhaka, Bangladesh
+            MBSTU, Santosh, Tangail, Bangladesh
           </p>
           <p className="mb-2">
             <span className="font-semibold">Phone:</span>

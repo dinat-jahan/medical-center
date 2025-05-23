@@ -45,12 +45,14 @@ export const TelemedicineInfo = () => {
         <p>No doctors available today.</p>
       )}
 
-      <button
-        onClick={() => navigate("/telemedicine")}
-        className="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2  my-2 rounded-full  text-sm transition duration-300"
-      >
-        See Telemedicine Roster
-      </button>
+      <div className="flex">
+        <button
+          onClick={() => navigate("/telemedicine")}
+          className="bg-teal-500 hover:bg-teal-600 justify-center items-center text-white font-semibold py-2 w-[200px] my-2 rounded-full  text-sm transition duration-300"
+        >
+          See Telemedicine Roster
+        </button>
+      </div>
     </div>
   );
 };

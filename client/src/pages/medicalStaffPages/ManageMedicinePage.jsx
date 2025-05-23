@@ -121,13 +121,6 @@ export default function ManageMedicinePage() {
 
   return (
     <div className="p-6 bg-gray-50 rounded-lg shadow">
-      <style>
-        {`@media print {
-          body * { visibility: hidden !important; }
-          .print-area, .print-area * { visibility: visible !important; }
-          .print-area { position: absolute; top: 0; left: 0; width: 100%; }
-        }`}
-      </style>
       {/* Unified Search */}
       <div className="flex items-center space-x-4 mb-4">
         <div className="flex-1">
@@ -213,7 +206,7 @@ export default function ManageMedicinePage() {
                 <th className="px-4 py-2">Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="text-center">
               {displayedMeds.map((med) => {
                 const expDate = new Date(med.expiryDate);
                 const isExpiringSoon =
@@ -238,8 +231,8 @@ export default function ManageMedicinePage() {
                     >
                       {new Date(med.expiryDate).toLocaleDateString()}
                     </td>
-                    <td className="px-4 py-2">
-                      <div className="flex items-center space-x-2">
+                    <td className="pr-8 pl-8 py-2">
+                      <div className="flex items-center justify-center space-x-2">
                         <button onClick={() => openModal(med)}>
                           <PencilIcon size={18} />
                         </button>

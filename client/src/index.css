@@ -12,18 +12,3 @@ input[type="password"] {
 .addMember {
   @apply text-teal-500;
 }
-
-/* ================= Print CSS ===================== */
-@media print {
-  body > * {
-    display: none !important;
-  }
-
-  #prescription-print {
-    display: block !important;
-    position: static !important;
-    width: 100% !important;
-    padding: 20px !important;
-    background: white !important;
-  }
-}

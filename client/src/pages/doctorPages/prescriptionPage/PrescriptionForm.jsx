@@ -36,7 +36,9 @@ const PrescriptionForm = () => {
   useEffect(() => {
     const fetchPatientProfile = async () => {
       try {
-        const { data } = await axios.get(`/doctor/pres/patient-profile/${uniqueId}`);
+        const { data } = await axios.get(
+          `/doctor/pres/patient-profile/${uniqueId}`
+        );
         setPatient(data.patient);
       } catch (err) {
         console.log(err);
@@ -130,13 +132,23 @@ const PrescriptionForm = () => {
         {patient ? (
           <div className="flex justify-between items-start border-b border-gray-300 pb-4 mb-4">
             <div className="text-gray-700 space-y-1 text-base leading-relaxed font-semibold">
-              <div><span className="font-bold">Name:</span> {patient.name}</div>
-              <div><span className="font-bold">Unique ID:</span> {patient.uniqueId}</div>
-              <div><span className="font-bold">Age:</span> {patient.age}</div>
-              <div><span className="font-bold">Sex:</span> {patient.sex}</div>
+              <div>
+                <span className="font-bold">Name:</span> {patient.name}
+              </div>
+              <div>
+                <span className="font-bold">Unique ID:</span> {patient.uniqueId}
+              </div>
+              <div>
+                <span className="font-bold">Age:</span> {patient.age}
+              </div>
+              <div>
+                <span className="font-bold">Sex:</span> {patient.sex}
+              </div>
             </div>
             <div className="text-right text-gray-600 text-sm font-semibold whitespace-nowrap">
-              <div>Doctor: {doctor.name} (ID: {doctor.uniqueId})</div>
+              <div>
+                Doctor: {doctor.name} (ID: {doctor.uniqueId})
+              </div>
               <div>Date: {today}</div>
             </div>
           </div>
@@ -148,8 +160,11 @@ const PrescriptionForm = () => {
           {/* Left Column */}
           <div className="space-y-6">
             {/* Diagnosis Select */}
-            <DiagnosisSelect diagnoses={diagnoses} setDiagnoses={setDiagnoses} />
-            
+            <DiagnosisSelect
+              diagnoses={diagnoses}
+              setDiagnoses={setDiagnoses}
+            />
+
             {/* Medicine Entry */}
             <MedicineEntry
               entry={entry}
@@ -165,7 +180,7 @@ const PrescriptionForm = () => {
             <div className="flex flex-col lg:flex-row gap-4">
               <div className="w-full lg:w-1/2">
                 <label className="block font-semibold text-gray-800 mb-1 text-lg">
-                  Advice (optional)
+                  Advice
                 </label>
                 <textarea
                   className="w-full h-10 border border-gray-500 p-3 rounded-3xl focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -176,7 +191,7 @@ const PrescriptionForm = () => {
               </div>
               <div className="w-full lg:w-1/2">
                 <label className="block text-lg font-semibold text-gray-800 mb-1">
-                  Follow-Up Date (optional)
+                  Follow-Up Date
                 </label>
                 <input
                   type="date"
@@ -190,10 +205,16 @@ const PrescriptionForm = () => {
 
           {/* Right Column */}
           <div className="flex flex-col gap-y-10 h-full">
-            <MedicineList items={items} setItems={setItems} setEntry={setEntry} />
+            <MedicineList
+              items={items}
+              setItems={setItems}
+              setEntry={setEntry}
+            />
 
             <div className="text-right text-gray-600 text-sm font-semibold whitespace-nowrap">
-              <div>Doctor: {doctor.name} (ID: {doctor.uniqueId})</div>
+              <div>
+                Doctor: {doctor.name} (ID: {doctor.uniqueId})
+              </div>
               <div>Date: {today}</div>
             </div>
 
