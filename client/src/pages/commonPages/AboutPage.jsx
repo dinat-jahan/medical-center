@@ -19,7 +19,7 @@ const About = () => {
 
   return (
     <div className="bg-teal-50 pt-20 pb-10 px-4 md:px-12 mx-auto min-h-screen">
-      <div className="container mx-auto px-8 md:px-16">
+      <div className="container mx-auto px-4 md:px-10">
         <div className="flex flex-col md:flex-row justify-center md:items-start gap-8">
           {/* Sticky Doctor Image */}
           <div className="hidden md:block md:w-[40%] md:mr-8 sticky top-28 self-start">
