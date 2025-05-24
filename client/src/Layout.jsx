@@ -33,23 +33,40 @@ const Layout = () => {
         <LoginPage />
 
         {showBack && (
-          <button
-            onClick={() => navigate(-1)}
-            className="absolute top-[100px] left-4 flex items-center text-teal-600 hover:text-teal-700 p-1 bg-transparent"
-          >
-            <FaArrowLeft className="mr-1" size={16} />
-            <span className="text-sm font-medium">Back</span>
-          </button>
-        )}
+          <>
+            {/* -------- non-logged-in back, always visible -------- */}
+            {!user && (
+              <button
+                onClick={() => navigate(-1)}
+                className="absolute top-[100px] left-4 flex items-center text-teal-600 hover:text-teal-700 p-1 bg-transparent"
+              >
+                <FaArrowLeft className="mr-1" size={16} />
+                <span className="text-sm font-medium">Back</span>
+              </button>
+            )}
 
-        {showBack && user && (
-          <button
-            onClick={() => navigate(-1)}
-            className="absolute top-[180px] left-4 flex items-center text-teal-600 hover:text-teal-700 p-1 bg-transparent"
-          >
-            <FaArrowLeft className="mr-1" size={16} />
-            <span className="text-sm font-medium">Back</span>
-          </button>
+            {/* -------- logged-in back on mobile (100px) -------- */}
+            {user && (
+              <button
+                onClick={() => navigate(-1)}
+                className="lg:hidden absolute top-[85px] left-4 flex items-center text-teal-600 hover:text-teal-700 p-1 bg-transparent"
+              >
+                <FaArrowLeft className="mr-1" size={16} />
+                <span className="text-sm font-medium">Back</span>
+              </button>
+            )}
+
+            {/* -------- logged-in back on desktop (180px) -------- */}
+            {user && (
+              <button
+                onClick={() => navigate(-1)}
+                className="hidden lg:flex absolute top-[180px] left-4  items-center text-teal-600 hover:text-teal-700 p-1 bg-transparent"
+              >
+                <FaArrowLeft className="mr-1" size={16} />
+                <span className="text-sm font-medium">Back</span>
+              </button>
+            )}
+          </>
         )}
       </div>
 

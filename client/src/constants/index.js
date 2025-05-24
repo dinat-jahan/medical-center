@@ -16,6 +16,7 @@ export const roleMenus = {
   ],
   "medical-staff": [
     { name: "Profile", path: "/profile" },
+    { name: "Add Medicine", path: "/medical-staff/add-medicine" },
     { name: "Available Medicine", path: "/medical-staff/manage-medicine" },
     {
       name: "Pending Medicine Requests",

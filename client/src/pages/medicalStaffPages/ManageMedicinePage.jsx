@@ -123,7 +123,7 @@ export default function ManageMedicinePage() {
     <div className="p-6 bg-gray-50 rounded-lg shadow">
       {/* Unified Search */}
       <div className="flex items-center space-x-4 mb-4">
-        <div className="flex-1">
+        <div className="flex-1 ml-20">
           <AsyncCreatableSelect
             ref={selectRef}
             cacheOptions

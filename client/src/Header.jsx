@@ -195,14 +195,18 @@ const Header = () => {
         <div className="block lg:hidden items-center space-x-4">
           <button
             onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-            className="text-white focus:outline-none rounded-full"
+            className="text-white bg-primary focus:outline-none rounded-full"
           >
-            <UserIcon className="w-6 h-6" />
+            <UserIcon className="w-7 h-7" />
           </button>
         </div>
       </header>
       {/* Show Role Menu in second row if logged in */}
-      {user && <RoleMenu />}
+      {user && (
+        <div className="hidden lg:block">
+          <RoleMenu />
+        </div>
+      )}
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="lg:hidden absolute top-full left-0 w-full bg-base-100 shadow-md z-40">
@@ -272,7 +276,7 @@ const Header = () => {
                 onClick={() => handleMobileMenuClick("/telemedicine")}
                 className="text-left w-full"
               >
-                Doctor Schedule
+                Telemedicine
               </button>
             </li>
             <li>
@@ -283,25 +287,37 @@ const Header = () => {
                 Staff Duty Roster
               </button>
             </li>
-            <li>
-              <button
-                onClick={() => {
-                  document.getElementById("login_modal").showModal();
-                  setIsMobileMenuOpen(false);
-                }}
-                className="bg-red-700 text-white px-3 py-1 rounded-md w-full text-left"
-              >
-                Login
-              </button>
-            </li>
-            <li>
-              <button
-                onClick={() => handleMobileMenuClick("/register")}
-                className="bg-violet-700 text-white px-4 py-1 rounded-md w-full text-left"
-              >
-                Register
-              </button>
-            </li>
+            {user ? (
+              <li>
+                <button
+                  className="bg-red-700 text-white px-3 py-1 rounded-full hover:bg-red-800 transition"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
+              </li>
+            ) : (
+              <>
+                <li>
+                  <button
+                    className="bg-red-700 text-white px-3 py-1 rounded-full hover:bg-red-800 transition"
+                    onClick={() =>
+                      document.getElementById("login_modal").showModal()
+                    }
+                  >
+                    Login
+                  </button>
+                </li>
+                <li>
+                  <Link
+                    className="bg-violet-700 text-white px-4 py-1 rounded-md hover:bg-violet-800 transition"
+                    to="/register"
+                  >
+                    Register
+                  </Link>
+                </li>
+              </>
+            )}
           </ul>
         </div>
       )}
@@ -318,7 +334,7 @@ const Header = () => {
                       document.getElementById("login_modal").showModal();
                       setIsProfileMenuOpen(false);
                     }}
-                    className="bg-red-700 text-white px-3 py-1 rounded-md w-full text-left"
+                    className="bg-red-700 text-white px-3 py-1 rounded-md w-[90px] text-left mb-3"
                   >
                     Login
                   </button>
@@ -339,6 +355,7 @@ const Header = () => {
                   <Link
                     key={menuItem.path}
                     to={menuItem.path}
+                    onClick={() => setIsProfileMenuOpen(false)}
                     className="block px-4 py-2 hover:bg-blue-100 hover:text-blue-900"
                   >
                     {menuItem.name}
@@ -350,7 +367,10 @@ const Header = () => {
             {user && (
               <li>
                 <button
-                  onClick={handleLogout}
+                  onClick={() => {
+                    handleLogout();
+                    setIsProfileMenuOpen(false);
+                  }}
                   className="block px-4 py-2 hover:bg-blue-100 hover:text-blue-900"
                 >
                   Logout

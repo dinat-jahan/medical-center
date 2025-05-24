@@ -43,6 +43,7 @@ import AmbulanceAssignmentPage from "./pages/medicalAdminPages/AmbulanceAssignme
 import DutyRosterViewer from "./pages/commonPages/DutyRosterViewer";
 import DoctorPatientHistory from "./pages/doctorPages/DoctorPatientHistory";
 import DoctorPrescriptionHistory from "./pages/doctorPages/DoctorPrescriptionHistory";
+import AddMedicine from "./pages/medicalStaffPages/AddMedicine";
 const backendURL = import.meta.env.DEV
   ? import.meta.env.VITE_API_BASE_URL // localhost for dev
   : import.meta.env.VITE_API_BASE_URL; // production URL
@@ -169,6 +170,7 @@ function App() {
             path="/doctor/prescription-history"
             element={<DoctorPrescriptionHistory />}
           />
+          <Route path="/medical-staff/add-medicine" element={<AddMedicine />} />
         </Route>
       </Routes>
     </UserContextProvider>

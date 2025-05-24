@@ -235,3 +235,19 @@ exports.addStockAndExpiry = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+
+//add medicine by medical staff
+exports.createMedicine = async (req, res) => {
+  try {
+    const med = new Medicine(req.body);
+    await med.save();
+    console.log(med);
+    res.status(201).json({ message: "Medicine added", medicine: med });
+  } catch (err) {
+    console.error(err);
+    if (err.code === 11000) {
+      return res.status(400).json({ error: "Medicine already exists" });
+    }
+    res.status(500).json({ error: "Server error" });
+  }
+};

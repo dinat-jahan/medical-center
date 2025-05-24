@@ -82,4 +82,7 @@ router.patch(
 );
 router.get("/low-stock", medicineController.getLowStockMeds);
 
+//add medicine
+router.post("/add-medicine", medicineController.createMedicine);
+
 module.exports = router;
