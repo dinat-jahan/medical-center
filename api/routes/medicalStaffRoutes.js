@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Medicine = require("../models/medicine");
 const { body, validationResult } = require("express-validator");
-
+const DispenseRecord = require("../models/dispenseRecord");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const { GetObjectAclCommand, GetObjectCommand } = require("@aws-sdk/client-s3");
 const s3Client = require("../config/awsConfig");
@@ -84,5 +84,63 @@ router.get("/low-stock", medicineController.getLowStockMeds);
 
 //add medicine
 router.post("/add-medicine", medicineController.createMedicine);
+
+// routes/medicines.js
+
+router.get("/dispensed-report", async (req, res) => {
+  // parse and expand the date range
+  const now = new Date();
+  const startDate = req.query.start
+    ? new Date(req.query.start)
+    : new Date(now.getFullYear(), now.getMonth(), 1);
+  const endDate = req.query.end
+    ? (() => {
+        let d = new Date(req.query.end);
+        d.setDate(d.getDate() + 1);
+        return d;
+      })()
+    : now;
+
+  try {
+    const report = await DispenseRecord.aggregate([
+      {
+        $match: {
+          overallStatus: "completed",
+          dispensedAt: { $gte: startDate, $lt: endDate },
+        },
+      },
+      { $unwind: "$medicines" },
+      {
+        $group: {
+          _id: "$medicines.medicine",
+          dispensedQuantity: { $sum: "$medicines.quantity" },
+        },
+      },
+      {
+        $lookup: {
+          from: "medicines",
+          localField: "_id",
+          foreignField: "_id",
+          as: "medicineDoc",
+        },
+      },
+      { $unwind: "$medicineDoc" },
+      {
+        $project: {
+          _id: 0,
+          medicineId: "$_id",
+          name: "$medicineDoc.name",
+          dispensedQuantity: 1,
+          remainingMonthlyStock: "$medicineDoc.monthlyStockQuantity",
+        },
+      },
+      { $sort: { dispensedQuantity: -1 } },
+    ]);
+    res.json(report);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 module.exports = router;

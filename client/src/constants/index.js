@@ -26,6 +26,10 @@ export const roleMenus = {
       name: "Medicine Out of Stock",
       path: "/medical-staff/medicine-out-of-stock",
     },
+    {
+      name: "Medicine Dispense History",
+      path: "/medical-staff/dispense-report",
+    },
   ],
   "university-admin": [
     { name: "Add university member", path: "/university-admin/add-member" },
