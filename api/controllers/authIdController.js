@@ -38,7 +38,7 @@ exports.fetchMember = asyncHandler(async (req, res, next) => {
   res.json({ success: true, member });
 });
 
-const OTP_EXPIRATION_MS = 20 * 10000; //2 * 60 * 1000; // 2 minutes
+const OTP_EXPIRATION_MS = 2 * 60 * 1000; // 2 minutes
 const MAX_OTP_RETRIES = 3;
 
 //send otp to email
@@ -103,7 +103,7 @@ exports.sendOtp = asyncHandler(async (req, res, next) => {
   await transporter.sendMail({
     from: process.env.MAIL_USER,
     to: emailForOtp,
-    subject: "Your OTP for MBSTU Medical Center registration",
+    subject: "Your OTP for MBSTU Medical Service registration",
     text: `Your OTP code is ${otp}`,
   });
 

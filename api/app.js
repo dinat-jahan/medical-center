@@ -9,6 +9,8 @@ const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
 const http = require("http");
 const { Server } = require("socket.io");
+const helmet = require("helmet");
+const mongoSanitize = require("express-mongo-sanitize");
 
 const app = express();
 const server = http.createServer(app);
@@ -54,7 +56,8 @@ app.use(
     },
   })
 );
-
+app.use(helmet());
+// app.use(mongoSanitize());
 app.use(passport.initialize());
 app.use(passport.session());
 app.use("/", require("./routes/main"));

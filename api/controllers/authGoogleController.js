@@ -21,21 +21,21 @@ passport.use(
     },
     async (req, accessToken, refreshToken, profile, done) => {
       try {
-        console.log("Google Profile Email:", profile.emails[0].value);
+        // console.log("Google Profile Email:", profile.emails[0].value);
 
         const email = profile.emails[0].value.toLowerCase();
         // Check if the user exists in MedicalUser
         let user = await MedicalUser.findOne({
           emails: { $elemMatch: { $regex: new RegExp(`^${email}$`, "i") } },
         });
-        console.log("User from Google:", user);
+        // console.log("User from Google:", user);
 
         if (!user) {
           // If user not found, check if the user exists in UniversityMember
           const universityUser = await UniversityMember.findOne({
             emails: { $elemMatch: { $regex: new RegExp(`^${email}$`, "i") } },
           });
-          console.log("user from university user:", universityUser);
+          // console.log("user from university user:", universityUser);
           if (universityUser) {
             // Calculate the role based on universityUser data
             const role = MedicalUser.determineRole(
@@ -90,9 +90,9 @@ passport.deserializeUser((user, done) => done(null, user));
 
 module.exports.auth_google = [
   (req, res, next) => {
-    console.log("Cookies:", req.cookies);
-    const role = req.cookies.role;
-    req.session.role = role;
+    if (req.cookies.role) {
+      req.session.role = req.cookies.role;
+    }
     next();
   },
   passport.authenticate("google", {

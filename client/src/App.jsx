@@ -18,14 +18,11 @@ import AboutPage from "./pages/commonPages/AboutPage";
 import GoogleRedirect from "./pages/authPages/GoogleRedirectPage";
 import SetPasswordGoogle from "./pages/authPages/SetPasswordGoogle";
 import PatientProfilePage from "./pages/doctorPages/PatientProfilePage";
-import WritePrescription from "./pages/doctorPages/WritePrescriptionPage";
-import ShowPrescriptionPage from "./pages/doctorPages/ShowPrescriptionPage";
 import SearchMedicinesPage from "./pages/doctorPages/SearchMedicinesPage";
 import ManageMedicinePage from "./pages/medicalStaffPages/ManageMedicinePage";
 import MedicineOutOfStockPage from "./pages/medicalStaffPages/MedicineOutOfStockPage";
 import TelemedicinePage from "./pages/commonPages/TelemedicinePage";
 import BookingPage from "./pages/bookingPages/BookingPage";
-import SearchMedicines2Page from "./pages/doctorPages/SearchMedicines2Page";
 import ManageDutyRosterDoctor from "./pages/medicalAdminPages/ManageDutyRosterDoctor";
 import PrescriptionForm from "./pages/doctorPages/prescriptionPage/PrescriptionForm";
 import PrescriptionView from "./pages/doctorPages/prescriptionPage/PrescriptionView";
@@ -89,7 +86,6 @@ function App() {
             path="/patient-profile/:uniqueId"
             element={<PatientProfilePage />}
           />
-          <Route path="/write-prescription" element={<WritePrescription />} />
           <Route
             path="/medical-staff/manage-medicine"
             element={<ManageMedicinePage />}
@@ -98,7 +94,6 @@ function App() {
             path="/medical-staff/medicine-out-of-stock"
             element={<MedicineOutOfStockPage />}
           />
-          <Route path="/show-prescription" element={<ShowPrescriptionPage />} />
           <Route
             path="/duty-roster-of-doctors"
             element={<DutyRosterOfDoctorsPage />}
@@ -108,10 +103,6 @@ function App() {
           <Route
             path="/search-medicine/:medicineId"
             element={<SearchMedicinesPage />}
-          />
-          <Route
-            path="/search-medicine/:medicineSearch"
-            element={<SearchMedicines2Page />}
           />
           <Route
             path="/medical-admin/manage-duty-roster-doctor"
@@ -154,10 +145,10 @@ function App() {
             path="/medical-admin/telemedicine-duty"
             element={<TelemedicineDuty />}
           />
-          <Route
+          {/* <Route
             path="/doctor/write-prescription"
             element={<WritePrescription />}
-          />
+          /> */}
           <Route
             path="/medical-admin/set-driver"
             element={<AmbulanceAssignmentPage />}

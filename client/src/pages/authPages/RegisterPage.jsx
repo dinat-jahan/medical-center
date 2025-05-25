@@ -3,7 +3,7 @@ import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
 import api from "../../utils/api";
 
-const OTP_VALIDITY_SECONDS = 20; // 2 minutes
+const OTP_VALIDITY_SECONDS = 120; // 2 minutes
 const MAX_OTP_RETRIES = 3;
 
 const backendURL = import.meta.env.DEV
@@ -87,7 +87,6 @@ const RegisterPage = () => {
         setErrorMessage(data.message);
       }
     } catch (err) {
-      // Handle backend errors like retry limits or OTP already sent
       const msg =
         err.response?.data?.message || `Error sending OTP: ${err.message}`;
       setErrorMessage(msg);
@@ -160,10 +159,10 @@ const RegisterPage = () => {
               </a>
             </div>
             <div className="flex items-center w-[400px] mx-auto mb-4">
-      <hr className="flex-grow border-t border-gray-300" />
-      <span className="mx-4 text-gray-500 text-sm">OR</span>
-      <hr className="flex-grow border-t border-gray-300" />
-    </div>
+              <hr className="flex-grow border-t border-gray-300" />
+              <span className="mx-4 text-gray-500 text-sm">OR</span>
+              <hr className="flex-grow border-t border-gray-300" />
+            </div>
             <div className="flex flex-col items-center mb-4">
               <input
                 type="text"
@@ -311,7 +310,7 @@ const RegisterPage = () => {
               </button>
             )}
 
-            {otpRetries >= MAX_OTP_RETRIES && (
+            {otpRetries > MAX_OTP_RETRIES && (
               <p className="mt-2 text-center text-sm text-red-600 w-[400px]">
                 Maximum OTP retries reached. Please try again later.
               </p>
